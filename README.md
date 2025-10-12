@@ -10,7 +10,7 @@ departures in Vienna, Austria.
 1. Download the latest release from the Release Page.
 2. Copy `transport-card.js` into your Home Assistant `www` directory.
 3. Add the resource to your Home Assistant configuration, see
-[Registering Resources](https://developers.home-assistant.io/docs/frontend/custom-ui/registering-resources/)
+[Registering Resources](https://developers.home-assistant.io/docs/frontend/custom-ui/registering-resources/).
 
 ## Setup
 
