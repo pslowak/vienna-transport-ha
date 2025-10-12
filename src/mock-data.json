@@ -1,0 +1,742 @@
+{
+  "monitors": [
+    {
+      "locationStop": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.3981436,
+            48.1432218
+          ]
+        },
+        "properties": {
+          "name": "60200949",
+          "title": "Oberlaa U",
+          "municipality": "Wien",
+          "municipalityId": 49000001,
+          "type": "stop",
+          "coordName": "WGS84",
+          "gate": "C",
+          "attributes": {
+            "rbl": 5066
+          }
+        }
+      },
+      "lines": [
+        {
+          "name": "17A",
+          "towards": "Inzersdorf, Birostraße",
+          "direction": "R",
+          "platform": "2",
+          "richtungsId": "2",
+          "barrierFree": true,
+          "realtimeSupported": true,
+          "trafficjam": false,
+          "departures": {
+            "departure": [
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:22:30.000+0200",
+                  "timeReal": "2025-10-11T18:24:30.000+0200",
+                  "countdown": 9
+                },
+                "vehicle": {
+                  "name": "17A",
+                  "towards": "Inzersdorf, Birostraße",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 417
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:42:30.000+0200",
+                  "timeReal": "2025-10-11T18:42:30.000+0200",
+                  "countdown": 29
+                },
+                "vehicle": {
+                  "name": "17A",
+                  "towards": "Inzersdorf, Birostraße",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 417
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T19:02:30.000+0200",
+                  "timeReal": "2025-10-11T19:02:30.000+0200",
+                  "countdown": 49
+                },
+                "vehicle": {
+                  "name": "17A",
+                  "towards": "Inzersdorf, Birostraße",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 417
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T19:22:30.000+0200",
+                  "timeReal": "2025-10-11T19:22:30.000+0200",
+                  "countdown": 69
+                },
+                "vehicle": {
+                  "name": "17A",
+                  "towards": "Inzersdorf, Birostraße",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 417
+                }
+              }
+            ]
+          },
+          "type": "ptBusCity",
+          "lineId": 417
+        }
+      ],
+      "attributes": {}
+    },
+    {
+      "locationStop": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.3992665,
+            48.1427543
+          ]
+        },
+        "properties": {
+          "name": "60200949",
+          "title": "Oberlaa U, Laaer-Berg-Straße",
+          "municipality": "Wien",
+          "municipalityId": 49000001,
+          "type": "stop",
+          "coordName": "WGS84",
+          "gate": "A",
+          "attributes": {
+            "rbl": 2921
+          }
+        }
+      },
+      "lines": [
+        {
+          "name": "17A",
+          "towards": "Inzersdorf, Birostraße",
+          "direction": "R",
+          "platform": "2",
+          "richtungsId": "2",
+          "barrierFree": true,
+          "realtimeSupported": true,
+          "trafficjam": false,
+          "departures": {
+            "departure": [
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:26:00.000+0200",
+                  "timeReal": "2025-10-11T18:26:00.000+0200",
+                  "countdown": 12
+                },
+                "vehicle": {
+                  "name": "17A",
+                  "towards": "Inzersdorf, Birostraße",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 417
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:46:00.000+0200",
+                  "timeReal": "2025-10-11T18:46:00.000+0200",
+                  "countdown": 32
+                },
+                "vehicle": {
+                  "name": "17A",
+                  "towards": "Inzersdorf, Birostraße",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 417
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T19:06:00.000+0200",
+                  "timeReal": "2025-10-11T19:06:00.000+0200",
+                  "countdown": 52
+                },
+                "vehicle": {
+                  "name": "17A",
+                  "towards": "Inzersdorf, Birostraße",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 417
+                }
+              }
+            ]
+          },
+          "type": "ptBusCity",
+          "lineId": 417
+        }
+      ],
+      "attributes": {}
+    },
+    {
+      "locationStop": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.3988084,
+            48.1429461
+          ]
+        },
+        "properties": {
+          "name": "60200949",
+          "title": "Oberlaa U",
+          "municipality": "Wien",
+          "municipalityId": 49000001,
+          "type": "stop",
+          "coordName": "WGS84",
+          "gate": "B",
+          "attributes": {
+            "rbl": 2240
+          }
+        }
+      },
+      "lines": [
+        {
+          "name": "68B",
+          "towards": "Reumannplatz U",
+          "direction": "R",
+          "platform": "2",
+          "richtungsId": "2",
+          "barrierFree": true,
+          "realtimeSupported": true,
+          "trafficjam": false,
+          "departures": {
+            "departure": [
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:14:00.000+0200",
+                  "timeReal": "2025-10-11T18:14:00.000+0200",
+                  "countdown": 0
+                },
+                "vehicle": {
+                  "name": "68B",
+                  "towards": "Reumannplatz U",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 268
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:29:00.000+0200",
+                  "timeReal": "2025-10-11T18:29:00.000+0200",
+                  "countdown": 15
+                },
+                "vehicle": {
+                  "name": "68B",
+                  "towards": "Reumannplatz U",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 268
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:44:00.000+0200",
+                  "timeReal": "2025-10-11T18:44:00.000+0200",
+                  "countdown": 30
+                },
+                "vehicle": {
+                  "name": "68B",
+                  "towards": "Reumannplatz U",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 268
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T19:02:00.000+0200",
+                  "timeReal": "2025-10-11T19:02:00.000+0200",
+                  "countdown": 48
+                },
+                "vehicle": {
+                  "name": "68B",
+                  "towards": "Reumannplatz U",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 268
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T19:22:00.000+0200",
+                  "timeReal": "2025-10-11T19:22:00.000+0200",
+                  "countdown": 68
+                },
+                "vehicle": {
+                  "name": "68B",
+                  "towards": "Reumannplatz U",
+                  "direction": "R",
+                  "platform": "2",
+                  "richtungsId": "2",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 268
+                }
+              }
+            ]
+          },
+          "type": "ptBusCity",
+          "lineId": 268
+        }
+      ],
+      "attributes": {}
+    },
+    {
+      "locationStop": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.3981436,
+            48.1432218
+          ]
+        },
+        "properties": {
+          "name": "60200949",
+          "title": "Oberlaa U",
+          "municipality": "Wien",
+          "municipalityId": 49000001,
+          "type": "stop",
+          "coordName": "WGS84",
+          "gate": "C",
+          "attributes": {
+            "rbl": 5066
+          }
+        }
+      },
+      "lines": [
+        {
+          "name": "70A",
+          "towards": "Kledering, Bahnhof S",
+          "direction": "H",
+          "platform": "1",
+          "richtungsId": "1",
+          "barrierFree": true,
+          "realtimeSupported": true,
+          "trafficjam": false,
+          "departures": {
+            "departure": [
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:36:30.000+0200",
+                  "timeReal": "2025-10-11T18:36:30.000+0200",
+                  "countdown": 23
+                },
+                "vehicle": {
+                  "name": "70A",
+                  "towards": "Kledering, Bahnhof S",
+                  "direction": "H",
+                  "platform": "1",
+                  "richtungsId": "1",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 470
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T19:06:30.000+0200",
+                  "timeReal": "2025-10-11T19:06:30.000+0200",
+                  "countdown": 53
+                },
+                "vehicle": {
+                  "name": "70A",
+                  "towards": "Kledering, Bahnhof S",
+                  "direction": "H",
+                  "platform": "1",
+                  "richtungsId": "1",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 470
+                }
+              }
+            ]
+          },
+          "type": "ptBusCity",
+          "lineId": 470
+        }
+      ],
+      "attributes": {}
+    },
+    {
+      "locationStop": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.3992665,
+            48.1427543
+          ]
+        },
+        "properties": {
+          "name": "60200949",
+          "title": "Oberlaa U, Laaer-Berg-Straße",
+          "municipality": "Wien",
+          "municipalityId": 49000001,
+          "type": "stop",
+          "coordName": "WGS84",
+          "gate": "A",
+          "attributes": {
+            "rbl": 2921
+          }
+        }
+      },
+      "lines": [
+        {
+          "name": "70A",
+          "towards": "Kledering, Bahnhof S",
+          "direction": "H",
+          "platform": "1",
+          "richtungsId": "1",
+          "barrierFree": true,
+          "realtimeSupported": true,
+          "trafficjam": false,
+          "departures": {
+            "departure": [
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:40:00.000+0200",
+                  "timeReal": "2025-10-11T18:40:00.000+0200",
+                  "countdown": 26
+                },
+                "vehicle": {
+                  "name": "70A",
+                  "towards": "Kledering, Bahnhof S",
+                  "direction": "H",
+                  "platform": "1",
+                  "richtungsId": "1",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 470
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T19:10:00.000+0200",
+                  "timeReal": "2025-10-11T19:10:00.000+0200",
+                  "countdown": 56
+                },
+                "vehicle": {
+                  "name": "70A",
+                  "towards": "Kledering, Bahnhof S",
+                  "direction": "H",
+                  "platform": "1",
+                  "richtungsId": "1",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptBusCity",
+                  "attributes": {},
+                  "linienId": 470
+                }
+              }
+            ]
+          },
+          "type": "ptBusCity",
+          "lineId": 470
+        }
+      ],
+      "attributes": {}
+    },
+    {
+      "locationStop": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.4002367,
+            48.1422208
+          ]
+        },
+        "properties": {
+          "name": "60200949",
+          "title": "Oberlaa",
+          "municipality": "Wien",
+          "municipalityId": 49000001,
+          "type": "stop",
+          "coordName": "WGS84",
+          "gate": "1",
+          "attributes": {
+            "rbl": 4134
+          }
+        }
+      },
+      "lines": [
+        {
+          "name": "U1",
+          "towards": "LEOPOLDAU        ",
+          "direction": "H",
+          "platform": "1",
+          "richtungsId": "1",
+          "barrierFree": true,
+          "realtimeSupported": true,
+          "trafficjam": false,
+          "departures": {
+            "departure": [
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:18:57.000+0200",
+                  "timeReal": "2025-10-11T18:18:57.000+0200",
+                  "countdown": 6
+                },
+                "vehicle": {
+                  "name": "U1",
+                  "towards": "LEOPOLDAU        ",
+                  "direction": "H",
+                  "platform": "1",
+                  "richtungsId": "1",
+                  "barrierFree": true,
+                  "foldingRamp": true,
+                  "foldingRampType": "part",
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptMetro",
+                  "attributes": {},
+                  "linienId": 301
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:28:57.000+0200",
+                  "timeReal": "2025-10-11T18:28:57.000+0200",
+                  "countdown": 16
+                },
+                "vehicle": {
+                  "name": "U1",
+                  "towards": "LEOPOLDAU        ",
+                  "direction": "H",
+                  "platform": "1",
+                  "richtungsId": "1",
+                  "barrierFree": true,
+                  "foldingRamp": true,
+                  "foldingRampType": "part",
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptMetro",
+                  "attributes": {},
+                  "linienId": 301
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:38:30.000+0200",
+                  "countdown": 25
+                },
+                "vehicle": {
+                  "name": "U1",
+                  "towards": "Leopoldau",
+                  "direction": "H",
+                  "platform": "1",
+                  "richtungsId": "1",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptMetro",
+                  "attributes": {},
+                  "linienId": 301
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:48:30.000+0200",
+                  "countdown": 35
+                },
+                "vehicle": {
+                  "name": "U1",
+                  "towards": "Leopoldau",
+                  "direction": "H",
+                  "platform": "1",
+                  "richtungsId": "1",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptMetro",
+                  "attributes": {},
+                  "linienId": 301
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T18:58:30.000+0200",
+                  "countdown": 45
+                },
+                "vehicle": {
+                  "name": "U1",
+                  "towards": "Leopoldau",
+                  "direction": "H",
+                  "platform": "1",
+                  "richtungsId": "1",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptMetro",
+                  "attributes": {},
+                  "linienId": 301
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T19:08:30.000+0200",
+                  "countdown": 55
+                },
+                "vehicle": {
+                  "name": "U1",
+                  "towards": "Leopoldau",
+                  "direction": "H",
+                  "platform": "1",
+                  "richtungsId": "1",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptMetro",
+                  "attributes": {},
+                  "linienId": 301
+                }
+              },
+              {
+                "departureTime": {
+                  "timePlanned": "2025-10-11T19:18:30.000+0200",
+                  "countdown": 65
+                },
+                "vehicle": {
+                  "name": "U1",
+                  "towards": "Leopoldau",
+                  "direction": "H",
+                  "platform": "1",
+                  "richtungsId": "1",
+                  "barrierFree": true,
+                  "foldingRamp": false,
+                  "realtimeSupported": true,
+                  "trafficjam": false,
+                  "type": "ptMetro",
+                  "attributes": {},
+                  "linienId": 301
+                }
+              }
+            ]
+          },
+          "type": "ptMetro",
+          "lineId": 301
+        }
+      ],
+      "attributes": {}
+    }
+  ]
+}

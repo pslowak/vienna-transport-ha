@@ -1,0 +1,20 @@
+{
+  "name": "vienna-transport-ha",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lit": "^3.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.1",
+    "standard-version": "^9.5.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.7"
+  }
+}

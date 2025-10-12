@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Transport Card Mock</title>
+    <script type="module" src="/src/transport-card.ts"></script>
+</head>
+<body>
+<transport-card id="card"></transport-card>
+
+<script type="module">
+    import data from "./src/mock-data.json" assert { type: "json" };
+
+    const card = document.getElementById("card");
+    card.hass = {
+        states: {
+            "sensor.mock_station": {
+                state: "OK",
+                attributes: data
+            }
+        }
+    };
+    card.config = { title: "Volkertplatz", entity: "sensor.mock_station" };
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# Build outputs
+dist
+node_modules
+
+# Editors
+.idea
+.vite
+
+*.iml
