@@ -14,7 +14,7 @@ departures in Vienna, Austria.
 
 ## Setup
 
-1. Make sure you have the [RESTful Integration](https://www.home-assistant.io/integrations/rest/) is enabled.
+1. Make sure you have the [RESTful Integration](https://www.home-assistant.io/integrations/rest/) enabled.
 2. Add a  REST sensor for each stop in your `configuration.yaml`:
 
 ```yaml
