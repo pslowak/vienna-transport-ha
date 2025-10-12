@@ -84,6 +84,9 @@ export class TransportCard extends LitElement {
         if (!config.entity) {
             throw new Error("You need to define an entity");
         }
+        if (!config.lines || !Array.isArray(config.lines) || config.lines.length === 0) {
+            throw new Error("You need to define at least one line");
+        }
         this.config = config;
     }
 
@@ -102,9 +105,13 @@ export class TransportCard extends LitElement {
             return html`<ha-card>No monitors available</ha-card>`;
         }
 
+        const filtered = monitors.filter((monitor: any) =>
+            monitor.lines.some((line: any) => this.config.lines.includes(line.name))
+        );
+
         return html`
             <ha-card>
-                ${monitors.map((monitor: any) => this.renderMonitor(monitor))}
+                ${filtered.map((monitor: any) => this.renderMonitor(monitor))}
             </ha-card>
         `;
     }
