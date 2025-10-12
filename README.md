@@ -37,6 +37,7 @@ type: 'custom:transport-card'
 entity: sensor.station_volkertmarkt
 lines:
   - "5B" 
+max_departures: 3 # Optional
 ```
 
 ## Development
