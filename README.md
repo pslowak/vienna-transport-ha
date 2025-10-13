@@ -10,11 +10,11 @@ departures in Vienna, Austria.
 1. Download the latest release from the Release Page.
 2. Copy `transport-card.js` into your Home Assistant `www` directory.
 3. Add the resource to your Home Assistant configuration, see
-[Registering Resources](https://developers.home-assistant.io/docs/frontend/custom-ui/registering-resources/)
+[Registering Resources](https://developers.home-assistant.io/docs/frontend/custom-ui/registering-resources/).
 
 ## Setup
 
-1. Make sure you have the [RESTful Integration](https://www.home-assistant.io/integrations/rest/) is enabled.
+1. Make sure you have the [RESTful Integration](https://www.home-assistant.io/integrations/rest/) enabled.
 2. Add a  REST sensor for each stop in your `configuration.yaml`:
 
 ```yaml
@@ -37,6 +37,7 @@ type: 'custom:transport-card'
 entity: sensor.station_volkertmarkt
 lines:
   - "5B" 
+max_departures: 3 # Optional
 ```
 
 ## Development

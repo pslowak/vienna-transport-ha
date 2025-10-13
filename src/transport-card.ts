@@ -128,9 +128,12 @@ export class TransportCard extends LitElement {
     }
 
     private renderLine(line: any) {
+        const max = this.config.max_departures ?? line.departures.departure.length;
+        const departures = line.departures.departure.slice(0, max);
+
         return html`
             <div class="line">
-                ${line.departures.departure.map((dep: any) => this.renderDeparture(dep, line))}
+                ${departures.map((dep: any) => this.renderDeparture(dep, line))}
             </div>
         `;
     }
