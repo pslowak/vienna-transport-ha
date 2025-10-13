@@ -45,7 +45,7 @@ max_departures: 3
 You can configure the card using the following options:
 
 | Option           | Type   | Required | Description                                         |
-|------------------|--------|----------|-----------------------------------------------------|
+|:-----------------|:-------|:---------|:----------------------------------------------------|
 | `type`           | string | required | Must be `custom:transport-card`                     |
 | `entity`         | string | required | REST sensor entity ID                               |
 | `lines`          | array  | optional | List of lines to show (default: all)                |
