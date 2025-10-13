@@ -84,9 +84,6 @@ export class TransportCard extends LitElement {
         if (!config.entity) {
             throw new Error("You need to define an entity");
         }
-        if (!config.lines || !Array.isArray(config.lines) || config.lines.length === 0) {
-            throw new Error("You need to define at least one line");
-        }
         this.config = config;
     }
 
