@@ -30,15 +30,26 @@ sensor:
 ```
 
 3. You can find the `diva` code for each stop using the [Stop Search Tool](https://till.mabe.at/rbl/).
-4. Add the card to your dashboard:
+4. Add the card to your dashboard. Example configuration:
 
 ```yaml
 type: 'custom:transport-card'
 entity: sensor.station_volkertmarkt
 lines:
   - "5B" 
-max_departures: 3 # Optional
+max_departures: 3
 ```
+
+## Card Configuration
+
+You can configure the card using the following options:
+
+| Option           | Type   | Required | Description                                         |
+|:-----------------|:-------|:---------|:----------------------------------------------------|
+| `type`           | string | required | Must be `custom:transport-card`                     |
+| `entity`         | string | required | REST sensor entity ID                               |
+| `lines`          | array  | optional | List of lines to show (default: all)                |
+| `max_departures` | number | optional | Maximum number of departures to show (default: all) |
 
 ## Development
 

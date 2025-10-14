@@ -41,7 +41,7 @@ export class TransportCard extends LitElement {
 
         .departure {
             display: grid;
-            grid-template-columns: 40px 1fr auto auto;
+            grid-template-columns: 30px 1fr auto auto;
             align-items: center;
             gap: 8px;
             padding: 8px 12px;
@@ -84,9 +84,6 @@ export class TransportCard extends LitElement {
         if (!config.entity) {
             throw new Error("You need to define an entity");
         }
-        if (!config.lines || !Array.isArray(config.lines) || config.lines.length === 0) {
-            throw new Error("You need to define at least one line");
-        }
         this.config = config;
     }
 
@@ -105,9 +102,12 @@ export class TransportCard extends LitElement {
             return html`<ha-card>No monitors available</ha-card>`;
         }
 
-        const filtered = monitors.filter((monitor: any) =>
-            monitor.lines.some((line: any) => this.config.lines.includes(line.name))
-        );
+        let filtered = monitors;
+        if (this.config.lines && Array.isArray(this.config.lines) && this.config.lines.length > 0) {
+           filtered = monitors.filter((monitor: any) =>
+                   monitor.lines.some((line: any) => this.config.lines.includes(line.name))
+           );
+        }
 
         return html`
             <ha-card>
