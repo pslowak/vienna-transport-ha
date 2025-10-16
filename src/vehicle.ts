@@ -15,17 +15,17 @@ enum VehicleType {
 }
 
 const VEHICLE_REGISTRY: Record<VehicleType, VehicleInfo> = {
-    [VehicleType.U1]: { color: "#E3000F"},
-    [VehicleType.U2]: { color: "#A862A4"},
-    [VehicleType.U3]: { color: "#EF7C00"},
-    [VehicleType.U4]: { color: "#00963F"},
-    [VehicleType.U5]: { color: "#008F95"},
-    [VehicleType.U6]: { color: "#9D6830"},
-    [VehicleType.BUS]: { color: "#0a295d"},
-    [VehicleType.NIGHT_BUS]: { color: "#0a295d"},
-    [VehicleType.TRAM]: { color: "#c00808"},
-    [VehicleType.BADEN_TRAM]: { color: "#015792"},
-    [VehicleType.UNKNOWN]: { color: "#888"},
+    [VehicleType.U1]: { background: "#E3000F"},
+    [VehicleType.U2]: { background: "#A862A4"},
+    [VehicleType.U3]: { background: "#EF7C00"},
+    [VehicleType.U4]: { background: "#00963F"},
+    [VehicleType.U5]: { background: "#008F95"},
+    [VehicleType.U6]: { background: "#9D6830"},
+    [VehicleType.BUS]: { background: "#0a295d"},
+    [VehicleType.NIGHT_BUS]: { background: "#0a295d"},
+    [VehicleType.TRAM]: { background: "#c00808"},
+    [VehicleType.BADEN_TRAM]: { background: "#015792"},
+    [VehicleType.UNKNOWN]: { background: "#888"},
 };
 
 function vehicleTypeFromString(type: string, name: string): VehicleType {

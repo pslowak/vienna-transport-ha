@@ -157,7 +157,7 @@ export class TransportCard extends LitElement {
 
         return html`
             <div class="departure">
-                <div style="background:${info.color}">${line.name}</div>
+                <div style="background:${info.background}">${line.name}</div>
                 <div>${line.towards}</div>
                 <div>
                     ${wait < 15
