@@ -1,5 +1,7 @@
 import { LitElement, html, css, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import { getVehicleInfo } from "./vehicle";
+import type { Departure, Line, Monitor, VehicleInfo } from "./types";
 
 @customElement("transport-card")
 export class TransportCard extends LitElement {
@@ -13,7 +15,7 @@ export class TransportCard extends LitElement {
             padding: 12px;
             gap: 12px;
             background: var(--card-background-color, white);
-            color: var(--primary-text-color, );
+            color: var(--primary-text-color, black);
             transition: all 0.3s ease;
         }
 
@@ -41,7 +43,7 @@ export class TransportCard extends LitElement {
 
         .departure {
             display: grid;
-            grid-template-columns: 30px 1fr auto auto;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
             gap: 8px;
             padding: 8px 12px;
@@ -51,12 +53,17 @@ export class TransportCard extends LitElement {
         }
 
         .departure div:first-child {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
             font-weight: 600;
-            color: var(--primary-color, #1976d2);
-        }
-
-        .departure div:nth-child(2) {
-            color: var(--secondary-text-color, #666);
+            width: 24px;
+            height: 24px;
+            aspect-ratio: 1 / 1;
+            padding: 6px;
+            color: inherit;
+            background: inherit;
         }
 
         .delay {
@@ -71,7 +78,6 @@ export class TransportCard extends LitElement {
 
             .departure {
                 background: rgba(255, 255, 255, 0.05);
-                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
             }
 
             .stop {
@@ -97,72 +103,76 @@ export class TransportCard extends LitElement {
             return html`<ha-card>Entity ${this.config.entity} not found</ha-card>`;
         }
 
-        const monitors = entity.attributes.monitors ?? [];
+        const monitors: Monitor[] = entity.attributes.monitors ?? [];
         if (monitors.length === 0) {
-            return html`<ha-card>No monitors available</ha-card>`;
+            return html`<ha-card>No departures available</ha-card>`;
         }
 
-        let filtered = monitors;
+        let filtered: Monitor[] = monitors;
         if (this.config.lines && Array.isArray(this.config.lines) && this.config.lines.length > 0) {
-           filtered = monitors.filter((monitor: any) =>
-                   monitor.lines.some((line: any) => this.config.lines.includes(line.name))
+           filtered = monitors.filter((monitor: Monitor) =>
+                   monitor.lines.some((line: Line) => this.config.lines.includes(line.name))
            );
         }
 
         return html`
             <ha-card>
-                ${filtered.map((monitor: any) => this.renderMonitor(monitor))}
+                ${filtered.map((monitor: Monitor) => this.renderMonitor(monitor))}
             </ha-card>
         `;
     }
 
-    private renderMonitor(monitor: any) {
+    private renderMonitor(monitor: Monitor) {
         const stopName = monitor.locationStop.properties.title;
 
         return html`
             <div class="stop">
                 <span>${stopName}</span>
-                ${monitor.lines.map((line: any) => this.renderLine(line))}
+                ${monitor.lines.map((line: Line) => this.renderLine(line))}
             </div>
         `;
     }
 
-    private renderLine(line: any) {
+    private renderLine(line: Line) {
         const max = this.config.max_departures ?? line.departures.departure.length;
-        const departures = line.departures.departure.slice(0, max);
+        const departures: Departure[] = line.departures.departure.slice(0, max);
 
         return html`
             <div class="line">
-                ${departures.map((dep: any) => this.renderDeparture(dep, line))}
+                ${departures.map((dep: Departure) => this.renderDeparture(dep, line))}
             </div>
         `;
     }
 
-    private renderDeparture(departure: any, line: any) {
-        const planned = new Date(departure.departureTime.timePlanned);
-        const actual = new Date(departure.departureTime.timeReal || departure.departureTime.timePlanned);
+    private renderDeparture(dep: Departure, line: Line) {
+        const planned = new Date(dep.departureTime.timePlanned);
+        const actual = new Date(dep.departureTime.timeReal ?? dep.departureTime.timePlanned);
         const now = new Date();
 
         // in minutes
         const delay = Math.round((actual.getTime() - planned.getTime()) / 60_000);
         const wait = Math.round((actual.getTime() - now.getTime()) / 60_000);
 
+        const info: VehicleInfo = getVehicleInfo(dep.vehicle, line);
+
         return html`
             <div class="departure">
-                <div>${line.name}</div>
+                <div style="background:${info.background};color:${info.color}">${line.name}</div>
                 <div>${line.towards}</div>
-                ${wait < 15 
-                        ? html`<div>${wait} min</div>`
-                        : html`<div>${actual.toLocaleTimeString([], { 
-                            hour: '2-digit', 
-                            minute: '2-digit', 
-                            hour12: false
-                        })}</div>`}
-                ${delay == 0 
-                        ? nothing 
-                        : html`<div class="delay">(${Intl.NumberFormat('en', {
-                    signDisplay: "always"
-                }).format(delay)})</div>`}
+                <div>
+                    ${wait < 15
+                            ? html`<span>${wait} min</span>`
+                            : html`<span>${actual.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                            })}</span>`}
+                    ${delay == 0
+                            ? nothing
+                            : html`<span class="delay">(${Intl.NumberFormat('en', {
+                                signDisplay: "always"
+                            }).format(delay)})</span>`} 
+                </div>
             </div>
         `;
     }

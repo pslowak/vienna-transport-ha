@@ -15,28 +15,28 @@ departures in Vienna, Austria.
 ## Setup
 
 1. Make sure you have the [RESTful Integration](https://www.home-assistant.io/integrations/rest/) enabled.
-2. Add a  REST sensor for each stop in your `configuration.yaml`:
+2. Add a REST sensor for each stop in your `configuration.yaml`:
 
 ```yaml
 sensor:
   - platform: rest
-    name: "Station Volkertmarkt"
-    resource: "https://www.wienerlinien.at/ogd_realtime/monitor?diva=60201876"
-    scan_interval: 30
+    name: "Station Volkertplatz"
+    resource: "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=2683"
+    scan_interval: 25
     value_template: "{{ value_json.data.monitors[0].locationStop.properties.title }}"
     json_attributes_path: "$.data"
     json_attributes:
       - "monitors"
 ```
 
-3. You can find the `diva` code for each stop using the [Stop Search Tool](https://till.mabe.at/rbl/).
-4. Add the card to your dashboard. Example configuration:
+3. You can find the `stopId` code for each stop using the [Stop Search Tool](https://till.mabe.at/rbl/). 
+4. If you want to display multiple stops in a single card, you can chain the stops using the `&` operator (e.g., 
+`stopId=1&stopId=2`).
+5. Add the card to your dashboard. Example configuration:
 
 ```yaml
 type: 'custom:transport-card'
-entity: sensor.station_volkertmarkt
-lines:
-  - "5B" 
+entity: sensor.station_volkertplatz
 max_departures: 3
 ```
 

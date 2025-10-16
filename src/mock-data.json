@@ -61,20 +61,6 @@
                   "timePlanned": "2025-10-11T18:42:30.000+0200",
                   "timeReal": "2025-10-11T18:42:30.000+0200",
                   "countdown": 29
-                },
-                "vehicle": {
-                  "name": "17A",
-                  "towards": "Inzersdorf, Birostraße",
-                  "direction": "R",
-                  "platform": "2",
-                  "richtungsId": "2",
-                  "barrierFree": true,
-                  "foldingRamp": false,
-                  "realtimeSupported": true,
-                  "trafficjam": false,
-                  "type": "ptBusCity",
-                  "attributes": {},
-                  "linienId": 417
                 }
               },
               {
