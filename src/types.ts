@@ -37,4 +37,5 @@ export interface Vehicle {
 
 export interface VehicleInfo {
     background: string;
+    color: string;
 }

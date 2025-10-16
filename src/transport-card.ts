@@ -58,11 +58,11 @@ export class TransportCard extends LitElement {
             align-items: center;
             border-radius: 8px;
             font-weight: 600;
-            color: white;
             width: 24px;
             height: 24px;
             aspect-ratio: 1 / 1;
             padding: 6px;
+            color: inherit;
             background: inherit;
         }
 
@@ -105,7 +105,7 @@ export class TransportCard extends LitElement {
 
         const monitors: Monitor[] = entity.attributes.monitors ?? [];
         if (monitors.length === 0) {
-            return html`<ha-card>No monitors available</ha-card>`;
+            return html`<ha-card>No departures available</ha-card>`;
         }
 
         let filtered: Monitor[] = monitors;
@@ -157,7 +157,7 @@ export class TransportCard extends LitElement {
 
         return html`
             <div class="departure">
-                <div style="background:${info.background}">${line.name}</div>
+                <div style="background:${info.background};color:${info.color}">${line.name}</div>
                 <div>${line.towards}</div>
                 <div>
                     ${wait < 15
