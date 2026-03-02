@@ -1,18 +1,20 @@
 import type { Line, Vehicle, VehicleInfo } from "./types";
 
-enum VehicleType {
-    U1 = "U1",
-    U2 = "U2",
-    U3 = "U3",
-    U4 = "U4",
-    U5 = "U5",
-    U6 = "U6",
-    BUS = "BUS",
-    NIGHT_BUS = "NIGHT_BUS",
-    TRAM = "TRAM",
-    BADEN_TRAM = "BADEN_TRAM",
-    UNKNOWN = "UNKNOWN",
-}
+const VehicleType = {
+    U1: "U1",
+    U2: "U2",
+    U3: "U3",
+    U4: "U4",
+    U5: "U5",
+    U6: "U6",
+    BUS: "BUS",
+    NIGHT_BUS: "NIGHT_BUS",
+    TRAM: "TRAM",
+    BADEN_TRAM: "BADEN_TRAM",
+    UNKNOWN: "UNKNOWN",
+} as const;
+
+type VehicleType = typeof VehicleType[keyof typeof VehicleType];
 
 const VEHICLE_REGISTRY: Record<VehicleType, VehicleInfo> = {
     [VehicleType.U1]: { background: "#E3000F", color: "#fff"},

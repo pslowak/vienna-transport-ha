@@ -1,7 +1,9 @@
 import { LitElement, html, css, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { getVehicleInfo } from "./vehicle";
-import type { Departure, Line, Monitor, VehicleInfo } from "./types";
+import type {ApiResponse, Departure, Line, Message, Monitor, VehicleInfo} from "./types";
+
+const STATUS_OK = 1;
 
 @customElement("transport-card")
 export class TransportCard extends LitElement {
@@ -103,7 +105,15 @@ export class TransportCard extends LitElement {
             return html`<ha-card>Entity ${this.config.entity} not found</ha-card>`;
         }
 
-        const monitors: Monitor[] = entity.attributes.monitors ?? [];
+        const resp: ApiResponse = entity.attributes;
+        const message: Message = resp.message;
+        if (message.messageCode !== STATUS_OK) {
+            return html`
+                <ha-card>Error fetching departures: ${message.value}</ha-card>`;
+        }
+
+        const monitors: Monitor[] = resp.data?.monitors ?? [];
+
         if (monitors.length === 0) {
             return html`<ha-card>No departures available</ha-card>`;
         }
