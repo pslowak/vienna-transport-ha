@@ -23,10 +23,10 @@ sensor:
     name: "Station Volkertplatz"
     resource: "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=2683"
     scan_interval: 25
-    value_template: "{{ value_json.data.monitors[0].locationStop.properties.title }}"
-    json_attributes_path: "$.data"
+    value_template: "{{ value_json.message.value }}"
     json_attributes:
-      - "monitors"
+      - "message"
+      - "data" 
 ```
 
 3. You can find the `stopId` code for each stop using the [Stop Search Tool](https://till.mabe.at/rbl/). 

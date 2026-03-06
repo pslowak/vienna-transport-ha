@@ -1,3 +1,17 @@
+export interface ApiResponse {
+    data?: Data;
+    message: Message;
+}
+
+export interface Data {
+    monitors: Monitor[];
+}
+
+export interface Message {
+    value: string;
+    messageCode: number;
+}
+
 export interface Monitor {
     lines: Line[];
     locationStop: LocationStop;

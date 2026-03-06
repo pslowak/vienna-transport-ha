@@ -9,21 +9,21 @@
 <transport-card id="card"></transport-card>
 
 <script type="module">
-    import data from "./src/mock-data.json" assert { type: "json" };
+    import resp from "./src/mock-data.json" assert {type: "json"};
 
     const card = document.getElementById("card");
     card.hass = {
         states: {
             "sensor.mock_station": {
                 state: "OK",
-                attributes: data
+                attributes: resp
             }
         }
     };
     card.config = {
         title: "Volkertplatz",
         entity: "sensor.mock_station",
-        lines: ["17A", "U1"],
+        lines: ["17A", "U1", "U4"],
         max_departures: 3
     };
 </script>

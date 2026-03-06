@@ -1,12 +1,18 @@
 import { LitElement, html, css, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { getVehicleInfo } from "./vehicle";
-import type { Departure, Line, Monitor, VehicleInfo } from "./types";
+import type {ApiResponse, Data, Departure, Line, Message, Monitor, VehicleInfo} from "./types";
+import {ExpiringCache} from "./expiring-cache";
+
+const STATUS_OK = 1;
+const STATUS_RATE_LIMIT = 316;
 
 @customElement("transport-card")
 export class TransportCard extends LitElement {
-    @property({ attribute: false }) hass: any;
+    @property({attribute: false}) hass: any;
     @property() config: any;
+
+    private cache: ExpiringCache<Data> = new ExpiringCache<Data>(2 * 60 * 1_000); // 2 minutes
 
     static styles = css`
         ha-card {
@@ -100,19 +106,40 @@ export class TransportCard extends LitElement {
 
         const entity = this.hass.states[this.config.entity];
         if (!entity) {
-            return html`<ha-card>Entity ${this.config.entity} not found</ha-card>`;
+            return html`
+                <ha-card>Entity ${this.config.entity} not found</ha-card>`;
         }
 
-        const monitors: Monitor[] = entity.attributes.monitors ?? [];
+        const resp: ApiResponse = entity.attributes;
+        const message: Message = resp.message;
+
+        let data = resp.data;
+
+        if (message.messageCode === STATUS_OK && data) {
+            this.cache.set(data)
+        }
+
+        if (message.messageCode === STATUS_RATE_LIMIT) {
+            data = this.cache.get();
+        }
+
+        if (!data) {
+            return html`
+                <ha-card>Error fetching departures: ${message.value}</ha-card>`;
+        }
+
+        const monitors: Monitor[] = data.monitors ?? [];
+
         if (monitors.length === 0) {
-            return html`<ha-card>No departures available</ha-card>`;
+            return html`
+                <ha-card>No departures available</ha-card>`;
         }
 
         let filtered: Monitor[] = monitors;
         if (this.config.lines && Array.isArray(this.config.lines) && this.config.lines.length > 0) {
-           filtered = monitors.filter((monitor: Monitor) =>
-                   monitor.lines.some((line: Line) => this.config.lines.includes(line.name))
-           );
+            filtered = monitors.filter((monitor: Monitor) =>
+                monitor.lines.some((line: Line) => this.config.lines.includes(line.name))
+            );
         }
 
         return html`
@@ -171,7 +198,7 @@ export class TransportCard extends LitElement {
                             ? nothing
                             : html`<span class="delay">(${Intl.NumberFormat('en', {
                                 signDisplay: "always"
-                            }).format(delay)})</span>`} 
+                            }).format(delay)})</span>`}
                 </div>
             </div>
         `;
