@@ -6,13 +6,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write \"**/*.{ts,js,json,css,html}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,css,html}\""
   },
   "dependencies": {
     "lit": "^3.3.1"
   },
   "devDependencies": {
     "@types/node": "^24.7.1",
+    "prettier": "^3.8.1",
     "standard-version": "^9.5.0",
     "typescript": "~5.9.3",
     "vite": "^7.1.7"
