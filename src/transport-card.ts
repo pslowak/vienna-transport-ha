@@ -1,4 +1,4 @@
-import { LitElement, html, css, nothing } from "lit";
+import { css, html, LitElement, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { getVehicleInfo } from "./vehicle";
 import type {
@@ -9,20 +9,29 @@ import type {
     Message,
     Monitor,
     VehicleInfo,
-} from "./types";
-import {ExpiringCache} from "./expiring-cache";
+} from "./api.ts";
+import { ExpiringCache } from "./expiring-cache";
+import {
+    TRANSPORT_CARD_EDITOR_NAME,
+    TRANSPORT_CARD_NAME,
+} from "./constants.ts";
+import "./transport-card-editor.ts";
 
 const STATUS_OK = 1;
 const STATUS_RATE_LIMIT = 316;
 
-@customElement("transport-card")
+@customElement(TRANSPORT_CARD_NAME)
 export class TransportCard extends LitElement {
-    @property({attribute: false}) hass: any;
+    @property({ attribute: false }) hass: any;
     @property() config: any;
 
     private cache: ExpiringCache<Data> = new ExpiringCache<Data>(
         2 * 60 * 1_000,
     ); // 2 minutes
+
+    static getConfigElement() {
+        return document.createElement(TRANSPORT_CARD_EDITOR_NAME);
+    }
 
     static styles = css`
         ha-card {
@@ -102,7 +111,7 @@ export class TransportCard extends LitElement {
         }
     `;
 
-    setConfig(config: any) {
+    setConfig(config: any): void {
         if (!config.entity) {
             throw new Error("You need to define an entity");
         }
@@ -143,8 +152,7 @@ export class TransportCard extends LitElement {
         const monitors: Monitor[] = data.monitors ?? [];
 
         if (monitors.length === 0) {
-            return html`
-                <ha-card>No departures available</ha-card>`;
+            return html` <ha-card>No departures available</ha-card>`;
         }
 
         let filtered: Monitor[] = monitors;
@@ -163,7 +171,7 @@ export class TransportCard extends LitElement {
         return html`
             <ha-card>
                 ${filtered.map((monitor: Monitor) =>
-                        this.renderMonitor(monitor),
+                    this.renderMonitor(monitor),
                 )}
             </ha-card>
         `;
@@ -188,7 +196,7 @@ export class TransportCard extends LitElement {
         return html`
             <div class="line">
                 ${departures.map((dep: Departure) =>
-                        this.renderDeparture(dep, line),
+                    this.renderDeparture(dep, line),
                 )}
             </div>
         `;
@@ -217,8 +225,8 @@ export class TransportCard extends LitElement {
                 <div>${line.towards}</div>
                 <div>
                     ${wait < 15
-                            ? html`<span>${wait} min</span>`
-                            : html`<span>
+                        ? html`<span>${wait} min</span>`
+                        : html`<span>
                               ${actual.toLocaleTimeString([], {
                                   hour: "2-digit",
                                   minute: "2-digit",
@@ -226,11 +234,11 @@ export class TransportCard extends LitElement {
                               })}
                           </span>`}
                     ${delay == 0
-                            ? nothing
-                            : html`<span class="delay">
+                        ? nothing
+                        : html`<span class="delay">
                               (${Intl.NumberFormat("en", {
-                                    signDisplay: "always",
-                                }).format(delay)})
+                                  signDisplay: "always",
+                              }).format(delay)})
                           </span>`}
                 </div>
             </div>
