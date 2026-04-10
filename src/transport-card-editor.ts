@@ -48,7 +48,7 @@ export class TransportCardEditor extends LitElement {
             {
                 name: "max_departures",
                 selector: {
-                    number: { min: 0, max: 15, mode: "box" },
+                    number: { min: 1, max: 15, mode: "box" },
                 },
             },
             {
@@ -78,7 +78,7 @@ export class TransportCardEditor extends LitElement {
             case "entity":
                 return "Use your pre-defined sensor here.";
             case "max_departures":
-                return "Maximum number of departures to show. Set to 0 to show all.";
+                return "Maximum number of departures to show. Leave empty to show all.";
             case "lines":
                 return "Add line names (e.g., U1). Leave empty to show all.";
         }
