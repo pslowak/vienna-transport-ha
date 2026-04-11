@@ -3,6 +3,8 @@
 A custom Lovelace card for [Home Assistant](https://www.home-assistant.io/) that displays real-time public transport 
 departures in Vienna, Austria.
 
+![Mobile View](docs/images/card-mockup-mobile.jpg)
+
 ## Installation
 
 ### Option 1 - Manual
