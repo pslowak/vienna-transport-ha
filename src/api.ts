@@ -1,3 +1,6 @@
+export const STATUS_OK = 1;
+export const STATUS_RATE_LIMIT = 316;
+
 export interface ApiResponse {
     data?: Data;
     message: Message;
