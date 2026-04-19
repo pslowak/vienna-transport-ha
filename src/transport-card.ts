@@ -1,14 +1,16 @@
 import { css, html, LitElement, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { getVehicleInfo } from "./vehicle";
-import type {
-    ApiResponse,
-    Data,
-    Departure,
-    Line,
-    Message,
-    Monitor,
-    VehicleInfo,
+import {
+    type ApiResponse,
+    type Data,
+    type Departure,
+    type Line,
+    type Message,
+    type Monitor,
+    STATUS_OK,
+    STATUS_RATE_LIMIT,
+    type VehicleInfo,
 } from "./api.ts";
 import { ExpiringCache } from "./expiring-cache";
 import {
@@ -16,9 +18,6 @@ import {
     TRANSPORT_CARD_NAME,
 } from "./constants.ts";
 import "./transport-card-editor.ts";
-
-const STATUS_OK = 1;
-const STATUS_RATE_LIMIT = 316;
 
 @customElement(TRANSPORT_CARD_NAME)
 export class TransportCard extends LitElement {
