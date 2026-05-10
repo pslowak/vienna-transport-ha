@@ -1,5 +1,5 @@
 import { css, html, LitElement, nothing } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import { getVehicleInfo } from "./vehicle";
 import {
     type ApiResponse,
@@ -18,15 +18,24 @@ import {
     TRANSPORT_CARD_NAME,
 } from "./constants.ts";
 import "./transport-card-editor.ts";
+import { getHassLanguage, t } from "./i18n.ts";
 
 @customElement(TRANSPORT_CARD_NAME)
 export class TransportCard extends LitElement {
-    @property({ attribute: false }) hass: any;
+    @property({ attribute: false })
+    set hass(hass: any) {
+        this._hass = hass;
+        this._lang = getHassLanguage(hass);
+    }
+
+    @state() private _hass: any;
+    @state() private _lang: string = "en";
+
     @property() config: any;
 
     private cache: ExpiringCache<Data> = new ExpiringCache<Data>(
-        2 * 60 * 1_000,
-    ); // 2 minutes
+        2 * 60 * 1_000, // 2 minutes
+    );
 
     static getConfigElement() {
         return document.createElement(TRANSPORT_CARD_EDITOR_NAME);
@@ -112,20 +121,24 @@ export class TransportCard extends LitElement {
 
     setConfig(config: any): void {
         if (!config.entity) {
-            throw new Error("You need to define an entity");
+            throw new Error(t("card.config.entity_required", this._lang));
         }
         this.config = config;
     }
 
     render() {
-        if (!this.config || !this.hass) {
+        if (!this.config || !this._hass) {
             return nothing;
         }
 
-        const entity = this.hass.states[this.config.entity];
+        const entity = this._hass.states[this.config.entity];
         if (!entity) {
             return html`
-                <ha-card> Entity ${this.config.entity} not found</ha-card>
+                <ha-card
+                    >${t("card.errors.entity_not_found", this._lang, {
+                        entity: this.config.entity,
+                    })}</ha-card
+                >
             `;
         }
 
@@ -144,14 +157,20 @@ export class TransportCard extends LitElement {
 
         if (!data) {
             return html`
-                <ha-card>Error fetching departures: ${message.value}</ha-card>
+                <ha-card
+                    >${t("card.errors.fetch_departures", this._lang, {
+                        message: message.value,
+                    })}</ha-card
+                >
             `;
         }
 
         const monitors: Monitor[] = data.monitors ?? [];
 
         if (monitors.length === 0) {
-            return html` <ha-card>No departures available</ha-card>`;
+            return html` <ha-card
+                >${t("card.state.no_departures", this._lang)}</ha-card
+            >`;
         }
 
         let filtered: Monitor[] = monitors;
@@ -224,9 +243,12 @@ export class TransportCard extends LitElement {
                 <div>${line.towards}</div>
                 <div>
                     ${wait < 15
-                        ? html`<span>${wait} min</span>`
+                        ? html`<span
+                              >${wait}
+                              ${t("card.time.minute_short", this._lang)}</span
+                          >`
                         : html`<span>
-                              ${actual.toLocaleTimeString([], {
+                              ${actual.toLocaleTimeString(this._lang, {
                                   hour: "2-digit",
                                   minute: "2-digit",
                                   hour12: false,
@@ -235,7 +257,7 @@ export class TransportCard extends LitElement {
                     ${delay == 0
                         ? nothing
                         : html`<span class="delay">
-                              (${Intl.NumberFormat("en", {
+                              (${Intl.NumberFormat(this._lang, {
                                   signDisplay: "always",
                               }).format(delay)})
                           </span>`}

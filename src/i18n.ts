@@ -58,3 +58,7 @@ export function t(
         replacements[name] !== undefined ? String(replacements[name]) : match,
     );
 }
+
+export function getHassLanguage(hass: any): string {
+    return hass?.locale?.language ?? hass?.language ?? DEFAULT_LANG;
+}
