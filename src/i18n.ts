@@ -18,7 +18,7 @@ function resolveRegistryKey(lang: string): string {
             return candidate;
         }
 
-        const lastHyphen = candidate.indexOf("-");
+        const lastHyphen = candidate.lastIndexOf("-");
 
         if (lastHyphen === -1) {
             // Nothing found
