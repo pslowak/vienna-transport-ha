@@ -2,12 +2,19 @@ import { css, html, LitElement, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { TRANSPORT_CARD_EDITOR_NAME } from "./constants.ts";
 import type { TransportCardConfig } from "./transport-card-config.ts";
+import { getHassLanguage, t } from "./i18n.ts";
 
 @customElement(TRANSPORT_CARD_EDITOR_NAME)
 export class TransportCardEditor extends LitElement {
-    @property({ attribute: false }) hass: any;
+    @property({ attribute: false })
+    set hass(hass: any) {
+        this._hass = hass;
+        this._lang = getHassLanguage(hass);
+    }
 
-    @state() private config: TransportCardConfig = {};
+    @state() private _hass: any;
+    @state() private _lang: string = "en";
+    @state() private _config: TransportCardConfig = {};
 
     static styles = css`
         ha-form {
@@ -17,18 +24,18 @@ export class TransportCardEditor extends LitElement {
     `;
 
     setConfig(config: TransportCardConfig): void {
-        this.config = config;
+        this._config = config;
     }
 
     render() {
-        if (!this.hass) {
+        if (!this._hass) {
             return nothing;
         }
 
         return html`
             <ha-form
-                .hass=${this.hass}
-                .data=${this.config}
+                .hass=${this._hass}
+                .data=${this._config}
                 .schema=${this.schema}
                 .computeLabel=${this.computeLabel}
                 .computeHelper=${this.computeHelper}
@@ -63,11 +70,11 @@ export class TransportCardEditor extends LitElement {
     private computeLabel = (schema: any) => {
         switch (schema.name) {
             case "entity":
-                return "Entity";
+                return t("editor.fields.entity.label", this._lang);
             case "max_departures":
-                return "Maximum departures";
+                return t("editor.fields.max_departures.label", this._lang);
             case "lines":
-                return "Line";
+                return t("editor.fields.lines.label", this._lang);
         }
 
         return schema.name || undefined;
@@ -76,11 +83,11 @@ export class TransportCardEditor extends LitElement {
     private computeHelper = (schema: any) => {
         switch (schema.name) {
             case "entity":
-                return "Use your pre-defined sensor here.";
+                return t("editor.fields.entity.helper", this._lang);
             case "max_departures":
-                return "Maximum number of departures to show. Leave empty to show all.";
+                return t("editor.fields.max_departures.helper", this._lang);
             case "lines":
-                return "Add line names (e.g., U1). Leave empty to show all.";
+                return t("editor.fields.lines.helper", this._lang);
         }
 
         return undefined;
@@ -90,7 +97,7 @@ export class TransportCardEditor extends LitElement {
         const value = ev.detail.value as Partial<TransportCardConfig>;
 
         const newConfig: TransportCardConfig = {
-            ...this.config,
+            ...this._config,
             ...value,
             lines: (value.lines ?? []).filter(
                 (line) => line?.trim().length > 0,

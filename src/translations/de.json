@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "locale": "de",
+    "language": "Deutsch"
+  },
+  "card": {
+    "config": {
+      "entity_required": "Du musst eine Entität angeben."
+    },
+    "errors": {
+      "entity_not_found": "Entität {entity} nicht gefunden.",
+      "fetch_departures": "Fehler beim Laden der Abfahrten: {message}"
+    },
+    "state": {
+      "no_departures": "Keine Abfahrten verfügbar."
+    },
+    "time": {
+      "minute_short": "Min"
+    }
+  },
+  "editor": {
+    "fields": {
+      "entity": {
+        "label": "Entität",
+        "helper": "Verwende hier deinen vordefinierten Sensor."
+      },
+      "max_departures": {
+        "label": "Maximale Abfahrten",
+        "helper": "Maximale Anzahl der anzuzeigenden Abfahrten. Leer lassen, um alle anzuzeigen."
+      },
+      "lines": {
+        "label": "Linien",
+        "helper": "Liniennamen hinzufügen (z.B. U1). Leer lassen, um alle verfügbaren anzuzeigen."
+      }
+    }
+  }
+}

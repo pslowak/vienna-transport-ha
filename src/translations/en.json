@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "locale": "en",
+    "language": "English"
+  },
+  "card": {
+    "config": {
+      "entity_required": "You need to define an entity."
+    },
+    "errors": {
+      "entity_not_found": "Entity {entity} not found.",
+      "fetch_departures": "Error fetching departures: {message}"
+    },
+    "state": {
+      "no_departures": "No departures available"
+    },
+    "time": {
+      "minute_short": "min"
+    }
+  },
+  "editor": {
+    "fields": {
+      "entity": {
+        "label": "Entity",
+        "helper": "Use your pre-defined sensor here."
+      },
+      "max_departures": {
+        "label": "Maximum departures",
+        "helper": "Maximum number of departures to show. Leave empty to show all."
+      },
+      "lines": {
+        "label": "Lines",
+        "helper": "Add line names (e.g., U1). Leave empty to show all."
+      }
+    }
+  }
+}
