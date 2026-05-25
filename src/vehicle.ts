@@ -48,6 +48,10 @@ function vehicleTypeFromString(type: string, name: string): VehicleType {
 }
 
 function getVehicleType(line: any): VehicleType {
+    if (line.type) {
+        return vehicleTypeFromString(line.type, line.name);
+    }
+
     for (const dep of line.departures.departure) {
         if (dep.vehicle) {
             return vehicleTypeFromString(dep.vehicle.type, line.name);

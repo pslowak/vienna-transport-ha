@@ -31,6 +31,7 @@ export interface LocationStopProperties {
 export interface Line {
     name: string;
     towards: string;
+    type?: string;
     departures: Departures;
 }
 
