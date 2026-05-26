@@ -1,0 +1,49 @@
+[project]
+name = "vienna-transport-ha"
+version = "0.0.0"
+requires-python = ">=3.14.2"
+description = "Vienna Public Transport Home Assistant Integration"
+authors = [
+    { name = "Philipp Slowak", email = "philipp.slowak@gmail.com" }
+]
+license = { text = "MIT" }
+
+dependencies = [
+    "homeassistant>=2026.5.4",
+    "aiohttp>=3.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "aioresponses>=0.7.8",
+    "mypy>=2.1.0",
+    "pytest-homeassistant-custom-component>=0.13.333",
+    "ruff>=0.15.13",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+pythonpath = ["."]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = ["custom_components"]
+#ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components.vienna_transport_ha"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]

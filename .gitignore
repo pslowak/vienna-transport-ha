@@ -4,6 +4,9 @@ node_modules
 
 # Editors
 .idea
+
+# Environment files
+.venv
 .vite
 
 *.iml
