@@ -1,5 +1,7 @@
 # Vienna Public Transport Card
 
+[![be-test](https://github.com/pslowak/vienna-transport-ha/actions/workflows/be-test.yml/badge.svg)](https://github.com/pslowak/vienna-transport-ha/actions/workflows/be-test.yml)
+
 A custom Lovelace card for [Home Assistant](https://www.home-assistant.io/) that displays real-time public transport 
 departures in Vienna, Austria.
 
