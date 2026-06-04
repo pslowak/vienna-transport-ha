@@ -43,7 +43,7 @@ def test_parse_produces_one_stop(parser: ViennaTransportParser) -> None:
 
 def test_parse_stop_properties(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    stop = parser.parse(raw).stops[0]
+    stop = parser.parse(raw).stops[2683]
 
     assert stop.props.id == 2683
     assert stop.props.name == "Volkertplatz"
@@ -51,25 +51,25 @@ def test_parse_stop_properties(parser: ViennaTransportParser) -> None:
 
 def test_parse_stop_has_one_line(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    stop = parser.parse(raw).stops[0]
+    stop = parser.parse(raw).stops[2683]
     assert len(stop.lines) == 1
 
 
 def test_parse_line_name(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    line = parser.parse(raw).stops[0].lines[0]
+    line = parser.parse(raw).stops[2683].lines[0]
     assert line.name == "5B"
 
 
 def test_parse_line_has_one_departure(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    line = parser.parse(raw).stops[0].lines[0]
+    line = parser.parse(raw).stops[2683].lines[0]
     assert len(line.departures) == 1
 
 
 def test_parse_departure_times(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    departure = parser.parse(raw).stops[0].lines[0].departures[0]
+    departure = parser.parse(raw).stops[2683].lines[0].departures[0]
 
     tz = timezone(timedelta(hours=2))
     expected_planned = datetime(2026, 6, 3, 12, 4, 30, tzinfo=tz)
@@ -83,7 +83,7 @@ def test_parse_departure_times_are_timezone_aware(
     parser: ViennaTransportParser,
 ) -> None:
     raw = load_fixture("single_stop.json")
-    departure: Departure = parser.parse(raw).stops[0].lines[0].departures[0]
+    departure: Departure = parser.parse(raw).stops[2683].lines[0].departures[0]
 
     assert departure.time_planned.tzinfo is not None
     assert departure.time_real.tzinfo is not None
@@ -91,7 +91,7 @@ def test_parse_departure_times_are_timezone_aware(
 
 def test_parse_vehicle(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    vehicle: Vehicle = parser.parse(raw).stops[0].lines[0].departures[0].vehicle
+    vehicle: Vehicle = parser.parse(raw).stops[2683].lines[0].departures[0].vehicle
 
     assert vehicle.name == "5B"
     assert vehicle.type == "ptBusCity"

@@ -24,17 +24,18 @@ class ViennaTransportParser:
 
             if msg_code == _MSG_CODE_OK:
                 raw_monitors = raw.get("data", {}).get("monitors", [])
-                stops = [self._parse_stop(stop) for stop in raw_monitors]
+                parsed = [self._parse_stop(stop) for stop in raw_monitors]
+                stops = {stop.props.id: stop for stop in parsed}
                 return TransportData(stops=stops, return_code=msg_code)
 
             if msg_code == _MSG_CODE_RATE_LIMIT:
-                return TransportData(stops=[], return_code=_MSG_CODE_RATE_LIMIT)
+                return TransportData(stops={}, return_code=_MSG_CODE_RATE_LIMIT)
 
             _LOGGER.warning("Unexpected message code %s", msg_code)
-            return TransportData(stops=[], return_code=msg_code)
+            return TransportData(stops={}, return_code=msg_code)
         except (KeyError, TypeError, ValueError) as e:
             _LOGGER.error(f"unexpected API response {e}")
-            return TransportData(stops=[], return_code=-1)
+            return TransportData(stops={}, return_code=-1)
 
     @staticmethod
     def _parse_stop(raw: dict) -> Stop:
