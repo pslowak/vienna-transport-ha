@@ -8,26 +8,31 @@ class Vehicle:
     type: str
     towards: str
 
+
 @dataclass(frozen=True)
 class Departure:
     time_planned: datetime
     time_real: datetime
     vehicle: Vehicle
 
+
 @dataclass(frozen=True)
 class Line:
     name: str
     departures: list[Departure]
+
 
 @dataclass(frozen=True)
 class StopProperties:
     id: int
     name: str
 
+
 @dataclass(frozen=True)
 class Stop:
     props: StopProperties
     lines: list[Line]
+
 
 @dataclass(frozen=True)
 class TransportData:
