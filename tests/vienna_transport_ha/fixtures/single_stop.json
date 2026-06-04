@@ -1,0 +1,69 @@
+{
+  "data": {
+    "monitors": [
+      {
+        "locationStop": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [16.3856121, 48.222751]
+          },
+          "properties": {
+            "name": "60201876",
+            "title": "Volkertplatz",
+            "municipality": "Wien",
+            "municipalityId": 49000001,
+            "type": "stop",
+            "coordName": "WGS84",
+            "attributes": { "rbl": 2683 }
+          }
+        },
+        "lines": [
+          {
+            "name": "5B",
+            "towards": "Bhf. Heiligenstadt S U",
+            "direction": "H",
+            "platform": "1",
+            "richtungsId": "1",
+            "barrierFree": true,
+            "realtimeSupported": true,
+            "trafficjam": false,
+            "departures": {
+              "departure": [
+                {
+                  "departureTime": {
+                    "timePlanned": "2026-06-03T12:04:30.000+0200",
+                    "timeReal": "2026-06-03T12:05:30.000+0200",
+                    "countdown": 4
+                  },
+                  "vehicle": {
+                    "name": "5B",
+                    "towards": "Bhf. Heiligenstadt S U",
+                    "direction": "H",
+                    "platform": "1",
+                    "richtungsId": "1",
+                    "barrierFree": true,
+                    "cooling": true,
+                    "realtimeSupported": true,
+                    "trafficjam": false,
+                    "type": "ptBusCity",
+                    "attributes": {},
+                    "linienId": 205
+                  }
+                }
+              ]
+            },
+            "type": "ptBusCity",
+            "lineId": 205
+          }
+        ],
+        "attributes": {}
+      }
+    ]
+  },
+  "message": {
+    "value": "OK",
+    "messageCode": 1,
+    "serverTime": "2026-06-03T12:00:02.000+0200"
+  }
+}
