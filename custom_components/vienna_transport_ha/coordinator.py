@@ -1,7 +1,6 @@
 import logging
 from datetime import timedelta
 
-import aiohttp
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
