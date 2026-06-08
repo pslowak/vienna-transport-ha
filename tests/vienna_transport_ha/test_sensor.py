@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock
 
-from custom_components.vienna_transport_ha import ViennaTransportCoordinator
+from custom_components.vienna_transport_ha.coordinator import ViennaTransportCoordinator
 from custom_components.vienna_transport_ha.model import (
     Departure,
     Line,
