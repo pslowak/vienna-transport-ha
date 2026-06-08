@@ -6,7 +6,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from custom_components.vienna_transport_ha import DOMAIN, ViennaTransportCoordinator
+from custom_components.vienna_transport_ha.const import DOMAIN
+from custom_components.vienna_transport_ha.coordinator import ViennaTransportCoordinator
 
 
 async def async_setup_entry(
