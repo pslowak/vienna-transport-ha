@@ -35,6 +35,7 @@ class ViennaTransportParser:
             return TransportData(stops={}, return_code=msg_code)
         except (KeyError, TypeError, ValueError) as e:
             _LOGGER.error(f"unexpected API response {e}")
+            _LOGGER.debug(f"API response {raw}")
             return TransportData(stops={}, return_code=-1)
 
     @staticmethod
