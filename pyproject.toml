@@ -18,7 +18,7 @@ dev = [
     "aioresponses>=0.7.8",
     "mypy>=2.1.0",
     "pytest-homeassistant-custom-component>=0.13.333",
-    "ruff>=0.15.13",
+    "ruff>=0.15.16",
 ]
 
 [tool.uv]
