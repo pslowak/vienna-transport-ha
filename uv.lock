@@ -2502,7 +2502,7 @@ wheels = [
 
 [[package]]
 name = "vienna-transport-ha"
-version = "0.0.0"
+version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "aiohttp" },

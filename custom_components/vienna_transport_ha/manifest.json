@@ -1,0 +1,14 @@
+{
+  "domain": "vienna_transport_ha",
+  "name": "Vienna Public Transport",
+  "version": "0.1.0",
+  "config_flow": true,
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "dependencies": [],
+  "after_dependencies": [],
+  "codeowners": ["@pslowak"],
+  "documentation": "https://github.com/pslowak/vienna-transport-ha",
+  "issue_tracker": "https://github.com/pslowak/vienna-transport-ha/issues"
+}
