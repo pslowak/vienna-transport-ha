@@ -2,14 +2,9 @@ import { css, html, LitElement, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { getVehicleInfo } from "./vehicle";
 import {
-    type ApiResponse,
-    type Data,
     type Departure,
     type Line,
-    type Message,
-    type Monitor,
-    STATUS_OK,
-    STATUS_RATE_LIMIT,
+    type Stop,
     type VehicleInfo,
 } from "./api.ts";
 import { ExpiringCache } from "./expiring-cache";
@@ -33,7 +28,7 @@ export class TransportCard extends LitElement {
 
     @property() config: any;
 
-    private cache: ExpiringCache<Data> = new ExpiringCache<Data>(
+    private cache: ExpiringCache<Stop> = new ExpiringCache<Stop>(
         2 * 60 * 1_000, // 2 minutes
     );
 
@@ -142,74 +137,56 @@ export class TransportCard extends LitElement {
             `;
         }
 
-        const resp: ApiResponse = entity.attributes;
-        const message: Message = resp.message;
+        const stop: Stop = entity.attributes as Stop;
+        const hasData = stop.lines && stop.lines.length > 0;
 
-        let data = resp.data;
-
-        if (message.messageCode === STATUS_OK && data) {
-            this.cache.set(data);
+        if (hasData) {
+            this.cache.set(stop);
         }
 
-        if (message.messageCode === STATUS_RATE_LIMIT) {
-            data = this.cache.get();
-        }
+        const data = hasData ? stop : this.cache.get();
 
         if (!data) {
             return html`
                 <ha-card
                     >${t("card.errors.fetch_departures", this._lang, {
-                        message: message.value,
+                        message: "no data",
                     })}</ha-card
                 >
             `;
         }
 
-        const monitors: Monitor[] = data.monitors ?? [];
+        let lines: Line[] = data.lines;
 
-        if (monitors.length === 0) {
-            return html` <ha-card
-                >${t("card.state.no_departures", this._lang)}</ha-card
-            >`;
-        }
-
-        let filtered: Monitor[] = monitors;
         if (
             this.config.lines &&
             Array.isArray(this.config.lines) &&
             this.config.lines.length > 0
         ) {
-            filtered = monitors.filter((monitor: Monitor) =>
-                monitor.lines.some((line: Line) =>
-                    this.config.lines.includes(line.name),
-                ),
+            lines = data.lines.filter((line: Line) =>
+                this.config.lines.includes(line.name),
             );
+        }
+
+        if (lines.length === 0) {
+            return html` <ha-card
+                >${t("card.state.no_departures", this._lang)}</ha-card
+            >`;
         }
 
         return html`
             <ha-card>
-                ${filtered.map((monitor: Monitor) =>
-                    this.renderMonitor(monitor),
-                )}
+                <div class="stop">
+                    <span>${data.props.name}</span>
+                    ${lines.map((line: Line) => this.renderLine(line))}
+                </div>
             </ha-card>
         `;
     }
 
-    private renderMonitor(monitor: Monitor) {
-        const stopName = monitor.locationStop.properties.title;
-
-        return html`
-            <div class="stop">
-                <span>${stopName}</span>
-                ${monitor.lines.map((line: Line) => this.renderLine(line))}
-            </div>
-        `;
-    }
-
     private renderLine(line: Line) {
-        const max =
-            this.config.max_departures ?? line.departures.departure.length;
-        const departures: Departure[] = line.departures.departure.slice(0, max);
+        const max = this.config.max_departures ?? line.departures.length;
+        const departures: Departure[] = line.departures.slice(0, max);
 
         return html`
             <div class="line">
@@ -221,10 +198,8 @@ export class TransportCard extends LitElement {
     }
 
     private renderDeparture(dep: Departure, line: Line) {
-        const planned = new Date(dep.departureTime.timePlanned);
-        const actual = new Date(
-            dep.departureTime.timeReal ?? dep.departureTime.timePlanned,
-        );
+        const planned = new Date(dep.time_planned);
+        const actual = new Date(dep.time_real ?? dep.time_planned);
         const now = new Date();
 
         // in minutes
@@ -240,7 +215,7 @@ export class TransportCard extends LitElement {
                 <div style="background:${info.background};color:${info.color}">
                     ${line.name}
                 </div>
-                <div>${line.towards}</div>
+                <div>${dep.vehicle.towards}</div>
                 <div>
                     ${wait < 15
                         ? html`<span
