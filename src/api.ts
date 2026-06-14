@@ -1,55 +1,28 @@
-export const STATUS_OK = 1;
-export const STATUS_RATE_LIMIT = 316;
-
-export interface ApiResponse {
-    data?: Data;
-    message: Message;
+export interface StopProperties {
+    id: number;
+    name: string;
 }
 
-export interface Data {
-    monitors: Monitor[];
-}
-
-export interface Message {
-    value: string;
-    messageCode: number;
-}
-
-export interface Monitor {
+export interface Stop {
+    props: StopProperties;
     lines: Line[];
-    locationStop: LocationStop;
-}
-
-export interface LocationStop {
-    properties: LocationStopProperties;
-}
-
-export interface LocationStopProperties {
-    title: string;
 }
 
 export interface Line {
     name: string;
-    towards: string;
-    departures: Departures;
-}
-
-export interface Departures {
-    departure: Departure[];
+    departures: Departure[];
 }
 
 export interface Departure {
-    departureTime: DepartureTime;
-    vehicle?: Vehicle;
-}
-
-export interface DepartureTime {
-    timePlanned: string;
-    timeReal?: string;
+    time_planned: string;
+    time_real: string;
+    vehicle: Vehicle;
 }
 
 export interface Vehicle {
+    name: string;
     type: string;
+    towards: string;
 }
 
 export interface VehicleInfo {
