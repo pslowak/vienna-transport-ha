@@ -56,5 +56,5 @@ uv run mypy custom_components tests   # Type checking
 npm install                 # Install dependencies
 npm run dev                 # Development server
 npm run build               # Build the card
-npm run test                    # Run tests
+npm run test                # Run tests
 ```

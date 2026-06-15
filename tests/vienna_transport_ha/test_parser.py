@@ -61,10 +61,10 @@ def test_parse_line_name(parser: ViennaTransportParser) -> None:
     assert line.name == "5B"
 
 
-def test_parse_line_has_one_departure(parser: ViennaTransportParser) -> None:
+def test_parse_line_has_two_departures(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
     line = parser.parse(raw).stops[2683].lines[0]
-    assert len(line.departures) == 1
+    assert len(line.departures) == 2
 
 
 def test_parse_departure_times(parser: ViennaTransportParser) -> None:
@@ -77,6 +77,15 @@ def test_parse_departure_times(parser: ViennaTransportParser) -> None:
 
     assert departure.time_planned == expected_planned
     assert departure.time_real == expected_real
+
+
+def test_parse_departure_falls_back_to_time_planned_when_time_real_missing(
+    parser: ViennaTransportParser,
+) -> None:
+    raw = load_fixture("single_stop.json")
+    departure = parser.parse(raw).stops[2683].lines[0].departures[1]
+
+    assert departure.time_real == departure.time_planned
 
 
 def test_parse_departure_times_are_timezone_aware(

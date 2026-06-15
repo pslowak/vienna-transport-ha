@@ -34,7 +34,7 @@ class ViennaTransportParser:
             _LOGGER.warning("Unexpected message code %s", msg_code)
             return TransportData(stops={}, return_code=msg_code)
         except (KeyError, TypeError, ValueError) as e:
-            _LOGGER.error(f"unexpected API response {e}")
+            _LOGGER.exception(f"unexpected API response {e}")
             _LOGGER.debug(f"API response {raw}")
             return TransportData(stops={}, return_code=-1)
 
@@ -65,7 +65,9 @@ class ViennaTransportParser:
     def _parse_departure(raw: dict) -> Departure:
         times = raw["departureTime"]
         time_planned = datetime.fromisoformat(times["timePlanned"])
-        time_real = datetime.fromisoformat(times["timeReal"])
+        time_real = datetime.fromisoformat(
+            times.get("timeReal", times["timePlanned"])
+        )
         vehicle = ViennaTransportParser._parse_vehicle(raw["vehicle"])
         return Departure(
             time_planned=time_planned, time_real=time_real, vehicle=vehicle
