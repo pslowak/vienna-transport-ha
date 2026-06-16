@@ -6,10 +6,10 @@ from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import TextSelector, TextSelectorConfig
 
-from custom_components.vienna_transport_ha.client import ViennaTransportClient
-from custom_components.vienna_transport_ha.const import DOMAIN
-from custom_components.vienna_transport_ha.model import TransportData
-from custom_components.vienna_transport_ha.parser import ViennaTransportParser
+from custom_components.vienna_transport.client import ViennaTransportClient
+from custom_components.vienna_transport.const import DOMAIN
+from custom_components.vienna_transport.model import TransportData
+from custom_components.vienna_transport.parser import ViennaTransportParser
 
 _LOGGER = logging.getLogger(__name__)
 

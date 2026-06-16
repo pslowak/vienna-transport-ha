@@ -8,7 +8,7 @@ A custom integration and Lovelace card for [Home Assistant](https://www.home-ass
 
 ## Installation
 
-1. Copy `custom_components/vienna_transport_ha/` into your Home Assistant `custom_components/` directory.
+1. Copy `custom_components/vienna_transport/` into your Home Assistant `custom_components/` directory.
 2. Restart Home Assistant.
 3. Copy `dist/transport-card.js` into your Home Assistant `www/` directory.
 4. Register the card resource in your Home Assistant configuration (see [Registering Resources](https://developers.home-assistant.io/docs/frontend/custom-ui/registering-resources/)).

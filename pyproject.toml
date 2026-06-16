@@ -1,5 +1,5 @@
 [project]
-name = "vienna-transport-ha"
+name = "vienna-transport"
 version = "0.1.0"
 requires-python = ">=3.14.2"
 description = "Vienna Public Transport Home Assistant Integration"
@@ -48,7 +48,7 @@ select = ["E", "F", "I", "UP", "B", "SIM", "TID"]
 ban-relative-imports = "parents"
 
 [tool.ruff.lint.isort]
-known-first-party = ["custom_components.vienna_transport_ha"]
+known-first-party = ["custom_components.vienna_transport"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101"]
