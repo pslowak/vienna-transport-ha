@@ -7,7 +7,7 @@ from aiohttp import ClientSession
 from aioresponses import aioresponses
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
-from custom_components.vienna_transport_ha.client import ViennaTransportClient
+from custom_components.vienna_transport.client import ViennaTransportClient
 
 
 @pytest.fixture

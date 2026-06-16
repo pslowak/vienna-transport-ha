@@ -4,9 +4,9 @@ from datetime import timedelta
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from custom_components.vienna_transport_ha.client import ViennaTransportClient
-from custom_components.vienna_transport_ha.model import TransportData
-from custom_components.vienna_transport_ha.parser import ViennaTransportParser
+from custom_components.vienna_transport.client import ViennaTransportClient
+from custom_components.vienna_transport.model import TransportData
+from custom_components.vienna_transport.parser import ViennaTransportParser
 
 _LOGGER = logging.getLogger(__name__)
 

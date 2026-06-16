@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock
 
-from custom_components.vienna_transport_ha.coordinator import ViennaTransportCoordinator
-from custom_components.vienna_transport_ha.model import (
+from custom_components.vienna_transport.coordinator import ViennaTransportCoordinator
+from custom_components.vienna_transport.model import (
     Departure,
     Line,
     Stop,
@@ -10,7 +10,7 @@ from custom_components.vienna_transport_ha.model import (
     TransportData,
     Vehicle,
 )
-from custom_components.vienna_transport_ha.sensor import ViennaTransportSensor
+from custom_components.vienna_transport.sensor import ViennaTransportSensor
 
 
 def make_stop(rbl: int = 2683, name: str = "Volkertplatz") -> Stop:

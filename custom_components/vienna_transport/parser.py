@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from custom_components.vienna_transport_ha.model import (
+from custom_components.vienna_transport.model import (
     Departure,
     Line,
     Stop,

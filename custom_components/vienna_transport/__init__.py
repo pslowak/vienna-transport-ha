@@ -6,10 +6,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
 
-from custom_components.vienna_transport_ha.client import ViennaTransportClient
-from custom_components.vienna_transport_ha.const import DOMAIN
-from custom_components.vienna_transport_ha.coordinator import ViennaTransportCoordinator
-from custom_components.vienna_transport_ha.parser import ViennaTransportParser
+from custom_components.vienna_transport.client import ViennaTransportClient
+from custom_components.vienna_transport.const import DOMAIN
+from custom_components.vienna_transport.coordinator import ViennaTransportCoordinator
+from custom_components.vienna_transport.parser import ViennaTransportParser
 
 PLATFORMS = ["sensor"]
 

@@ -2,8 +2,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from custom_components.vienna_transport_ha.coordinator import ViennaTransportCoordinator
-from custom_components.vienna_transport_ha.model import Stop, TransportData
+from custom_components.vienna_transport.coordinator import ViennaTransportCoordinator
+from custom_components.vienna_transport.model import Stop, TransportData
 
 
 @pytest.fixture

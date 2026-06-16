@@ -1,4 +1,4 @@
-from custom_components.vienna_transport_ha.config_flow import ViennaTransportConfigFlow
+from custom_components.vienna_transport.config_flow import ViennaTransportConfigFlow
 
 
 def test_validate_stop_ids_returns_cleaned_list() -> None:

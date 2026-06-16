@@ -1,5 +1,5 @@
 {
-  "domain": "vienna_transport_ha",
+  "domain": "vienna_transport",
   "name": "Vienna Public Transport",
   "version": "0.1.0",
   "config_flow": true,

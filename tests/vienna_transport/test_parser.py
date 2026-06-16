@@ -4,12 +4,12 @@ from pathlib import Path
 
 import pytest
 
-from custom_components.vienna_transport_ha.model import (
+from custom_components.vienna_transport.model import (
     Departure,
     TransportData,
     Vehicle,
 )
-from custom_components.vienna_transport_ha.parser import ViennaTransportParser
+from custom_components.vienna_transport.parser import ViennaTransportParser
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
