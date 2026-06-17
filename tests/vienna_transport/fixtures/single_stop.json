@@ -70,6 +70,27 @@
                     "attributes": {},
                     "linienId": 205
                   }
+                },
+                {
+                  "departureTime": {
+                    "timePlanned": null,
+                    "timeReal": "2026-06-03T12:15:00.000+0200",
+                    "countdown": 2
+                  },
+                  "vehicle": {
+                    "name": "5B",
+                    "towards": "Bhf. Heiligenstadt S U",
+                    "direction": "H",
+                    "platform": "1",
+                    "richtungsId": "1",
+                    "barrierFree": true,
+                    "cooling": true,
+                    "realtimeSupported": false,
+                    "trafficjam": false,
+                    "type": "ptBusCity",
+                    "attributes": {},
+                    "linienId": 205
+                  }
                 }
               ]
             },

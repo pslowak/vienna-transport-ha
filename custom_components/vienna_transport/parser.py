@@ -64,10 +64,21 @@ class ViennaTransportParser:
     @staticmethod
     def _parse_departure(raw: dict) -> Departure:
         times = raw["departureTime"]
-        time_planned = datetime.fromisoformat(times["timePlanned"])
-        time_real = datetime.fromisoformat(
-            times.get("timeReal", times["timePlanned"])
-        )
+        time_planned_raw = times.get("timePlanned")
+        time_real_raw = times.get("timeReal")
+
+        if time_planned_raw is not None and time_real_raw is not None:
+            time_planned = datetime.fromisoformat(time_planned_raw)
+            time_real = datetime.fromisoformat(time_real_raw)
+        elif time_planned_raw is not None:
+            time_planned = datetime.fromisoformat(time_planned_raw)
+            time_real = time_planned
+        elif time_real_raw is not None:
+            time_real = datetime.fromisoformat(time_real_raw)
+            time_planned = time_real
+        else:
+            raise ValueError("Both timePlanned and timeReal are missing")
+
         vehicle = ViennaTransportParser._parse_vehicle(raw["vehicle"])
         return Departure(
             time_planned=time_planned, time_real=time_real, vehicle=vehicle
