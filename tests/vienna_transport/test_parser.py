@@ -61,10 +61,10 @@ def test_parse_line_name(parser: ViennaTransportParser) -> None:
     assert line.name == "5B"
 
 
-def test_parse_line_has_two_departures(parser: ViennaTransportParser) -> None:
+def test_parse_line_has_three_departures(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
     line = parser.parse(raw).stops[2683].lines[0]
-    assert len(line.departures) == 2
+    assert len(line.departures) == 3
 
 
 def test_parse_departure_times(parser: ViennaTransportParser) -> None:
@@ -86,6 +86,40 @@ def test_parse_departure_falls_back_to_time_planned_when_time_real_missing(
     departure = parser.parse(raw).stops[2683].lines[0].departures[1]
 
     assert departure.time_real == departure.time_planned
+
+
+def test_parse_departure_falls_back_to_time_real_when_time_planned_missing(
+    parser: ViennaTransportParser,
+) -> None:
+    raw = load_fixture("single_stop.json")
+    departure = parser.parse(raw).stops[2683].lines[0].departures[2]
+
+    assert departure.time_planned == departure.time_real
+
+
+def test_parse_departure_raises_on_both_times_missing(
+    parser: ViennaTransportParser,
+) -> None:
+    with pytest.raises(ValueError):
+        parser._parse_departure(
+            {
+                "departureTime": {},
+                "vehicle": {
+                    "name": "5B",
+                    "towards": "Bhf. Heiligenstadt S U",
+                    "direction": "H",
+                    "platform": "1",
+                    "richtungsId": "1",
+                    "barrierFree": True,
+                    "cooling": True,
+                    "realtimeSupported": False,
+                    "trafficjam": False,
+                    "type": "ptBusCity",
+                    "attributes": {},
+                    "linienId": 205,
+                },
+            }
+        )
 
 
 def test_parse_departure_times_are_timezone_aware(
