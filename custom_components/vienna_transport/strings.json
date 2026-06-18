@@ -8,7 +8,7 @@
           "stop_ids": "Stop IDs"
         },
         "data_description": {
-          "stop_ids": "Comma-separated list of RBL stop IDs, e.g., 4118, 1337"
+          "stop_ids": "Add one stop ID per line, e.g., 4118"
         }
       }
     },
