@@ -132,13 +132,24 @@ def test_parse_departure_times_are_timezone_aware(
     assert departure.time_real.tzinfo is not None
 
 
-def test_parse_vehicle(parser: ViennaTransportParser) -> None:
+def test_parse_cooled_vehicle(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
     vehicle: Vehicle = parser.parse(raw).stops[2683].lines[0].departures[0].vehicle
 
     assert vehicle.name == "5B"
     assert vehicle.type == "ptBusCity"
     assert vehicle.towards == "Bhf. Heiligenstadt S U"
+    assert vehicle.cooling is True
+
+
+def test_parse_non_cooled_vehicle(parser: ViennaTransportParser) -> None:
+    raw = load_fixture("single_stop.json")
+    vehicle: Vehicle = parser.parse(raw).stops[2683].lines[0].departures[1].vehicle
+
+    assert vehicle.name == "5B"
+    assert vehicle.type == "ptBusCity"
+    assert vehicle.towards == "Bhf. Heiligenstadt S U"
+    assert vehicle.cooling is False
 
 
 def test_parse_rate_limit_error(parser: ViennaTransportParser) -> None:
