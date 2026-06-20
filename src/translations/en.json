@@ -15,7 +15,8 @@
       "no_departures": "No departures available"
     },
     "time": {
-      "minute_short": "min"
+      "minute_short": "min",
+      "now": "now"
     }
   },
   "editor": {

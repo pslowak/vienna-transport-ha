@@ -199,7 +199,7 @@ export class TransportCard extends LitElement {
 
     private renderDeparture(dep: Departure, line: Line) {
         const planned = new Date(dep.time_planned);
-        const actual = new Date(dep.time_real ?? dep.time_planned);
+        const actual = new Date(dep.time_real);
         const now = new Date();
 
         // in minutes
@@ -217,27 +217,41 @@ export class TransportCard extends LitElement {
                 </div>
                 <div>${dep.vehicle.towards}</div>
                 <div>
-                    ${wait < 15
-                        ? html`<span
-                              >${wait}
-                              ${t("card.time.minute_short", this._lang)}</span
-                          >`
-                        : html`<span>
-                              ${actual.toLocaleTimeString(this._lang, {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  hour12: false,
-                              })}
-                          </span>`}
-                    ${delay == 0
-                        ? nothing
-                        : html`<span class="delay">
-                              (${Intl.NumberFormat(this._lang, {
-                                  signDisplay: "always",
-                              }).format(delay)})
-                          </span>`}
+                    ${this.renderWaitingTime(wait, actual)}
+                    ${this.renderDelay(delay)}
                 </div>
             </div>
         `;
+    }
+
+    private renderWaitingTime(wait: number, actual: Date) {
+        if (wait <= 0) {
+            return html`<span>${t("card.time.now", this._lang)}</span>`;
+        }
+        if (wait < 15) {
+            return html`
+                <span>${wait} ${t("card.time.minute_short", this._lang)}</span>
+            `;
+        }
+        return html`
+            <span
+                >${actual.toLocaleTimeString(this._lang, {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                })}</span
+            >
+        `;
+    }
+
+    private renderDelay(delay: number) {
+        if (delay == 0) {
+            return nothing;
+        }
+        return html`<span class="delay">
+            (${Intl.NumberFormat(this._lang, {
+                signDisplay: "always",
+            }).format(delay)})
+        </span>`;
     }
 }

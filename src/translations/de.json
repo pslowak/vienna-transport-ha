@@ -15,7 +15,8 @@
       "no_departures": "Keine Abfahrten verfügbar."
     },
     "time": {
-      "minute_short": "Min"
+      "minute_short": "Min",
+      "now": "Jetzt"
     }
   },
   "editor": {
