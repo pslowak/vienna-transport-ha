@@ -63,7 +63,6 @@
                     "platform": "1",
                     "richtungsId": "1",
                     "barrierFree": true,
-                    "cooling": true,
                     "realtimeSupported": false,
                     "trafficjam": false,
                     "type": "ptBusCity",

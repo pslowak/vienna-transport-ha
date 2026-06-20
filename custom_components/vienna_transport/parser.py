@@ -86,4 +86,8 @@ class ViennaTransportParser:
 
     @staticmethod
     def _parse_vehicle(raw: dict) -> Vehicle:
-        return Vehicle(name=raw["name"], type=raw["type"], towards=raw["towards"])
+        name = raw["name"]
+        vehicle_type = raw["type"]
+        towards = raw["towards"]
+        cooling = raw.get("cooling", False)
+        return Vehicle(name=name, type=vehicle_type, towards=towards, cooling=cooling)

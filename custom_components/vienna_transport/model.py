@@ -7,6 +7,7 @@ class Vehicle:
     name: str
     type: str
     towards: str
+    cooling: bool
 
 
 @dataclass(frozen=True)

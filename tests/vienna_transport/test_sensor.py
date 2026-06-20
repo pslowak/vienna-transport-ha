@@ -29,6 +29,7 @@ def make_stop(rbl: int = 2683, name: str = "Volkertplatz") -> Stop:
                             name="5B",
                             type="ptBusCity",
                             towards="Bhf. Heiligenstadt S U",
+                            cooling=True,
                         ),
                     )
                 ],
