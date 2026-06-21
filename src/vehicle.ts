@@ -47,27 +47,7 @@ function vehicleTypeFromString(type: string, name: string): VehicleType {
     }
 }
 
-function getVehicleType(line: any): VehicleType {
-    for (const dep of line.departures) {
-        if (dep.vehicle) {
-            return vehicleTypeFromString(dep.vehicle.type, line.name);
-        }
-    }
-
-    return VehicleType.UNKNOWN;
-}
-
-export function getVehicleInfo(
-    vehicle: Vehicle | undefined,
-    line: Line,
-): VehicleInfo {
-    if (!vehicle) {
-        // No vehicle info available for this departure
-        // try other departures of the same line
-        const type = getVehicleType(line);
-        return VEHICLE_REGISTRY[type];
-    }
-
+export function getVehicleInfo(vehicle: Vehicle, line: Line): VehicleInfo {
     const type: VehicleType = vehicleTypeFromString(vehicle.type, line.name);
     return VEHICLE_REGISTRY[type];
 }
