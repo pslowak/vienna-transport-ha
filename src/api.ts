@@ -23,6 +23,7 @@ export interface Vehicle {
     name: string;
     type: string;
     towards: string;
+    cooling: boolean;
 }
 
 export interface VehicleInfo {

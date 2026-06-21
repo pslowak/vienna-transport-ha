@@ -98,6 +98,25 @@ export class TransportCard extends LitElement {
             color: var(--error-color, #e53935);
         }
 
+        .towards-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .towards-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        ha-icon[icon="mdi:snowflake"] {
+            --mdc-icon-size: 14px;
+            color: var(--info-color, #4fc3f7);
+        }
+
         @media (prefers-color-scheme: dark) {
             ha-card {
                 background: rgba(40, 40, 40, 0.8);
@@ -215,13 +234,23 @@ export class TransportCard extends LitElement {
                 <div style="background:${info.background};color:${info.color}">
                     ${line.name}
                 </div>
-                <div>${dep.vehicle.towards}</div>
+                <div class="towards-cell">
+                    <span class="towards-text">${dep.vehicle.towards}</span>
+                    ${this.renderCoolingIndicator(dep.vehicle.cooling)}
+                </div>
                 <div>
                     ${this.renderWaitingTime(wait, actual)}
                     ${this.renderDelay(delay)}
                 </div>
             </div>
         `;
+    }
+
+    private renderCoolingIndicator(cooling: boolean) {
+        if (!cooling) {
+            return nothing;
+        }
+        return html`<ha-icon icon="mdi:snowflake"></ha-icon>`;
     }
 
     private renderWaitingTime(wait: number, actual: Date) {
