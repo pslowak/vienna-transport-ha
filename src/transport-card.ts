@@ -7,7 +7,6 @@ import {
     type Stop,
     type VehicleInfo,
 } from "./api.ts";
-import { ExpiringCache } from "./expiring-cache";
 import {
     TRANSPORT_CARD_EDITOR_NAME,
     TRANSPORT_CARD_NAME,
@@ -27,10 +26,6 @@ export class TransportCard extends LitElement {
     @state() private _lang: string = "en";
 
     @property() config: any;
-
-    private cache: ExpiringCache<Stop> = new ExpiringCache<Stop>(
-        2 * 60 * 1_000, // 2 minutes
-    );
 
     static getConfigElement() {
         return document.createElement(TRANSPORT_CARD_EDITOR_NAME);
@@ -156,33 +151,15 @@ export class TransportCard extends LitElement {
             `;
         }
 
-        const stop: Stop = entity.attributes as Stop;
-        const hasData = stop.lines && stop.lines.length > 0;
-
-        if (hasData) {
-            this.cache.set(stop);
-        }
-
-        const data = hasData ? stop : this.cache.get();
-
-        if (!data) {
-            return html`
-                <ha-card
-                    >${t("card.errors.fetch_departures", this._lang, {
-                        message: "no data",
-                    })}</ha-card
-                >
-            `;
-        }
-
-        let lines: Line[] = data.lines;
+        const stop = entity.attributes as Stop;
+        let lines: Line[] = stop.lines;
 
         if (
             this.config.lines &&
             Array.isArray(this.config.lines) &&
             this.config.lines.length > 0
         ) {
-            lines = data.lines.filter((line: Line) =>
+            lines = stop.lines.filter((line: Line) =>
                 this.config.lines.includes(line.name),
             );
         }
@@ -196,7 +173,7 @@ export class TransportCard extends LitElement {
         return html`
             <ha-card>
                 <div class="stop">
-                    <span>${data.props.name}</span>
+                    <span>${stop.props.name}</span>
                     ${lines.map((line: Line) => this.renderLine(line))}
                 </div>
             </ha-card>
