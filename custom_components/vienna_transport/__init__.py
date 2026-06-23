@@ -2,6 +2,8 @@
 Vienna Transport HA integration.
 """
 
+import logging
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
@@ -11,30 +13,40 @@ from custom_components.vienna_transport.const import DOMAIN
 from custom_components.vienna_transport.coordinator import ViennaTransportCoordinator
 from custom_components.vienna_transport.parser import ViennaTransportParser
 
+_LOGGER = logging.getLogger(__name__)
+
 PLATFORMS = ["sensor"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    stop_ids = entry.data["stop_ids"]
+    _LOGGER.debug("Setting up Vienna Transport integration for stops %s", stop_ids)
+
     session = aiohttp_client.async_get_clientsession(hass)
 
     pt_client = ViennaTransportClient(session=session)
     pt_parser = ViennaTransportParser()
 
     c = ViennaTransportCoordinator(
-        hass=hass, client=pt_client, parser=pt_parser, stop_ids=entry.data["stop_ids"]
+        hass=hass, client=pt_client, parser=pt_parser, stop_ids=stop_ids
     )
 
     await c.async_config_entry_first_refresh()
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = c
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    _LOGGER.debug("Vienna Transport integration setup complete for stops %s", stop_ids)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    _LOGGER.debug("Unloading Vienna Transport integration for entry %s", entry.entry_id)
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
+        _LOGGER.debug(
+            "Vienna Transport integration unloaded for entry %s", entry.entry_id
+        )
 
     return unload_ok
