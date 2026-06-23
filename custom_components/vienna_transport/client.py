@@ -30,6 +30,9 @@ class ViennaTransportClient:
             async with self._session.get(
                 _API_BASE_URL, params=params, timeout=_REQUEST_TIMEOUT
             ) as response:
+                _LOGGER.debug(
+                    "Received HTTP %s for stops %s", response.status, stop_ids
+                )
                 if response.status == _HTTP_OK or response.status == _HTTP_FORBIDDEN:
                     return await response.json()
                 else:

@@ -29,6 +29,7 @@ class ViennaTransportParser:
                 return TransportData(stops=stops, return_code=msg_code)
 
             if msg_code == _MSG_CODE_RATE_LIMIT:
+                _LOGGER.warning("API rate limit reached (message code %s)", msg_code)
                 return TransportData(stops={}, return_code=_MSG_CODE_RATE_LIMIT)
 
             _LOGGER.warning("Unexpected message code %s", msg_code)
