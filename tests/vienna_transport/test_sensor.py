@@ -67,19 +67,19 @@ def test_available_false_when_data_is_none(hass) -> None:
 
 
 def test_available_false_when_stop_not_in_data(hass) -> None:
-    data = TransportData(stops={9999: make_stop(9999)}, return_code=1)
+    data = TransportData(stops={9999: make_stop(9999)})
     sensor = make_sensor(hass, data=data, stop_id=2683)
     assert sensor.available is False
 
 
 def test_available_true_when_stop_in_data(hass) -> None:
-    data = TransportData(stops={2683: make_stop(2683)}, return_code=1)
+    data = TransportData(stops={2683: make_stop(2683)})
     sensor = make_sensor(hass, data=data, stop_id=2683)
     assert sensor.available is True
 
 
 def test_native_value_is_ok(hass) -> None:
-    data = TransportData(stops={2683: make_stop()}, return_code=1)
+    data = TransportData(stops={2683: make_stop()})
     sensor = make_sensor(hass, data=data)
     assert sensor.native_value == "ok"
 
@@ -90,7 +90,7 @@ def test_extra_state_attributes_empty_when_data_is_none(hass) -> None:
 
 
 def test_extra_state_attributes_empty_when_stop_not_found(hass) -> None:
-    data = TransportData(stops={9999: make_stop(9999)}, return_code=1)
+    data = TransportData(stops={9999: make_stop(9999)})
     sensor = make_sensor(hass, data=data, stop_id=2683)
     assert sensor.extra_state_attributes == {}
 
@@ -101,7 +101,6 @@ def test_sensor_only_returns_its_own_stop(hass) -> None:
             1337: make_stop(1337, "Schottentor"),
             2683: make_stop(2683, "Volkertplatz"),
         },
-        return_code=1,
     )
     sensor = make_sensor(hass, data=data, stop_id=2683)
     assert sensor.extra_state_attributes["props"]["name"] == "Volkertplatz"

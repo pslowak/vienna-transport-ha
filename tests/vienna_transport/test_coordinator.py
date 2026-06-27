@@ -20,7 +20,7 @@ def mock_parser() -> MagicMock:
 
 @pytest.fixture
 def transport_data() -> TransportData:
-    return TransportData(stops={2683: MagicMock(spec=Stop)}, return_code=1)
+    return TransportData(stops={2683: MagicMock(spec=Stop)})
 
 
 @pytest.fixture
