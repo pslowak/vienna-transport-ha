@@ -4,11 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from custom_components.vienna_transport.model import (
-    Departure,
-    TransportData,
-    Vehicle,
-)
+from custom_components.vienna_transport.model import Departure, TransportData, Vehicle
 from custom_components.vienna_transport.parser import ViennaTransportParser
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -27,12 +23,6 @@ def test_parse_returns_transport_data(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
     result = parser.parse(raw)
     assert isinstance(result, TransportData)
-
-
-def test_parse_return_code_is_1_on_success(parser: ViennaTransportParser) -> None:
-    raw = load_fixture("single_stop.json")
-    result = parser.parse(raw)
-    assert result.return_code == 1
 
 
 def test_parse_produces_one_stop(parser: ViennaTransportParser) -> None:
@@ -158,7 +148,6 @@ def test_parse_rate_limit_error(parser: ViennaTransportParser) -> None:
     }
     result = parser.parse(raw)
 
-    assert result.return_code == 316
     assert len(result.stops) == 0
 
 
@@ -168,7 +157,6 @@ def test_parse_unknown_code(parser: ViennaTransportParser) -> None:
     }
     result = parser.parse(raw)
 
-    assert result.return_code == -1
     assert len(result.stops) == 0
 
 
@@ -183,5 +171,4 @@ def test_parse_malformed_data(parser: ViennaTransportParser) -> None:
     }
     result = parser.parse(raw)
 
-    assert result.return_code == -1
     assert len(result.stops) == 0

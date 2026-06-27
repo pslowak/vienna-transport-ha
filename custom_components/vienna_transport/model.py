@@ -38,4 +38,3 @@ class Stop:
 @dataclass(frozen=True)
 class TransportData:
     stops: dict[int, Stop]
-    return_code: int
