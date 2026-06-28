@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+from custom_components.vienna_transport.exceptions import ParserError
 from custom_components.vienna_transport.model import (
     Departure,
     Line,
@@ -14,13 +15,14 @@ _LOGGER = logging.getLogger(__name__)
 
 _MSG_CODE_OK = 1
 _MSG_CODE_RATE_LIMIT = 316
+_MSG_CODE_UNKNOWN = -1
 
 
 class ViennaTransportParser:
     def parse(self, raw: dict) -> TransportData:
         try:
             msg = raw["message"]
-            msg_code = msg.get("messageCode", -1)
+            msg_code = msg.get("messageCode", _MSG_CODE_UNKNOWN)
 
             if msg_code == _MSG_CODE_OK:
                 raw_monitors = raw.get("data", {}).get("monitors", [])
@@ -30,14 +32,14 @@ class ViennaTransportParser:
 
             if msg_code == _MSG_CODE_RATE_LIMIT:
                 _LOGGER.warning("API rate limit reached (message code %s)", msg_code)
-                return TransportData(stops={})
+                raise ParserError(f"API rate limit reached (message code {msg_code})")
 
             _LOGGER.warning("Unexpected message code %s", msg_code)
-            return TransportData(stops={})
+            raise ParserError(f"Unexpected message code {msg_code}")
         except (KeyError, TypeError, ValueError) as e:
             _LOGGER.exception(f"unexpected API response {e}")
             _LOGGER.debug(f"API response {raw}")
-            return TransportData(stops={})
+            raise ParserError(f"unexpected API response: {e}") from e
 
     @staticmethod
     def _parse_stop(raw: dict) -> Stop:
@@ -78,7 +80,7 @@ class ViennaTransportParser:
             time_real = datetime.fromisoformat(time_real_raw)
             time_planned = time_real
         else:
-            raise ValueError("Both timePlanned and timeReal are missing")
+            raise ParserError("Both timePlanned and timeReal are missing")
 
         vehicle = ViennaTransportParser._parse_vehicle(raw["vehicle"])
         return Departure(
