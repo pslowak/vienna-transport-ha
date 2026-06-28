@@ -8,7 +8,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from custom_components.vienna_transport.client import ViennaTransportClient
-from custom_components.vienna_transport.exceptions import ClientError
+from custom_components.vienna_transport.exceptions import ClientError, ParserError
 from custom_components.vienna_transport.model import TransportData
 from custom_components.vienna_transport.parser import ViennaTransportParser
 
@@ -36,6 +36,6 @@ class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
     async def _async_update_data(self) -> TransportData:
         try:
             raw = await self._client.fetch(self.stop_ids)
-        except ClientError as err:
-            raise UpdateFailed(str(err)) from err
-        return self._parser.parse(raw)
+            return self._parser.parse(raw)
+        except (ClientError, ParserError) as e:
+            raise UpdateFailed(str(e)) from e

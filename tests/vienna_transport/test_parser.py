@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from custom_components.vienna_transport.exceptions import ParserError
 from custom_components.vienna_transport.model import Departure, TransportData, Vehicle
 from custom_components.vienna_transport.parser import ViennaTransportParser
 
@@ -90,7 +91,7 @@ def test_parse_departure_falls_back_to_time_real_when_time_planned_missing(
 def test_parse_departure_raises_on_both_times_missing(
     parser: ViennaTransportParser,
 ) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ParserError):
         parser._parse_departure(
             {
                 "departureTime": {},
@@ -146,18 +147,16 @@ def test_parse_rate_limit_error(parser: ViennaTransportParser) -> None:
     raw = {
         "message": {"messageCode": 316, "value": "Rate limit exceeded"},
     }
-    result = parser.parse(raw)
-
-    assert len(result.stops) == 0
+    with pytest.raises(ParserError, match="rate limit"):
+        parser.parse(raw)
 
 
 def test_parse_unknown_code(parser: ViennaTransportParser) -> None:
     raw = {
         "message": {"messageCode": -1, "value": "Some unknown code"},
     }
-    result = parser.parse(raw)
-
-    assert len(result.stops) == 0
+    with pytest.raises(ParserError, match="Unexpected message code"):
+        parser.parse(raw)
 
 
 def test_parse_malformed_data(parser: ViennaTransportParser) -> None:
@@ -169,6 +168,5 @@ def test_parse_malformed_data(parser: ViennaTransportParser) -> None:
             ]
         },
     }
-    result = parser.parse(raw)
-
-    assert len(result.stops) == 0
+    with pytest.raises(ParserError, match="unexpected API response"):
+        parser.parse(raw)
