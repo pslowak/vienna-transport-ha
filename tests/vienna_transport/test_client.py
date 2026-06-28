@@ -5,9 +5,9 @@ import aiohttp
 import pytest
 from aiohttp import ClientSession
 from aioresponses import aioresponses
-from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from custom_components.vienna_transport.client import ViennaTransportClient
+from custom_components.vienna_transport.exceptions import ClientError
 
 
 @pytest.fixture
@@ -69,7 +69,7 @@ async def test_fetch_raises_update_failed_on_non_200(
             "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=1", status=500
         )
 
-        with pytest.raises(UpdateFailed, match="Unexpected HTTP status code: 500"):
+        with pytest.raises(ClientError, match="Unexpected HTTP status code: 500"):
             await client.fetch(["1"])
 
 
@@ -82,7 +82,7 @@ async def test_fetch_raises_update_failed_on_connection_error(
             exception=aiohttp.ClientConnectionError("refused"),
         )
 
-        with pytest.raises(UpdateFailed, match="Connection error: refused"):
+        with pytest.raises(ClientError, match="Connection error: refused"):
             await client.fetch(["1"])
 
 
@@ -95,5 +95,5 @@ async def test_fetch_raises_update_failed_on_timeout(
             exception=TimeoutError(),
         )
 
-        with pytest.raises(UpdateFailed, match="Timeout error"):
+        with pytest.raises(ClientError, match="Timeout error"):
             await client.fetch(["1"])
