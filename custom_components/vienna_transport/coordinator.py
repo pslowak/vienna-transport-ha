@@ -2,9 +2,13 @@ import logging
 from datetime import timedelta
 
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers.update_coordinator import (
+    DataUpdateCoordinator,
+    UpdateFailed,
+)
 
 from custom_components.vienna_transport.client import ViennaTransportClient
+from custom_components.vienna_transport.exceptions import ClientError
 from custom_components.vienna_transport.model import TransportData
 from custom_components.vienna_transport.parser import ViennaTransportParser
 
@@ -30,5 +34,8 @@ class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
         self.stop_ids = stop_ids
 
     async def _async_update_data(self) -> TransportData:
-        raw = await self._client.fetch(self.stop_ids)
+        try:
+            raw = await self._client.fetch(self.stop_ids)
+        except ClientError as err:
+            raise UpdateFailed(str(err)) from err
         return self._parser.parse(raw)

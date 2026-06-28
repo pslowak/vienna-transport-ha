@@ -1,7 +1,8 @@
 import logging
 
 import aiohttp
-from homeassistant.helpers.update_coordinator import UpdateFailed
+
+from custom_components.vienna_transport.exceptions import ClientError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,11 +36,8 @@ class ViennaTransportClient:
                 )
                 if response.status == _HTTP_OK or response.status == _HTTP_FORBIDDEN:
                     return await response.json()
-                else:
-                    raise UpdateFailed(
-                        f"Unexpected HTTP status code: {response.status}"
-                    )
+                raise ClientError(f"Unexpected HTTP status code: {response.status}")
         except aiohttp.ClientConnectionError as e:
-            raise UpdateFailed(f"Connection error: {e}") from e
+            raise ClientError(f"Connection error: {e}") from e
         except TimeoutError as e:
-            raise UpdateFailed(f"Timeout error: {e}") from e
+            raise ClientError(f"Timeout error: {e}") from e
