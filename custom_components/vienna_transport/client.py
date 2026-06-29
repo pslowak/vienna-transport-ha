@@ -10,7 +10,6 @@ _API_BASE_URL = "https://www.wienerlinien.at/ogd_realtime/monitor"
 _REQUEST_TIMEOUT = aiohttp.ClientTimeout(total=10)
 
 _HTTP_OK = 200
-_HTTP_FORBIDDEN = 403
 
 
 class ViennaTransportClient:
@@ -34,7 +33,7 @@ class ViennaTransportClient:
                 _LOGGER.debug(
                     "Received HTTP %s for stops %s", response.status, stop_ids
                 )
-                if response.status == _HTTP_OK or response.status == _HTTP_FORBIDDEN:
+                if response.status == _HTTP_OK:
                     return await response.json()
                 raise ClientError(f"Unexpected HTTP status code: {response.status}")
         except aiohttp.ClientConnectionError as e:

@@ -46,6 +46,32 @@ async def test_fetch_returns_json_on_200(
     assert result == payload
 
 
+async def test_fetch_raises_on_403(
+    client: ViennaTransportClient,
+) -> None:
+    with aioresponses() as mock:
+        mock.get(
+            "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=1",
+            status=403,
+            payload={"message": {"messageCode": 316}},
+        )
+
+        with pytest.raises(ClientError, match="Unexpected HTTP status code: 403"):
+            await client.fetch(["1"])
+
+
+async def test_fetch_raises_client_error_on_non_200(
+    client: ViennaTransportClient,
+) -> None:
+    with aioresponses() as mock:
+        mock.get(
+            "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=1", status=500
+        )
+
+        with pytest.raises(ClientError, match="Unexpected HTTP status code: 500"):
+            await client.fetch(["1"])
+
+
 async def test_fetch_sends_multiple_stop_ids(
     client: ViennaTransportClient,
 ) -> None:
@@ -59,18 +85,6 @@ async def test_fetch_sends_multiple_stop_ids(
         result = await client.fetch(["1", "2"])
 
     assert result == payload
-
-
-async def test_fetch_raises_update_failed_on_non_200(
-    client: ViennaTransportClient,
-) -> None:
-    with aioresponses() as mock:
-        mock.get(
-            "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=1", status=500
-        )
-
-        with pytest.raises(ClientError, match="Unexpected HTTP status code: 500"):
-            await client.fetch(["1"])
 
 
 async def test_fetch_raises_update_failed_on_connection_error(
