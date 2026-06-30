@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
 
+from custom_components.vienna_transport.cache import ExpiringCache
 from custom_components.vienna_transport.client import ViennaTransportClient
 from custom_components.vienna_transport.const import DOMAIN
 from custom_components.vienna_transport.coordinator import ViennaTransportCoordinator
@@ -26,9 +27,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     pt_client = ViennaTransportClient(session=session)
     pt_parser = ViennaTransportParser()
+    pt_cache = ExpiringCache()
 
     c = ViennaTransportCoordinator(
-        hass=hass, client=pt_client, parser=pt_parser, stop_ids=stop_ids
+        hass=hass, client=pt_client, parser=pt_parser, cache=pt_cache, stop_ids=stop_ids
     )
 
     await c.async_config_entry_first_refresh()
