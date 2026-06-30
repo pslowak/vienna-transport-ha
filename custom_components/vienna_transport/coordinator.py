@@ -7,6 +7,7 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
 )
 
+from custom_components.vienna_transport.cache import ExpiringCache
 from custom_components.vienna_transport.client import ViennaTransportClient
 from custom_components.vienna_transport.exceptions import ClientError, ParserError
 from custom_components.vienna_transport.model import TransportData
@@ -21,6 +22,7 @@ class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
         hass: HomeAssistant,
         client: ViennaTransportClient,
         parser: ViennaTransportParser,
+        cache: ExpiringCache,
         stop_ids: list[str],
     ) -> None:
         super().__init__(
@@ -31,11 +33,25 @@ class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
         )
         self._client = client
         self._parser = parser
+        self._cache = cache
         self.stop_ids = stop_ids
 
     async def _async_update_data(self) -> TransportData:
         try:
             raw = await self._client.fetch(self.stop_ids)
-            return self._parser.parse(raw)
+            parsed = self._parser.parse(raw)
+            self._cache.set(parsed)
+            _LOGGER.debug("Cache updated")
+            return parsed
         except (ClientError, ParserError) as e:
+            cached = self._cache.get()
+            if cached is not None:
+                _LOGGER.info(
+                    "Cache hit: Using transport data due to %s: %s",
+                    type(e).__name__,
+                    e,
+                    exc_info=True,
+                )
+                return cached
+            _LOGGER.debug("Cache miss")
             raise UpdateFailed(str(e)) from e

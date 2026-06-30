@@ -44,6 +44,7 @@ def make_coordinator(hass, data: TransportData | None) -> ViennaTransportCoordin
         stop_ids=["2683"],
         client=MagicMock(),
         parser=MagicMock(),
+        cache=MagicMock(),
     )
     coordinator.data = data
     return coordinator
