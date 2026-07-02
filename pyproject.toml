@@ -10,7 +10,7 @@ license = { text = "MIT" }
 
 dependencies = [
     "homeassistant>=2026.6.4",
-    "aiohttp>=3.9.0",
+    "aiohttp>=3.13.5",
 ]
 
 [project.optional-dependencies]
