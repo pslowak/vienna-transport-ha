@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -49,7 +50,7 @@ class ViennaTransportSensor(
         return "ok"
 
     @property
-    def extra_state_attributes(self) -> dict:
+    def extra_state_attributes(self) -> dict[str, Any]:
         if self.coordinator.data is None:
             return {}
 
