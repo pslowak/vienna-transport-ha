@@ -6,8 +6,8 @@ from custom_components.vienna_transport.model import TransportData
 class ExpiringCache:
     def __init__(self, ttl: timedelta = timedelta(minutes=3)) -> None:
         self._ttl = ttl
-        self._timestamp = None
-        self._data = None
+        self._timestamp: datetime | None = None
+        self._data: TransportData | None = None
 
     def set(self, data: TransportData) -> None:
         self._timestamp = datetime.now(UTC)
