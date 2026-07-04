@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from custom_components.vienna_transport.cache import ExpiringCache
@@ -33,7 +34,10 @@ def transport_data() -> TransportData:
 
 @pytest.fixture
 def coordinator(
-    hass, mock_client, mock_parser, mock_cache
+    hass: HomeAssistant,
+    mock_client: MagicMock,
+    mock_parser: MagicMock,
+    mock_cache: MagicMock,
 ) -> ViennaTransportCoordinator:
     return ViennaTransportCoordinator(
         hass=hass,
