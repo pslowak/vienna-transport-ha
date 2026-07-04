@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Any
 
 from custom_components.vienna_transport.exceptions import ParserError
 from custom_components.vienna_transport.model import (
@@ -19,7 +20,7 @@ _MSG_CODE_UNKNOWN = -1
 
 
 class ViennaTransportParser:
-    def parse(self, raw: dict) -> TransportData:
+    def parse(self, raw: dict[str, Any]) -> TransportData:
         try:
             msg = raw["message"]
             msg_code = msg.get("messageCode", _MSG_CODE_UNKNOWN)
@@ -42,7 +43,7 @@ class ViennaTransportParser:
             raise ParserError(f"unexpected API response: {e}") from e
 
     @staticmethod
-    def _parse_stop(raw: dict) -> Stop:
+    def _parse_stop(raw: dict[str, Any]) -> Stop:
         props = ViennaTransportParser._parse_properties(
             raw["locationStop"]["properties"]
         )
@@ -52,11 +53,11 @@ class ViennaTransportParser:
         return Stop(props=props, lines=lines)
 
     @staticmethod
-    def _parse_properties(raw: dict) -> StopProperties:
+    def _parse_properties(raw: dict[str, Any]) -> StopProperties:
         return StopProperties(id=int(raw["attributes"]["rbl"]), name=raw["title"])
 
     @staticmethod
-    def _parse_line(raw: dict) -> Line:
+    def _parse_line(raw: dict[str, Any]) -> Line:
         name = raw["name"]
         departures = [
             ViennaTransportParser._parse_departure(dep)
@@ -65,7 +66,7 @@ class ViennaTransportParser:
         return Line(name=name, departures=departures)
 
     @staticmethod
-    def _parse_departure(raw: dict) -> Departure:
+    def _parse_departure(raw: dict[str, Any]) -> Departure:
         times = raw["departureTime"]
         time_planned_raw = times.get("timePlanned")
         time_real_raw = times.get("timeReal")
@@ -88,7 +89,7 @@ class ViennaTransportParser:
         )
 
     @staticmethod
-    def _parse_vehicle(raw: dict) -> Vehicle:
+    def _parse_vehicle(raw: dict[str, Any]) -> Vehicle:
         name = raw["name"]
         vehicle_type = raw["type"]
         towards = raw["towards"]
