@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -11,8 +12,9 @@ from custom_components.vienna_transport.parser import ViennaTransportParser
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
-def load_fixture(filename: str) -> dict:
-    return json.loads((FIXTURES_DIR / filename).read_text())
+def load_fixture(filename: str) -> dict[str, Any]:
+    result: dict[str, Any] = json.loads((FIXTURES_DIR / filename).read_text())
+    return result
 
 
 @pytest.fixture
