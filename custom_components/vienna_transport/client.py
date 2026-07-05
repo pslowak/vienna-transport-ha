@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 import aiohttp
 
@@ -16,7 +17,7 @@ class ViennaTransportClient:
     def __init__(self, session: aiohttp.ClientSession) -> None:
         self._session = session
 
-    async def fetch(self, stop_ids: list[str]) -> dict:
+    async def fetch(self, stop_ids: list[str]) -> dict[str, Any]:
         """Fetches departure data for one or more stops."""
 
         if not stop_ids:
@@ -34,7 +35,8 @@ class ViennaTransportClient:
                     "Received HTTP %s for stops %s", response.status, stop_ids
                 )
                 if response.status == _HTTP_OK:
-                    return await response.json()
+                    data: dict[str, Any] = await response.json()
+                    return data
                 raise ClientError(f"Unexpected HTTP status code: {response.status}")
         except aiohttp.ClientConnectionError as e:
             raise ClientError(f"Connection error: {e}") from e
