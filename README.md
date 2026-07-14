@@ -8,10 +8,9 @@ A custom integration and Lovelace card for [Home Assistant](https://www.home-ass
 
 ## Installation
 
-1. Copy `custom_components/vienna_transport/` into your Home Assistant `custom_components/` directory.
-2. Restart Home Assistant.
-3. Copy `dist/transport-card.js` into your Home Assistant `www/` directory.
-4. Register the card resource in your Home Assistant configuration (see [Registering Resources](https://developers.home-assistant.io/docs/frontend/custom-ui/registering-resources/)).
+1. Download the latest release from the [GitHub releases page](https://github.com/pslowak/vienna-transport-ha/releases). 
+2. Copy `custom_components/vienna_transport/` into your `custom_components/` directory.
+3. Restart Home Assistant.
 
 ## Configuration
 
@@ -19,6 +18,7 @@ A custom integration and Lovelace card for [Home Assistant](https://www.home-ass
 2. Search for *Vienna Public Transport* and select it.
 3. Enter the **RBL stop IDs** you want to monitor. 
 4. A sensor entity (e.g. `sensor.vienna_transport_departures_for_stop_2683`) is created for each stop ID.
+5. If the card does not appear in the Lovelace card picker, **clear your browser cache**.
 
 ## Lovelace Card
 
@@ -53,8 +53,9 @@ uv run mypy custom_components tests   # Type checking
 ### Frontend (Lovelace card)
 
 ```bash
-npm install                 # Install dependencies
-npm run dev                 # Development server
-npm run build               # Build the card
-npm run test                # Run tests
+npm install                   # Install dependencies
+npm run dev                   # Development server
+npm run build                 # Build the card
+npm run build:release         # Build the card for release
+npm run test                  # Run tests
 ```

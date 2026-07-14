@@ -10,3 +10,6 @@ node_modules
 .vite
 
 *.iml
+
+# Mount point the the transport-card.js file
+/custom_components/vienna_transport/frontend/transport-card.js
