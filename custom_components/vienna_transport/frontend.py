@@ -2,7 +2,6 @@ import logging
 from pathlib import Path
 
 from homeassistant.components.http import StaticPathConfig
-from homeassistant.components.lovelace import DOMAIN as LOVELACE_DOMAIN
 from homeassistant.components.lovelace import LovelaceData
 from homeassistant.components.lovelace.resources import ResourceStorageCollection
 from homeassistant.core import HomeAssistant
@@ -12,6 +11,7 @@ from .const import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 
 CARD_URL = f"/api/static/{DOMAIN}/transport-card.js"
+LOVELACE_DOMAIN = "lovelace"
 
 
 async def async_register_card(hass: HomeAssistant) -> None:
