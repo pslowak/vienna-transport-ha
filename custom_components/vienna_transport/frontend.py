@@ -25,9 +25,17 @@ async def async_register_card(hass: HomeAssistant) -> None:
         )
         return
 
-    await hass.http.async_register_static_paths(
-        [StaticPathConfig(url_path=CARD_URL, path=str(card_path), cache_headers=True)]
-    )
+    try:
+        await hass.http.async_register_static_paths(
+            [
+                StaticPathConfig(
+                    url_path=CARD_URL, path=str(card_path), cache_headers=True
+                )
+            ]
+        )
+        _LOGGER.debug("Static path registered: %s -> %s", CARD_URL, card_path)
+    except RuntimeError:
+        _LOGGER.debug("Static path already registered: %s", CARD_URL)
 
     lovelace: LovelaceData | None = hass.data.get(LOVELACE_DOMAIN)
     if lovelace is None:
