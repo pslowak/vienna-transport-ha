@@ -14,6 +14,15 @@ import {
 import "./transport-card-editor.ts";
 import { getHassLanguage, t } from "./i18n.ts";
 
+(window as any).customCards = (window as any).customCards || [];
+(window as any).customCards.push({
+    type: TRANSPORT_CARD_NAME,
+    name: "Vienna Public Transport Card",
+    description: "Display departures from Vienna public transport stops",
+    preview: true,
+    documentationURL: "https://github.com/pslowak/vienna-transport-ha",
+});
+
 @customElement(TRANSPORT_CARD_NAME)
 export class TransportCard extends LitElement {
     @property({ attribute: false })
