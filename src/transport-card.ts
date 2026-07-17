@@ -40,6 +40,12 @@ export class TransportCard extends LitElement {
         return document.createElement(TRANSPORT_CARD_EDITOR_NAME);
     }
 
+    static getStubConfig(): Record<string, unknown> {
+        return {
+            max_departures: 3,
+        };
+    }
+
     static styles = css`
         ha-card {
             display: flex;
