@@ -1,13 +1,16 @@
+import asyncio
 from collections.abc import AsyncGenerator
 from typing import Any
 
 import aiohttp
 import pytest
 from aiohttp import ClientSession
-from aioresponses import aioresponses
+from aiointercept import CallbackResult, aiointercept
 
 from custom_components.vienna_transport.client import ViennaTransportClient
 from custom_components.vienna_transport.exceptions import ClientError
+
+_API_URL = "https://www.wienerlinien.at/ogd_realtime/monitor"
 
 
 @pytest.fixture
@@ -24,23 +27,18 @@ def client(session: aiohttp.ClientSession) -> ViennaTransportClient:
 async def test_fetch_raises_value_error_on_empty_stop_ids(
     client: ViennaTransportClient,
 ) -> None:
-    with aioresponses() as mock:
-        with pytest.raises(ValueError, match="stop_ids cannot be empty"):
-            await client.fetch([])
-
-        assert len(mock.requests) == 0
+    with pytest.raises(ValueError, match="stop_ids cannot be empty"):
+        await client.fetch([])
 
 
 async def test_fetch_returns_json_on_200(
     client: ViennaTransportClient,
+    socket_enabled: None,
 ) -> None:
     payload = {"message": {"messageCode": 1}, "data": {"monitors": []}}
 
-    with aioresponses() as mock:
-        mock.get(
-            "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=1",
-            payload=payload,
-        )
+    async with aiointercept(mock_external_urls=True) as mock:
+        mock.get(f"{_API_URL}?stopId=1", payload=payload)
         result = await client.fetch(["1"])
 
     assert result == payload
@@ -48,10 +46,11 @@ async def test_fetch_returns_json_on_200(
 
 async def test_fetch_raises_on_403(
     client: ViennaTransportClient,
+    socket_enabled: None,
 ) -> None:
-    with aioresponses() as mock:
+    async with aiointercept(mock_external_urls=True) as mock:
         mock.get(
-            "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=1",
+            f"{_API_URL}?stopId=1",
             status=403,
             payload={"message": {"messageCode": 316}},
         )
@@ -62,11 +61,10 @@ async def test_fetch_raises_on_403(
 
 async def test_fetch_raises_client_error_on_non_200(
     client: ViennaTransportClient,
+    socket_enabled: None,
 ) -> None:
-    with aioresponses() as mock:
-        mock.get(
-            "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=1", status=500
-        )
+    async with aiointercept(mock_external_urls=True) as mock:
+        mock.get(f"{_API_URL}?stopId=1", status=500)
 
         with pytest.raises(ClientError, match="Unexpected HTTP status code: 500"):
             await client.fetch(["1"])
@@ -74,14 +72,12 @@ async def test_fetch_raises_client_error_on_non_200(
 
 async def test_fetch_sends_multiple_stop_ids(
     client: ViennaTransportClient,
+    socket_enabled: None,
 ) -> None:
     payload = {"message": {"messageCode": 1}, "data": {"monitors": []}}
 
-    with aioresponses() as mock:
-        mock.get(
-            "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=1&stopId=2",
-            payload=payload,
-        )
+    async with aiointercept(mock_external_urls=True) as mock:
+        mock.get(f"{_API_URL}?stopId=1&stopId=2", payload=payload)
         result = await client.fetch(["1", "2"])
 
     assert result == payload
@@ -89,25 +85,35 @@ async def test_fetch_sends_multiple_stop_ids(
 
 async def test_fetch_raises_update_failed_on_connection_error(
     client: ViennaTransportClient,
+    socket_enabled: None,
 ) -> None:
-    with aioresponses() as mock:
-        mock.get(
-            "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=1",
-            exception=aiohttp.ClientConnectionError("refused"),
-        )
+    async with aiointercept(mock_external_urls=True) as mock:
+        mock.get(f"{_API_URL}?stopId=1", exception=True)
 
-        with pytest.raises(ClientError, match="Connection error: refused"):
+        with pytest.raises(ClientError, match="Connection error"):
             await client.fetch(["1"])
 
 
 async def test_fetch_raises_update_failed_on_timeout(
     client: ViennaTransportClient,
+    socket_enabled: None,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    with aioresponses() as mock:
-        mock.get(
-            "https://www.wienerlinien.at/ogd_realtime/monitor?stopId=1",
-            exception=TimeoutError(),
-        )
+    import custom_components.vienna_transport.client as client_mod
+
+    monkeypatch.setattr(
+        client_mod, "_REQUEST_TIMEOUT", aiohttp.ClientTimeout(total=0.1)
+    )
+
+    async def _slow_handler(
+        url: str,
+        **kwargs: Any,
+    ) -> CallbackResult:
+        await asyncio.sleep(0.2)
+        return CallbackResult(status=200)
+
+    async with aiointercept(mock_external_urls=True) as mock:
+        mock.get(f"{_API_URL}?stopId=1", callback=_slow_handler)
 
         with pytest.raises(ClientError, match="Timeout error"):
             await client.fetch(["1"])
