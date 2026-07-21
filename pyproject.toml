@@ -19,7 +19,7 @@ dev = [
     "freezegun>=1.5.0",
     "mypy>=2.3.0",
     "pytest-homeassistant-custom-component>=0.13.340",
-    "ruff>=0.15.20",
+    "ruff>=0.15.22",
 ]
 
 [tool.uv]
