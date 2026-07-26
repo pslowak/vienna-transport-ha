@@ -41,9 +41,11 @@ export function t(
 
     const value = key
         .split(".")
-        .reduce<
-            TranslationVal | undefined
-        >((node, segment) => (node as Record<string, TranslationVal>)?.[segment], bundle);
+        .reduce<TranslationVal | undefined>(
+            (node, segment) =>
+                (node as Record<string, TranslationVal>)?.[segment],
+            bundle,
+        );
 
     if (typeof value !== "string") {
         console.warn(`[i18n] Missing key "${key}" in locale "${registryKey}"`);
