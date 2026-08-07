@@ -1,0 +1,19 @@
+{
+  "bootstrap-sha": "a7166627d9a90caad112c3fc02c8fd3272453e7f",
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "initial-version": "1.0.0",
+      "extra-files": [
+        "package.json",
+        {
+          "type": "toml",
+          "path": "pyproject.toml",
+          "jsonpath": "$.project.version"
+        },
+        "custom_components/vienna_transport/manifest.json"
+      ],
+      "include-component-in-tag": false
+    }
+  }
+}
