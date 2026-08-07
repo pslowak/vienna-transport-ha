@@ -1,2 +1,3 @@
 node_modules
 dist
+custom_components/vienna_transport/manifest.json
