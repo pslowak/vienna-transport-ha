@@ -1,10 +1,21 @@
-# Vienna Public Transport Card
+<h1 align="center">Vienna Public Transport</h1>
 
+<p align="center"><em>Real-time departures for Vienna's public transport, right on your Home Assistant dashboard.</em></p>
+
+[![GitHub Release](https://img.shields.io/github/v/release/pslowak/vienna-transport-ha)](https://github.com/pslowak/vienna-transport-ha/releases/latest) 
 [![backend tests](https://github.com/pslowak/vienna-transport-ha/actions/workflows/be-test.yml/badge.svg)](https://github.com/pslowak/vienna-transport-ha/actions/workflows/be-test.yml)
 
 A custom integration and Lovelace card for [Home Assistant](https://www.home-assistant.io/) that displays real-time public transport departures in Vienna, Austria (Wiener Linien).
 
 ![Mobile View](docs/images/card-mockup-mobile.jpg)
+
+## Features
+
+- **Live departures** from Wiener Linien
+- **Delay indicator** - know exactly which departure is running late and by how much
+- **Cooling indicator** - know exactly which vehicles are air-conditioned
+- **Auto-registered Lovelace card** - no manual resource setup
+- **One sensor per stop** - multiple stops per config entry
 
 ## Installation
 
@@ -16,7 +27,7 @@ A custom integration and Lovelace card for [Home Assistant](https://www.home-ass
 
 1. Go to **Settings → Devices & Services → Add Integration**.
 2. Search for *Vienna Public Transport* and select it.
-3. Enter the **RBL stop IDs** you want to monitor. 
+3. Enter the **RBL stop IDs** you want to monitor. You can find stop IDs via the [RBL search](https://till.mabe.at/rbl/).
 4. A sensor entity (e.g. `sensor.vienna_transport_departures_for_stop_2683`) is created for each stop ID.
 5. If the card does not appear in the Lovelace card picker, **clear your browser cache**.
 
