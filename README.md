@@ -2,7 +2,8 @@
 
 <p align="center"><em>Real-time departures for Vienna's public transport, right on your Home Assistant dashboard.</em></p>
 
-[![GitHub Release](https://img.shields.io/github/v/release/pslowak/vienna-transport-ha)](https://github.com/pslowak/vienna-transport-ha/releases/latest) 
+[![GitHub Release](https://img.shields.io/github/v/release/pslowak/vienna-transport-ha)](https://github.com/pslowak/vienna-transport-ha/releases/latest)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![backend tests](https://github.com/pslowak/vienna-transport-ha/actions/workflows/be-test.yml/badge.svg)](https://github.com/pslowak/vienna-transport-ha/actions/workflows/be-test.yml)
 
 A custom integration and Lovelace card for [Home Assistant](https://www.home-assistant.io/) that displays real-time public transport departures in Vienna, Austria (Wiener Linien).
@@ -18,6 +19,14 @@ A custom integration and Lovelace card for [Home Assistant](https://www.home-ass
 - **One sensor per stop** - multiple stops per config entry
 
 ## Installation
+
+### HACS (recommended)
+
+1. In HACS go to **Settings → Custom repositories** and add `https://github.com/pslowak/vienna-transport-ha` (category: **Integration**).
+2. Search for *Vienna Public Transport*, and download it.
+3. Restart Home Assistant.
+
+### Manual
 
 1. Download the latest release from the [GitHub releases page](https://github.com/pslowak/vienna-transport-ha/releases). 
 2. Copy `custom_components/vienna_transport/` into your `custom_components/` directory.
