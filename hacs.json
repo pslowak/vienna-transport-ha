@@ -1,0 +1,9 @@
+{
+  "name": "Vienna Public Transport",
+  "render_readme": true,
+  "homeassistant": "2025.1.0",
+  "country": ["AT"],
+  "hacs": "1.6.0",
+  "zip_release": true,
+  "filename": "vienna-transport.zip"
+}

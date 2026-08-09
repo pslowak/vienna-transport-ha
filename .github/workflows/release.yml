@@ -49,10 +49,10 @@ jobs:
 
       - name: Package component
         run: |
-          zip -r vienna-transport-${{ needs.release-please.outputs.tag_name }}.zip custom_components/
+          zip -r vienna-transport.zip custom_components/
 
       - name: Attach assets to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release-please.outputs.tag_name }}
-          files: vienna-transport-${{ needs.release-please.outputs.tag_name }}.zip
+          files: vienna-transport.zip
