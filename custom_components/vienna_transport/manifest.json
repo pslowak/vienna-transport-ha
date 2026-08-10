@@ -6,7 +6,9 @@
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "requirements": [],
-  "dependencies": [],
+  "dependencies": [
+    "http"
+  ],
   "after_dependencies": [],
   "codeowners": [
     "@pslowak"
