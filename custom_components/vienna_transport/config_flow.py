@@ -13,6 +13,8 @@ from custom_components.vienna_transport.parser import ViennaTransportParser
 
 _LOGGER = logging.getLogger(__name__)
 
+RBL_SEARCH_URL = "https://till.mabe.at/rbl/"
+
 KEY_STOP_IDS = "stop_ids"
 
 STEP_USER_SCHEMA = voluptuous.Schema(
@@ -48,6 +50,7 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=STEP_USER_SCHEMA,
             errors=errors,
+            description_placeholders={"rbl_url": RBL_SEARCH_URL},
         )
 
     async def _test_connection(self, stop_ids: list[str]) -> TransportData | None:
