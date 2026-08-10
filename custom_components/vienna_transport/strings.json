@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Set up Vienna Transport",
-        "description": "Enter the RBL stop IDs you want to monitor. You can find stop IDs via the [RBL search](https://till.mabe.at/rbl/).",
+        "description": "Enter the RBL stop IDs you want to monitor. You can find stop IDs via the [RBL search]({rbl_url}).",
         "data": {
           "stop_ids": "Stop IDs"
         },
