@@ -9,7 +9,9 @@
   "dependencies": [
     "http"
   ],
-  "after_dependencies": [],
+  "after_dependencies": [
+    "lovelace"
+  ],
   "codeowners": [
     "@pslowak"
   ],
