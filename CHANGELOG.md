@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/pslowak/vienna-transport-ha/compare/v1.0.0...v1.1.0) (2026-08-13)
+
+
+### Features
+
+* add HACS support ([#59](https://github.com/pslowak/vienna-transport-ha/issues/59)) ([3c1b3cc](https://github.com/pslowak/vienna-transport-ha/commit/3c1b3ccc38e3cf5f46db25cbbc88256a934e09c2))
+
 ## 1.0.0 (2026-08-07)
 
 
