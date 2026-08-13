@@ -2572,7 +2572,7 @@ requires-dist = [
     { name = "freezegun", marker = "extra == 'dev'", specifier = ">=1.5.5" },
     { name = "homeassistant", specifier = ">=2026.6.4" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=2.3.0" },
-    { name = "pytest-homeassistant-custom-component", marker = "extra == 'dev'", specifier = ">=0.13.340" },
+    { name = "pytest-homeassistant-custom-component", marker = "extra == 'dev'", specifier = ">=0.13.355" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.15.22" },
 ]
 provides-extras = ["dev"]
