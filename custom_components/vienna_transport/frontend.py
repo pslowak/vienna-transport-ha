@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from homeassistant.components.http import StaticPathConfig
+from homeassistant.components.http.server import StaticPathConfig
 from homeassistant.components.lovelace import LovelaceData
 from homeassistant.components.lovelace.resources import ResourceStorageCollection
 from homeassistant.core import HomeAssistant
