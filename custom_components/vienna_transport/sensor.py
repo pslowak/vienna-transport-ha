@@ -8,17 +8,20 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from custom_components.vienna_transport.const import DOMAIN
-from custom_components.vienna_transport.coordinator import ViennaTransportCoordinator
+from custom_components.vienna_transport.coordinator import (
+    PlatformData,
+    ViennaTransportCoordinator,
+)
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    data: PlatformData = entry.runtime_data
 
     async_add_entities(
-        ViennaTransportSensor(coordinator=coordinator, stop_id=int(stop_id))
-        for stop_id in coordinator.stop_ids
+        ViennaTransportSensor(coordinator=data.coordinator, stop_id=int(stop_id))
+        for stop_id in data.stop_ids
     )
 
 

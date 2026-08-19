@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import logging
+from dataclasses import dataclass
 from datetime import timedelta
 
 from homeassistant.core import HomeAssistant
@@ -12,8 +15,17 @@ from custom_components.vienna_transport.client import ViennaTransportClient
 from custom_components.vienna_transport.exceptions import ClientError, ParserError
 from custom_components.vienna_transport.model import TransportData
 from custom_components.vienna_transport.parser import ViennaTransportParser
+from custom_components.vienna_transport.registry import StopRegistry
 
 _LOGGER = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class PlatformData:
+    """Per-config-entry data handed to the sensor platform."""
+
+    coordinator: ViennaTransportCoordinator
+    stop_ids: list[str]
 
 
 class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
@@ -23,7 +35,7 @@ class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
         client: ViennaTransportClient,
         parser: ViennaTransportParser,
         cache: ExpiringCache,
-        stop_ids: list[str],
+        registry: StopRegistry,
     ) -> None:
         super().__init__(
             hass,
@@ -34,11 +46,16 @@ class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
         self._client = client
         self._parser = parser
         self._cache = cache
-        self.stop_ids = stop_ids
+        self._registry = registry
 
     async def _async_update_data(self) -> TransportData:
+        stop_ids = self._registry.stop_ids
+        if not stop_ids:
+            _LOGGER.debug("No stop IDs registered, skipping data fetching")
+            return self._cache.get() or TransportData(stops={})
+
         try:
-            raw = await self._client.fetch(self.stop_ids)
+            raw = await self._client.fetch(stop_ids)
             parsed = self._parser.parse(raw)
             self._cache.set(parsed)
             _LOGGER.debug("Cache updated")

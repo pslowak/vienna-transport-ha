@@ -1,9 +1,15 @@
+from collections.abc import Iterable
 from datetime import datetime, timedelta, timezone
+from typing import cast
 from unittest.mock import MagicMock
 
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import Entity
 
-from custom_components.vienna_transport.coordinator import ViennaTransportCoordinator
+from custom_components.vienna_transport.coordinator import (
+    PlatformData,
+    ViennaTransportCoordinator,
+)
 from custom_components.vienna_transport.model import (
     Departure,
     Line,
@@ -12,7 +18,11 @@ from custom_components.vienna_transport.model import (
     TransportData,
     Vehicle,
 )
-from custom_components.vienna_transport.sensor import ViennaTransportSensor
+from custom_components.vienna_transport.registry import StopRegistry
+from custom_components.vienna_transport.sensor import (
+    ViennaTransportSensor,
+    async_setup_entry,
+)
 
 
 def make_stop(rbl: int = 2683, name: str = "Volkertplatz") -> Stop:
@@ -45,10 +55,10 @@ def make_coordinator(
 ) -> ViennaTransportCoordinator:
     coordinator = ViennaTransportCoordinator(
         hass=hass,
-        stop_ids=["2683"],
         client=MagicMock(),
         parser=MagicMock(),
         cache=MagicMock(),
+        registry=StopRegistry(),
     )
     if data is not None:
         coordinator.data = data
@@ -110,3 +120,24 @@ def test_sensor_only_returns_its_own_stop(hass: HomeAssistant) -> None:
     )
     sensor = make_sensor(hass, data=data, stop_id=2683)
     assert sensor.extra_state_attributes["props"]["name"] == "Volkertplatz"
+
+
+async def test_async_setup_entry_creates_one_sensor_per_stop_id(
+    hass: HomeAssistant,
+) -> None:
+    coordinator = make_coordinator(hass, data=None)
+    entry = MagicMock()
+    entry.runtime_data = PlatformData(
+        coordinator=coordinator, stop_ids=["2683", "1337"]
+    )
+    added: list[ViennaTransportSensor] = []
+
+    def async_add_entities(
+        new_entities: Iterable[Entity], update_before_add: bool = False
+    ) -> None:
+        added.extend(cast(Iterable[ViennaTransportSensor], new_entities))
+
+    await async_setup_entry(hass, entry, async_add_entities)
+    assert len(added) == 2
+    assert {sensor._stop_id for sensor in added} == {2683, 1337}
+    assert all(sensor.coordinator is coordinator for sensor in added)
