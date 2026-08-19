@@ -6,7 +6,7 @@ from pytest_homeassistant_custom_component import common
 
 from custom_components.vienna_transport.config_flow import ViennaTransportConfigFlow
 from custom_components.vienna_transport.const import DOMAIN
-from custom_components.vienna_transport.model import TransportData
+from custom_components.vienna_transport.model import Stop, StopProperties, TransportData
 
 
 def test_validate_stop_ids_returns_cleaned_list() -> None:
@@ -28,6 +28,28 @@ def test_validate_stop_ids_returns_empty_on_non_numeric() -> None:
 def test_validate_stop_ids_accepts_multiple_valid_ids() -> None:
     result = ViennaTransportConfigFlow._validate_stop_ids(["2683", "1337", "5566"])
     assert result == ["2683", "1337", "5566"]
+
+
+def test_build_title_uses_singular_stop() -> None:
+    data = TransportData(
+        stops={2683: Stop(props=StopProperties(id=2683, name="Volkertplatz"), lines=[])}
+    )
+    assert (
+        ViennaTransportConfigFlow._build_title(data) == "Stop: Volkertplatz (ID: 2683)"
+    )
+
+
+def test_build_title_uses_plural_stops() -> None:
+    data = TransportData(
+        stops={
+            2683: Stop(props=StopProperties(id=2683, name="Volkertplatz"), lines=[]),
+            1337: Stop(props=StopProperties(id=1337, name="Schottentor"), lines=[]),
+        }
+    )
+    assert (
+        ViennaTransportConfigFlow._build_title(data)
+        == "Stops: Volkertplatz (ID: 2683), Schottentor (ID: 1337)"
+    )
 
 
 def make_flow(hass: HomeAssistant) -> ViennaTransportConfigFlow:
