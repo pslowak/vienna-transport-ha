@@ -13,12 +13,14 @@ from custom_components.vienna_transport.parser import ViennaTransportParser
 
 _LOGGER = logging.getLogger(__name__)
 
-RBL_SEARCH_URL = "https://till.mabe.at/rbl/"
-
-KEY_STOP_IDS = "stop_ids"
-
-STEP_USER_SCHEMA = voluptuous.Schema(
-    {voluptuous.Required(KEY_STOP_IDS): TextSelector(TextSelectorConfig(multiple=True))}
+_KEY_STOP_IDS = "stop_ids"
+_RBL_SEARCH_URL = "https://till.mabe.at/rbl/"
+_STEP_USER_SCHEMA = voluptuous.Schema(
+    {
+        voluptuous.Required(_KEY_STOP_IDS): TextSelector(
+            TextSelectorConfig(multiple=True)
+        )
+    }
 )
 
 
@@ -28,30 +30,51 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        errors = {}
+        if user_input is None:
+            return self._show_error_form()
 
-        if user_input is not None:
-            stop_ids = self._validate_stop_ids(user_input[KEY_STOP_IDS])
+        stop_ids = self._validate_stop_ids(user_input[_KEY_STOP_IDS])
+        if not stop_ids:
+            return self._show_error_form(errors={_KEY_STOP_IDS: "invalid_stop_ids"})
 
-            if not stop_ids:
-                errors[KEY_STOP_IDS] = "invalid_stop_ids"
-            else:
-                data = await self._test_connection(stop_ids)
+        duplicates = set(stop_ids) & self._already_configured_stop_ids()
+        if duplicates:
+            return self._show_error_form(
+                errors={_KEY_STOP_IDS: "stop_ids_already_configured"},
+                placeholders={"stop_ids": ", ".join(duplicates)},
+            )
 
-                if data is None:
-                    errors[KEY_STOP_IDS] = "unknown"
-                else:
-                    return self.async_create_entry(
-                        title=self._build_title(data),
-                        data={KEY_STOP_IDS: stop_ids},
-                    )
+        data = await self._test_connection(stop_ids)
+        if data is None:
+            return self._show_error_form(errors={_KEY_STOP_IDS: "unknown"})
 
+        return self.async_create_entry(
+            title=self._build_title(data),
+            data={_KEY_STOP_IDS: stop_ids},
+        )
+
+    def _show_error_form(
+        self,
+        *,
+        errors: dict[str, str] | None = None,
+        placeholders: dict[str, str] | None = None,
+    ) -> ConfigFlowResult:
         return self.async_show_form(
             step_id="user",
-            data_schema=STEP_USER_SCHEMA,
-            errors=errors,
-            description_placeholders={"rbl_url": RBL_SEARCH_URL},
+            data_schema=_STEP_USER_SCHEMA,
+            errors=errors or {},
+            description_placeholders={
+                "rbl_url": _RBL_SEARCH_URL,
+                **(placeholders or {}),
+            },
         )
+
+    def _already_configured_stop_ids(self) -> set[str]:
+        return {
+            stop_id
+            for entry in self.hass.config_entries.async_entries(DOMAIN)
+            for stop_id in entry.data.get("stop_ids", [])
+        }
 
     async def _test_connection(self, stop_ids: list[str]) -> TransportData | None:
         session = async_get_clientsession(self.hass)
