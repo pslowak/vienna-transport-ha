@@ -105,6 +105,7 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
     @staticmethod
     def _build_title(data: TransportData) -> str:
         labels = [
-            f"{stop.props.name} (id {stop.props.id})" for stop in data.stops.values()
+            f"{stop.props.name} (ID: {stop.props.id})" for stop in data.stops.values()
         ]
-        return "stops " + ", ".join(labels)
+        prefix = "Stop: " if len(data.stops) == 1 else "Stops: "
+        return prefix + ", ".join(labels)
