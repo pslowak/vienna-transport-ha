@@ -8,6 +8,7 @@ from homeassistant.helpers.selector import TextSelector, TextSelectorConfig
 
 from custom_components.vienna_transport.client import ViennaTransportClient
 from custom_components.vienna_transport.const import DOMAIN
+from custom_components.vienna_transport.exceptions import ClientError, ParserError
 from custom_components.vienna_transport.model import TransportData
 from custom_components.vienna_transport.parser import ViennaTransportParser
 
@@ -44,8 +45,26 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
                 placeholders={"stop_ids": ", ".join(duplicates)},
             )
 
-        data = await self._test_connection(stop_ids)
-        if data is None:
+        try:
+            data = await self._test_connection(stop_ids)
+        except ClientError as err:
+            _LOGGER.warning("Wiener Linien API unreachable during setup: %s", err)
+            return self._show_error_form(
+                errors={_KEY_STOP_IDS: "cannot_connect"},
+                placeholders={"detail": str(err)},
+            )
+        except ParserError as err:
+            _LOGGER.warning(
+                "Unexpected Wiener Linien API response during setup: %s", err
+            )
+            return self._show_error_form(
+                errors={_KEY_STOP_IDS: "unexpected_response"},
+                placeholders={"detail": str(err)},
+            )
+        except Exception as err:
+            _LOGGER.exception(
+                "Unexpected error while connecting to Vienna Transport API: %s", err
+            )
             return self._show_error_form(errors={_KEY_STOP_IDS: "unknown"})
 
         return self.async_create_entry(
@@ -76,19 +95,12 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
             for stop_id in entry.data.get("stop_ids", [])
         }
 
-    async def _test_connection(self, stop_ids: list[str]) -> TransportData | None:
+    async def _test_connection(self, stop_ids: list[str]) -> TransportData:
         session = async_get_clientsession(self.hass)
         client = ViennaTransportClient(session=session)
         parser = ViennaTransportParser()
-
-        try:
-            raw = await client.fetch(stop_ids)
-            return parser.parse(raw)
-        except Exception as err:
-            _LOGGER.exception(
-                "Unexpected error while connecting to Vienna Transport API: %s", err
-            )
-            return None
+        raw = await client.fetch(stop_ids)
+        return parser.parse(raw)
 
     @staticmethod
     def _validate_stop_ids(raw: list[str]) -> list[str]:

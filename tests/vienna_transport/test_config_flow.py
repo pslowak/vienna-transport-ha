@@ -6,6 +6,7 @@ from pytest_homeassistant_custom_component import common
 
 from custom_components.vienna_transport.config_flow import ViennaTransportConfigFlow
 from custom_components.vienna_transport.const import DOMAIN
+from custom_components.vienna_transport.exceptions import ClientError, ParserError
 from custom_components.vienna_transport.model import Stop, StopProperties, TransportData
 
 
@@ -92,4 +93,76 @@ async def test_step_user_allows_new_stop(hass: HomeAssistant) -> None:
 
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"]["stop_ids"] == ["1337"]
+    test_connection.assert_awaited_once()
+
+
+async def test_step_user_shows_cannot_connect_on_client_error(
+    hass: HomeAssistant,
+) -> None:
+    common.MockConfigEntry(
+        domain=DOMAIN,
+        data={"stop_ids": ["2683"]},
+    ).add_to_hass(hass)
+
+    flow = make_flow(hass)
+
+    with patch.object(
+        flow,
+        "_test_connection",
+        new=AsyncMock(side_effect=ClientError("Timeout error: request timed out")),
+    ):
+        result = await flow.async_step_user(user_input={"stop_ids": ["1337"]})
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["errors"] == {"stop_ids": "cannot_connect"}
+    placeholders = result.get("description_placeholders")
+    assert placeholders is not None
+    assert placeholders["detail"] == "Timeout error: request timed out"
+
+
+async def test_step_user_shows_unexpected_response_on_parser_error(
+    hass: HomeAssistant,
+) -> None:
+    common.MockConfigEntry(
+        domain=DOMAIN,
+        data={"stop_ids": ["2683"]},
+    ).add_to_hass(hass)
+
+    flow = make_flow(hass)
+
+    with patch.object(
+        flow,
+        "_test_connection",
+        new=AsyncMock(
+            side_effect=ParserError("API rate limit reached (message code 316)")
+        ),
+    ):
+        result = await flow.async_step_user(user_input={"stop_ids": ["1337"]})
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["errors"] == {"stop_ids": "unexpected_response"}
+    placeholders = result.get("description_placeholders")
+    assert placeholders is not None
+    assert placeholders["detail"] == "API rate limit reached (message code 316)"
+
+
+async def test_step_user_shows_unknown_on_unexpected_error(
+    hass: HomeAssistant,
+) -> None:
+    common.MockConfigEntry(
+        domain=DOMAIN,
+        data={"stop_ids": ["2683"]},
+    ).add_to_hass(hass)
+
+    flow = make_flow(hass)
+
+    with patch.object(
+        flow,
+        "_test_connection",
+        new=AsyncMock(side_effect=RuntimeError("boom")),
+    ) as test_connection:
+        result = await flow.async_step_user(user_input={"stop_ids": ["1337"]})
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["errors"] == {"stop_ids": "unknown"}
     test_connection.assert_awaited_once()
