@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
@@ -61,7 +60,7 @@ class ViennaTransportSensor(
         if stop is None:
             return {}
 
-        return asdict(stop)
+        return stop.to_dict()
 
     @staticmethod
     def _resolve_name(coordinator: ViennaTransportCoordinator, stop_id: int) -> str:
