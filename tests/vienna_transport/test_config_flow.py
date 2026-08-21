@@ -75,7 +75,8 @@ async def test_step_user_rejects_stop_already_configured(
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "stop_ids_already_configured"}
     placeholders = result.get("description_placeholders")
-    assert placeholders is not None and placeholders["stop_ids"] == "2683"
+    assert placeholders is not None
+    assert placeholders["stop_ids"] == "2683"
 
 
 async def test_step_user_allows_new_stop(hass: HomeAssistant) -> None:
