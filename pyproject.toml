@@ -42,7 +42,16 @@ files = ["custom_components", "tests"]
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM", "TID"]
+select = [
+    "B",
+    "E",
+    "F",
+    "I",
+    "S",
+    "SIM",
+    "TID",
+    "UP",
+]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "parents"
