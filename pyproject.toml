@@ -47,6 +47,7 @@ select = [
     "E",
     "F",
     "I",
+    "LOG",
     "PT",
     "S",
     "SIM",
