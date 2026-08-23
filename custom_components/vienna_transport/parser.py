@@ -38,8 +38,8 @@ class ViennaTransportParser:
             _LOGGER.warning("Unexpected message code %s", msg_code)
             raise ParserError(f"Unexpected message code {msg_code}")
         except (KeyError, TypeError, ValueError) as e:
-            _LOGGER.exception(f"unexpected API response {e}")
-            _LOGGER.debug(f"API response {raw}")
+            _LOGGER.exception("Unexpected API response %s", e)
+            _LOGGER.debug("API response raw: %s", raw)
             raise ParserError(f"unexpected API response: {e}") from e
 
     @staticmethod
