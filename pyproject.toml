@@ -54,6 +54,7 @@ select = [
     "SIM",
     "TID",
     "UP",
+    "W",
 ]
 
 [tool.ruff.lint.flake8-tidy-imports]
