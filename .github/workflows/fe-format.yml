@@ -1,4 +1,4 @@
-name: Format
+name: Frontend Format
 
 on:
   push:
