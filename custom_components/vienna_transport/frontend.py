@@ -1,3 +1,5 @@
+"""Frontend registration for Vienna Transport card."""
+
 import logging
 from pathlib import Path
 
@@ -15,6 +17,12 @@ LOVELACE_DOMAIN = "lovelace"
 
 
 async def async_register_card(hass: HomeAssistant) -> None:
+    """Register transport card frontend and Lovelace resource.
+
+    Args:
+        hass: Home Assistant instance.
+
+    """
     _LOGGER.debug("Registering Vienna Transport Card frontend")
 
     card_path = Path(__file__).parent / "frontend" / "transport-card.js"

@@ -1,3 +1,5 @@
+"""Client for Wiener Linien realtime monitor API."""
+
 import logging
 from typing import Any
 
@@ -14,12 +16,31 @@ _HTTP_OK = 200
 
 
 class ViennaTransportClient:
+    """Client for fetching departure data from Wiener Linien API."""
+
     def __init__(self, session: aiohttp.ClientSession) -> None:
+        """Initialize client.
+
+        Args:
+            session: HTTP client session for API requests.
+
+        """
         self._session = session
 
     async def fetch(self, stop_ids: list[str]) -> dict[str, Any]:
-        """Fetches departure data for one or more stops."""
+        """Fetch departure data for one or more stops.
 
+        Args:
+            stop_ids: List of stop IDs to fetch.
+
+        Returns:
+            JSON response from API as dictionary.
+
+        Raises:
+            ClientError: If request fails or returns non-200 status.
+            ValueError: If stop_ids is empty.
+
+        """
         if not stop_ids:
             raise ValueError("stop_ids cannot be empty")
 

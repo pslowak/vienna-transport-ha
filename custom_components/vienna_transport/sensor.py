@@ -1,3 +1,5 @@
+"""Sensor platform for Vienna Transport stops."""
+
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
@@ -16,6 +18,14 @@ from custom_components.vienna_transport.coordinator import (
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
+    """Set up Vienna Transport sensors for config entry.
+
+    Args:
+        hass: Home Assistant instance.
+        entry: Config entry containing platform data.
+        async_add_entities: Callback to add entities.
+
+    """
     data: PlatformData = entry.runtime_data
 
     async_add_entities(
@@ -27,13 +37,18 @@ async def async_setup_entry(
 class ViennaTransportSensor(
     CoordinatorEntity[ViennaTransportCoordinator], SensorEntity
 ):
-    """
-    A sensor entity representing departures for one stop.
-    """
+    """Sensor entity representing departures for one stop."""
 
     _attr_has_entity_name = True
 
     def __init__(self, coordinator: ViennaTransportCoordinator, stop_id: int) -> None:
+        """Initialize sensor.
+
+        Args:
+            coordinator: Data coordinator.
+            stop_id: Stop ID for this sensor.
+
+        """
         super().__init__(coordinator)
         self._stop_id = stop_id
         self._attr_unique_id = f"{DOMAIN}_{stop_id}"
@@ -41,6 +56,12 @@ class ViennaTransportSensor(
 
     @property
     def available(self) -> bool:
+        """Check if sensor is available.
+
+        Returns:
+            True if coordinator data contains this stop.
+
+        """
         return (
             super().available
             and self.coordinator.data is not None
@@ -49,10 +70,22 @@ class ViennaTransportSensor(
 
     @property
     def native_value(self) -> str:
+        """Return sensor value.
+
+        Returns:
+            Always ``ok``; actual data in attributes.
+
+        """
         return "ok"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
+        """Return extra attributes with stop data.
+
+        Returns:
+            Dictionary with stop departure data or empty if unavailable.
+
+        """
         if self.coordinator.data is None:
             return {}
 

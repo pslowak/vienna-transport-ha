@@ -1,3 +1,5 @@
+"""Config flow for Vienna Transport integration."""
+
 import logging
 from typing import Any
 
@@ -26,11 +28,25 @@ _STEP_USER_SCHEMA = voluptuous.Schema(
 
 
 class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
+    """Config flow for Vienna Transport.
+
+    Handles user input for stop IDs, validation, duplicate check, and connection test.
+    """
+
     VERSION = 1
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
+        """Handle initial user step.
+
+        Args:
+            user_input: User input with stop IDs or None for initial form.
+
+        Returns:
+            Config flow result with form or created entry.
+
+        """
         if user_input is None:
             return self._show_error_form()
 

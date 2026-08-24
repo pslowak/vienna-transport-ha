@@ -1,3 +1,5 @@
+"""Parser for Wiener Linien API responses."""
+
 import logging
 from datetime import datetime
 from typing import Any
@@ -20,7 +22,21 @@ _MSG_CODE_UNKNOWN = -1
 
 
 class ViennaTransportParser:
+    """Parser for transforming raw API data into transport models."""
+
     def parse(self, raw: dict[str, Any]) -> TransportData:
+        """Parse raw API response into transport data.
+
+        Args:
+            raw: Raw JSON response from Wiener Linien monitor API.
+
+        Returns:
+            Parsed transport data.
+
+        Raises:
+            ParserError: If response malformed or message code indicates error.
+
+        """
         try:
             msg = raw["message"]
             msg_code = msg.get("messageCode", _MSG_CODE_UNKNOWN)
