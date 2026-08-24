@@ -1,4 +1,4 @@
-"""Coordinator for Vienna transport data updates."""
+"""Coordinator for Vienna Transport data updates."""
 
 from __future__ import annotations
 
