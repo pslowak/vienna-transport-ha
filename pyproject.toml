@@ -44,6 +44,7 @@ line-length = 88
 [tool.ruff.lint]
 select = [
     "B",
+    "D",
     "E",
     "F",
     "G",
@@ -63,5 +64,8 @@ ban-relative-imports = "parents"
 [tool.ruff.lint.isort]
 known-first-party = ["custom_components.vienna_transport"]
 
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101"]
+"tests/**" = ["D", "S101"]
