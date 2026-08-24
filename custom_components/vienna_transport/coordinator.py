@@ -1,3 +1,5 @@
+"""Coordinator for Vienna transport data updates."""
+
 from __future__ import annotations
 
 import logging
@@ -29,6 +31,12 @@ class PlatformData:
 
 
 class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
+    """Coordinator for fetching and caching transport data.
+
+    Fetches data via API client, parses it, and caches results.
+    Falls back to cached data on client or parser errors.
+    """
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -37,6 +45,16 @@ class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
         cache: ExpiringCache,
         registry: StopRegistry,
     ) -> None:
+        """Initialize coordinator.
+
+        Args:
+            hass: Home Assistant instance.
+            client: API client for fetching data.
+            parser: Parser for API responses.
+            cache: Cache for transport data.
+            registry: Registry of stop IDs.
+
+        """
         super().__init__(
             hass,
             _LOGGER,
