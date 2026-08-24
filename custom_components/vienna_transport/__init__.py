@@ -1,6 +1,4 @@
-"""
-Vienna Transport HA integration.
-"""
+"""Vienna Transport HA integration."""
 
 import logging
 
@@ -17,6 +15,16 @@ PLATFORMS = ["sensor"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up Vienna Transport integration from config entry.
+
+    Args:
+        hass: Home Assistant instance.
+        entry: Config entry to set up.
+
+    Returns:
+        True if setup was successful.
+
+    """
     stop_ids = entry.data["stop_ids"]
     _LOGGER.info("Setting up Vienna Transport integration for stops %s", stop_ids)
 
@@ -38,6 +46,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unload a config entry.
+
+    Unloads sensor platform for entry and removes its stops.
+    Tears down hub and coordinator only if last entry.
+
+    Args:
+        hass: Home Assistant instance.
+        entry: Config entry to unload.
+
+    Returns:
+        True if platform unload succeeded.
+
+    """
     _LOGGER.debug("Unloading Vienna Transport integration for entry %s", entry.entry_id)
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
