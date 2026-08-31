@@ -1,6 +1,8 @@
 import asyncio
+import json
 from collections.abc import AsyncGenerator
 from typing import Any
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
 import pytest
@@ -90,7 +92,7 @@ async def test_fetch_raises_update_failed_on_connection_error(
     async with aiointercept(mock_external_urls=True) as mock:
         mock.get(f"{_API_URL}?stopId=1", exception=True)
 
-        with pytest.raises(ClientError, match="Connection error"):
+        with pytest.raises(ClientError, match="HTTP client error"):
             await client.fetch(["1"])
 
 
@@ -117,3 +119,46 @@ async def test_fetch_raises_update_failed_on_timeout(
 
         with pytest.raises(ClientError, match="Timeout error"):
             await client.fetch(["1"])
+
+
+async def test_fetch_raises_client_error_on_invalid_json() -> None:
+    client = ViennaTransportClient(MagicMock(spec=aiohttp.ClientSession))
+    with (
+        patch.object(
+            client,
+            "_fetch_raw",
+            new=AsyncMock(
+                side_effect=json.JSONDecodeError("Expecting value", "doc", 0)
+            ),
+        ),
+        pytest.raises(ClientError, match="Invalid JSON response"),
+    ):
+        await client.fetch(["1"])
+
+
+async def test_fetch_raises_client_error_on_content_type_error() -> None:
+    client = ViennaTransportClient(MagicMock(spec=aiohttp.ClientSession))
+    with (
+        patch.object(
+            client,
+            "_fetch_raw",
+            new=AsyncMock(
+                side_effect=aiohttp.ContentTypeError(
+                    MagicMock(), history=(), message="not json"
+                )
+            ),
+        ),
+        pytest.raises(ClientError, match="Invalid JSON response"),
+    ):
+        await client.fetch(["1"])
+
+
+async def test_fetch_raises_client_error_on_generic_client_error() -> None:
+    client = ViennaTransportClient(MagicMock(spec=aiohttp.ClientSession))
+    with (
+        patch.object(
+            client, "_fetch_raw", new=AsyncMock(side_effect=aiohttp.ClientError("boom"))
+        ),
+        pytest.raises(ClientError, match="HTTP client error"),
+    ):
+        await client.fetch(["1"])
