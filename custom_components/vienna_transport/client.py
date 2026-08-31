@@ -49,17 +49,22 @@ class ViennaTransportClient:
         _LOGGER.debug("Fetching data for stops %s", stop_ids)
 
         try:
-            async with self._session.get(
-                _API_BASE_URL, params=params, timeout=_REQUEST_TIMEOUT
-            ) as response:
-                _LOGGER.debug(
-                    "Received HTTP %s for stops %s", response.status, stop_ids
-                )
-                if response.status == _HTTP_OK:
-                    data: dict[str, Any] = await response.json()
-                    return data
-                raise ClientError(f"Unexpected HTTP status code: {response.status}")
-        except aiohttp.ClientConnectionError as e:
-            raise ClientError(f"Connection error: {e}") from e
+            return await self._fetch_raw(params, stop_ids)
+        except (aiohttp.ContentTypeError, ValueError) as e:
+            raise ClientError(f"Invalid JSON response: {e}") from e
         except TimeoutError as e:
             raise ClientError(f"Timeout error: {e}") from e
+        except aiohttp.ClientError as e:
+            raise ClientError(f"Connection error: {e}") from e
+
+    async def _fetch_raw(
+        self, params: list[tuple[str, str]], stop_ids: list[str]
+    ) -> dict[str, Any]:
+        async with self._session.get(
+            _API_BASE_URL, params=params, timeout=_REQUEST_TIMEOUT
+        ) as response:
+            _LOGGER.debug("Received HTTP %s for stops %s", response.status, stop_ids)
+            if response.status != _HTTP_OK:
+                raise ClientError(f"Unexpected HTTP status code: {response.status}")
+            data: dict[str, Any] = await response.json()
+            return data
