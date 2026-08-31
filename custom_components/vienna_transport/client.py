@@ -55,7 +55,7 @@ class ViennaTransportClient:
         except TimeoutError as e:
             raise ClientError(f"Timeout error: {e}") from e
         except aiohttp.ClientError as e:
-            raise ClientError(f"Connection error: {e}") from e
+            raise ClientError(f"HTTP client error: {e}") from e
 
     async def _fetch_raw(
         self, params: list[tuple[str, str]], stop_ids: list[str]
