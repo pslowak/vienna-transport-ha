@@ -88,7 +88,17 @@ async def test_step_user_allows_new_stop(hass: HomeAssistant) -> None:
     flow = make_flow(hass)
 
     with patch.object(
-        flow, "_test_connection", new=AsyncMock(return_value=TransportData(stops={}))
+        flow,
+        "_test_connection",
+        new=AsyncMock(
+            return_value=TransportData(
+                stops={
+                    1337: Stop(
+                        props=StopProperties(id=1337, name="Schottentor"), lines=[]
+                    )
+                }
+            )
+        ),
     ) as test_connection:
         result = await flow.async_step_user(user_input={"stop_ids": ["1337"]})
 

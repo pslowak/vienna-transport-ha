@@ -16,6 +16,7 @@
       "cannot_connect": "Could not connect to the Wiener Linien API: {detail}. Check your internet connection and try again.",
       "invalid_stop_ids": "No valid stop IDs found. Enter at least one numeric stop ID.",
       "stop_ids_already_configured": "One sensor per stop ID is supported. These stop IDs are already monitored by another service: {stop_ids}",
+      "stop_not_found": "Some stop IDs were not found: {stop_ids}. Check the RBL ID.",
       "unexpected_response": "The Wiener Linien API returned an unexpected response: {detail}.",
       "unknown": "An unexpected error occurred. Check the Home Assistant logs for details."
     },

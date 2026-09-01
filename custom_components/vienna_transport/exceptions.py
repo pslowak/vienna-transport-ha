@@ -1,5 +1,6 @@
 """Exceptions for Vienna Transport integration."""
 
+
 class ClientError(Exception):
     """Raised by ViennaTransportClient on API errors."""
 
