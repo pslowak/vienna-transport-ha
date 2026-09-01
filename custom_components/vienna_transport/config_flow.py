@@ -83,6 +83,16 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
             )
             return self._show_error_form(errors={_KEY_STOP_IDS: "unknown"})
 
+        requested = {int(s) for s in stop_ids}
+        present = set(data.stops.keys())
+        missing = requested - present
+        if missing:
+            _LOGGER.warning("Stop IDs not found in API response: %s", missing)
+            return self._show_error_form(
+                errors={_KEY_STOP_IDS: "stop_not_found"},
+                placeholders={"stop_ids": ", ".join(str(m) for m in sorted(missing))},
+            )
+
         return self.async_create_entry(
             title=self._build_title(data),
             data={_KEY_STOP_IDS: stop_ids},
