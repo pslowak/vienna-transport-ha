@@ -177,3 +177,55 @@ async def test_step_user_shows_unknown_on_unexpected_error(
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "unknown"}
     test_connection.assert_awaited_once()
+
+
+async def test_step_user_shows_stop_not_found_on_empty_response(
+    hass: HomeAssistant,
+) -> None:
+    flow = make_flow(hass)
+
+    with patch.object(
+        flow,
+        "_test_connection",
+        new=AsyncMock(return_value=TransportData(stops={})),
+    ):
+        result = await flow.async_step_user(user_input={"stop_ids": ["9999"]})
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["errors"] == {"stop_ids": "stop_not_found"}
+    placeholders = result.get("description_placeholders")
+    assert placeholders is not None
+    assert placeholders["stop_ids"] == "9999"
+
+
+async def test_step_user_shows_stop_not_found_on_partial_response(
+    hass: HomeAssistant,
+) -> None:
+    common.MockConfigEntry(
+        domain=DOMAIN,
+        data={"stop_ids": ["1337"]},
+    ).add_to_hass(hass)
+
+    flow = make_flow(hass)
+
+    with patch.object(
+        flow,
+        "_test_connection",
+        new=AsyncMock(
+            return_value=TransportData(
+                stops={
+                    2683: Stop(
+                        props=StopProperties(id=2683, name="Volkertplatz"), lines=[]
+                    )
+                }
+            )
+        ),
+    ):
+        result = await flow.async_step_user(user_input={"stop_ids": ["2683", "9999"]})
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["errors"] == {"stop_ids": "stop_not_found"}
+    placeholders = result.get("description_placeholders")
+    assert placeholders is not None
+    assert placeholders["stop_ids"] == "9999"
+    assert "rbl_url" in placeholders
