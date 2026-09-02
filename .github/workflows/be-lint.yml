@@ -3,12 +3,32 @@ name: Backend Lint
 on:
   push:
     branches: [main]
+    paths:
+      - "custom_components/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/be-lint.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "custom_components/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/be-lint.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: be-lint-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -22,7 +42,7 @@ jobs:
           python-version-file: pyproject.toml
 
       - name: Sync dependencies
-        run: uv sync --extra dev --no-install-project
+        run: uv sync --extra dev --frozen --no-install-project
 
       - name: Lint with ruff
         run: uv run ruff check custom_components tests --output-format=github
