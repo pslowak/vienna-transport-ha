@@ -44,5 +44,11 @@ jobs:
       - name: Sync dependencies
         run: uv sync --extra dev --frozen --no-install-project
 
-      - name: Lint with ruff
+      - name: Ruff check
         run: uv run ruff check custom_components tests --output-format=github
+
+      - name: Ruff format check
+        run: uv run ruff format --check --diff custom_components tests
+
+      - name: Mypy type check
+        run: uv run mypy custom_components tests
