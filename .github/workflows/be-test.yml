@@ -3,13 +3,32 @@ name: Backend Tests
 on:
   push:
     branches: [main]
+    paths:
+      - "custom_components/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/be-test.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "custom_components/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/be-test.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: be-test-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -23,7 +42,7 @@ jobs:
           python-version-file: pyproject.toml
 
       - name: Sync dependencies
-        run: uv sync --extra dev --no-install-project
+        run: uv sync --extra dev --frozen --no-install-project
 
       - name: Run tests
         run: uv run pytest
