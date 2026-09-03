@@ -2631,6 +2631,7 @@ dev = [
     { name = "aiointercept" },
     { name = "freezegun" },
     { name = "mypy" },
+    { name = "pytest-cov" },
     { name = "pytest-homeassistant-custom-component" },
     { name = "ruff" },
 ]
@@ -2642,6 +2643,7 @@ requires-dist = [
     { name = "freezegun", marker = "extra == 'dev'", specifier = ">=1.5.5" },
     { name = "homeassistant", specifier = ">=2026.6.4" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=2.3.1" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-homeassistant-custom-component", marker = "extra == 'dev'", specifier = ">=0.13.359" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.16.4" },
 ]
