@@ -18,6 +18,7 @@ dev = [
     "aiointercept>=0.1.9",
     "freezegun>=1.5.5",
     "mypy>=2.3.1",
+    "pytest-cov>=7.0.0",
     "pytest-homeassistant-custom-component>=0.13.359",
     "ruff>=0.16.4",
 ]
@@ -29,6 +30,17 @@ package = false
 testpaths = ["tests"]
 asyncio_mode = "auto"
 pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["custom_components"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80
+
+[tool.coverage.xml]
+output = "coverage.xml"
 
 [tool.mypy]
 python_version = "3.14"
