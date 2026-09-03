@@ -4,6 +4,7 @@
 
 [![GitHub Release](https://img.shields.io/github/v/release/pslowak/vienna-transport-ha)](https://github.com/pslowak/vienna-transport-ha/releases/latest)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![codecov](https://codecov.io/gh/pslowak/vienna-transport-ha/branch/main/graph/badge.svg)](https://codecov.io/gh/pslowak/vienna-transport-ha)
 [![backend tests](https://github.com/pslowak/vienna-transport-ha/actions/workflows/be-test.yml/badge.svg)](https://github.com/pslowak/vienna-transport-ha/actions/workflows/be-test.yml)
 
 A custom integration and Lovelace card for [Home Assistant](https://www.home-assistant.io/) that displays real-time public transport departures in Vienna, Austria (Wiener Linien).
