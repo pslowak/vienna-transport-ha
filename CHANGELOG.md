@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.1](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.0...v1.1.1) (2026-09-04)
+
+
+### Bug Fixes
+
+* align Ruff target version with project's Python version ([#72](https://github.com/pslowak/vienna-transport-ha/issues/72)) ([8824764](https://github.com/pslowak/vienna-transport-ha/commit/88247649face6a079b2c3761a25792a5c65763fc))
+* **client:** handle all transport and JSON errors as ClientError ([#94](https://github.com/pslowak/vienna-transport-ha/issues/94)) ([d9a6793](https://github.com/pslowak/vienna-transport-ha/commit/d9a6793109e71aecd8b53fb8791d577c6e938381))
+* **config-flow:** reject unknown stop IDs ([#95](https://github.com/pslowak/vienna-transport-ha/issues/95)) ([ce6603d](https://github.com/pslowak/vienna-transport-ha/commit/ce6603d6dd0e5097bf4665998a4c571ea57da564))
+* **config-flow:** surface connection and API errors during setup ([#70](https://github.com/pslowak/vienna-transport-ha/issues/70)) ([c9e4c31](https://github.com/pslowak/vienna-transport-ha/commit/c9e4c3140bde41235f74b49964bc66f88a94bfce))
+* **sensor:** serialize departure datetime as ISO string in state attributes ([#71](https://github.com/pslowak/vienna-transport-ha/issues/71)) ([1a8bc60](https://github.com/pslowak/vienna-transport-ha/commit/1a8bc60bf9d3d9f1e7958fb46156067e51b703a4))
+* share single coordinator across all config entries ([#65](https://github.com/pslowak/vienna-transport-ha/issues/65)) ([e0b7456](https://github.com/pslowak/vienna-transport-ha/commit/e0b7456ac0d6e0ea60f1577c6acb553d3b28c410))
+
 ## [1.1.0](https://github.com/pslowak/vienna-transport-ha/compare/v1.0.0...v1.1.0) (2026-08-13)
 
 
