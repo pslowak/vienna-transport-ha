@@ -3,13 +3,34 @@ name: Frontend Format
 on:
   push:
     branches: [main]
+    paths:
+      - "src/**"
+      - "**/*.{ts,js,json,css,html}"
+      - ".prettierrc"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/fe-format.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "src/**"
+      - "**/*.{ts,js,json,css,html}"
+      - ".prettierrc"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/fe-format.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fe-format-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   format:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
