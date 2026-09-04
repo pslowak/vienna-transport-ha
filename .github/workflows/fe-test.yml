@@ -3,13 +3,34 @@ name: Frontend Tests
 on:
   push:
     branches: [main]
+    paths:
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "vite.config.ts"
+      - ".github/workflows/fe-test.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "vite.config.ts"
+      - ".github/workflows/fe-test.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fe-test-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
