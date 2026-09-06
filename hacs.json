@@ -1,7 +1,7 @@
 {
   "name": "Vienna Public Transport",
   "render_readme": true,
-  "homeassistant": "2025.1.0",
+  "homeassistant": "2026.6.4",
   "country": ["AT"],
   "hacs": "1.6.0",
   "zip_release": true,
