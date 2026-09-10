@@ -18,7 +18,7 @@ The codebase is organized into key architectural layers:
 
 #### Backend
 
-The core backend architecture is described in `custom_components/vienna_transport/architecture.md`.
+The core backend architecture is described in `custom_components/vienna_transport/ARCHITECTURE.md`.
 
 #### Frontend
 
