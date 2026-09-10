@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.1...v1.1.2) (2026-09-10)
+
+
+### Bug Fixes
+
+* **docs:** correct ARCHITECTURE.md path in copilot instructions ([#112](https://github.com/pslowak/vienna-transport-ha/issues/112)) ([f56e4ee](https://github.com/pslowak/vienna-transport-ha/commit/f56e4eeabdb54bb225a51ab3d4f0e7a84da59ef6))
+
 ## [1.1.1](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.0...v1.1.1) (2026-09-09)
 
 
