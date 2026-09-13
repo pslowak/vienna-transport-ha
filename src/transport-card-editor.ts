@@ -4,6 +4,10 @@ import { TRANSPORT_CARD_EDITOR_NAME } from "./constants.ts";
 import type { TransportCardConfig } from "./transport-card-config.ts";
 import { getHassLanguage, t } from "./i18n.ts";
 
+interface EditorSchema {
+    name: string;
+}
+
 @customElement(TRANSPORT_CARD_EDITOR_NAME)
 export class TransportCardEditor extends LitElement {
     @property({ attribute: false })
@@ -67,7 +71,7 @@ export class TransportCardEditor extends LitElement {
         ];
     }
 
-    private computeLabel = (schema: any) => {
+    private computeLabel = (schema: EditorSchema) => {
         switch (schema.name) {
             case "entity":
                 return t("editor.fields.entity.label", this._lang);
@@ -80,7 +84,7 @@ export class TransportCardEditor extends LitElement {
         return schema.name || undefined;
     };
 
-    private computeHelper = (schema: any) => {
+    private computeHelper = (schema: EditorSchema) => {
         switch (schema.name) {
             case "entity":
                 return t("editor.fields.entity.helper", this._lang);
