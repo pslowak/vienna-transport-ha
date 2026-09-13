@@ -1,3 +1,4 @@
+import type { HomeAssistant } from "./ha.ts";
 import en from "./translations/en.json";
 import de from "./translations/de.json";
 
@@ -61,6 +62,6 @@ export function t(
     );
 }
 
-export function getHassLanguage(hass: any): string {
+export function getHassLanguage(hass?: HomeAssistant): string {
     return hass?.locale?.language ?? hass?.language ?? DEFAULT_LANG;
 }
