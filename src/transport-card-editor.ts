@@ -1,20 +1,25 @@
-import { css, html, LitElement, nothing } from "lit";
+import { css, html, LitElement, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { TRANSPORT_CARD_EDITOR_NAME } from "./constants.ts";
+import type { HomeAssistant, LovelaceCardEditor } from "./ha.ts";
 import type { TransportCardConfig } from "./transport-card-config.ts";
 import { getHassLanguage, t } from "./i18n.ts";
 
 @customElement(TRANSPORT_CARD_EDITOR_NAME)
-export class TransportCardEditor extends LitElement {
-    @property({ attribute: false })
-    set hass(hass: any) {
-        this._hass = hass;
-        this._lang = getHassLanguage(hass);
-    }
+export class TransportCardEditor
+    extends LitElement
+    implements LovelaceCardEditor
+{
+    @property({ attribute: false }) hass?: HomeAssistant;
 
-    @state() private _hass: any;
     @state() private _lang: string = "en";
-    @state() private _config: TransportCardConfig = {};
+    @state() private _config?: TransportCardConfig;
+
+    willUpdate(changedProps: PropertyValues): void {
+        if (changedProps.has("hass")) {
+            this._lang = getHassLanguage(this.hass);
+        }
+    }
 
     static styles = css`
         ha-form {
@@ -28,13 +33,13 @@ export class TransportCardEditor extends LitElement {
     }
 
     render() {
-        if (!this._hass) {
+        if (!this.hass) {
             return nothing;
         }
 
         return html`
             <ha-form
-                .hass=${this._hass}
+                .hass=${this.hass}
                 .data=${this._config}
                 .schema=${this.schema}
                 .computeLabel=${this.computeLabel}
@@ -97,9 +102,11 @@ export class TransportCardEditor extends LitElement {
         const value = ev.detail.value as Partial<TransportCardConfig>;
 
         const newConfig: TransportCardConfig = {
+            type: "transport-card",
+            entity: "",
             ...this._config,
             ...value,
-            lines: (value.lines ?? []).filter(
+            lines: (value.lines ?? this._config?.lines ?? []).filter(
                 (line) => line?.trim().length > 0,
             ),
         };

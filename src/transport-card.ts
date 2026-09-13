@@ -1,4 +1,4 @@
-import { css, html, LitElement, nothing } from "lit";
+import { css, html, LitElement, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { getVehicleInfo } from "./vehicle";
 import {
@@ -11,11 +11,17 @@ import {
     TRANSPORT_CARD_EDITOR_NAME,
     TRANSPORT_CARD_NAME,
 } from "./constants.ts";
+import type { HomeAssistant, LovelaceCard } from "./ha.ts";
+import type { TransportCardConfig } from "./transport-card-config.ts";
 import "./transport-card-editor.ts";
 import { getHassLanguage, t } from "./i18n.ts";
 
-(window as any).customCards = (window as any).customCards || [];
-(window as any).customCards.push({
+interface CustomCardsWindow extends Window {
+    customCards?: Array<Record<string, unknown>>;
+}
+(window as unknown as CustomCardsWindow).customCards =
+    (window as unknown as CustomCardsWindow).customCards || [];
+(window as unknown as CustomCardsWindow).customCards!.push({
     type: TRANSPORT_CARD_NAME,
     name: "Vienna Public Transport Card",
     description: "Display departures from Vienna public transport stops",
@@ -24,26 +30,29 @@ import { getHassLanguage, t } from "./i18n.ts";
 });
 
 @customElement(TRANSPORT_CARD_NAME)
-export class TransportCard extends LitElement {
-    @property({ attribute: false })
-    set hass(hass: any) {
-        this._hass = hass;
-        this._lang = getHassLanguage(hass);
-    }
+export class TransportCard extends LitElement implements LovelaceCard {
+    @property({ attribute: false }) hass?: HomeAssistant;
 
-    @state() private _hass: any;
     @state() private _lang: string = "en";
 
-    @property() config: any;
+    @state() private config?: TransportCardConfig;
 
-    static getConfigElement() {
+    static getConfigElement(): HTMLElement {
         return document.createElement(TRANSPORT_CARD_EDITOR_NAME);
     }
 
-    static getStubConfig(): Record<string, unknown> {
+    static getStubConfig(): TransportCardConfig {
         return {
+            type: "transport-card",
+            entity: "",
             max_departures: 3,
         };
+    }
+
+    willUpdate(changedProps: PropertyValues): void {
+        if (changedProps.has("hass")) {
+            this._lang = getHassLanguage(this.hass);
+        }
     }
 
     static styles = css`
@@ -143,19 +152,23 @@ export class TransportCard extends LitElement {
         }
     `;
 
-    setConfig(config: any): void {
+    setConfig(config: TransportCardConfig): void {
         if (!config.entity) {
             throw new Error(t("card.config.entity_required", this._lang));
         }
         this.config = config;
     }
 
+    getCardSize(): number {
+        return 3;
+    }
+
     render() {
-        if (!this.config || !this._hass) {
+        if (!this.config || !this.hass) {
             return nothing;
         }
 
-        const entity = this._hass.states[this.config.entity];
+        const entity = this.hass.states[this.config.entity];
         if (!entity) {
             return html`
                 <ha-card
@@ -166,16 +179,16 @@ export class TransportCard extends LitElement {
             `;
         }
 
-        const stop = entity.attributes as Stop;
+        const stop = entity.attributes as unknown as Stop;
         let lines: Line[] = stop.lines;
 
         if (
-            this.config.lines &&
-            Array.isArray(this.config.lines) &&
-            this.config.lines.length > 0
+            this.config!.lines &&
+            Array.isArray(this.config!.lines) &&
+            this.config!.lines.length > 0
         ) {
             lines = stop.lines.filter((line: Line) =>
-                this.config.lines.includes(line.name),
+                this.config!.lines!.includes(line.name),
             );
         }
 
@@ -196,7 +209,7 @@ export class TransportCard extends LitElement {
     }
 
     private renderLine(line: Line) {
-        const max = this.config.max_departures ?? line.departures.length;
+        const max = this.config!.max_departures ?? line.departures.length;
         const departures: Departure[] = line.departures.slice(0, max);
 
         return html`
