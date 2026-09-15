@@ -125,8 +125,8 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
         session = async_get_clientsession(self.hass)
         client = ViennaTransportClient(session=session)
         parser = ViennaTransportParser()
-        raw = await client.fetch(stop_ids)
-        return parser.parse(raw)
+        raw_batches = await client.fetch(stop_ids)
+        return parser.parse(raw_batches)
 
     @staticmethod
     def _validate_stop_ids(raw: list[str]) -> list[str]:

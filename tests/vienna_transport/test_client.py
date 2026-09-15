@@ -43,7 +43,7 @@ async def test_fetch_returns_json_on_200(
         mock.get(f"{_API_URL}?stopId=1", payload=payload)
         result = await client.fetch(["1"])
 
-    assert result == payload
+    assert result == [payload]
 
 
 async def test_fetch_raises_on_403(
@@ -82,7 +82,7 @@ async def test_fetch_sends_multiple_stop_ids(
         mock.get(f"{_API_URL}?stopId=1&stopId=2", payload=payload)
         result = await client.fetch(["1", "2"])
 
-    assert result == payload
+    assert result == [payload]
 
 
 async def test_fetch_raises_update_failed_on_connection_error(
@@ -162,3 +162,72 @@ async def test_fetch_raises_client_error_on_generic_client_error() -> None:
         pytest.raises(ClientError, match="HTTP client error"),
     ):
         await client.fetch(["1"])
+
+
+async def test_fetch_single_batch_when_within_limit(
+    client: ViennaTransportClient,
+    socket_enabled: None,
+) -> None:
+    payload = {"message": {"messageCode": 1}, "data": {"monitors": []}}
+    stop_ids = ["1", "2", "3", "4", "5"]
+    query = "&".join(f"stopId={s}" for s in stop_ids)
+
+    async with aiointercept(mock_external_urls=True) as mock:
+        mock.get(f"{_API_URL}?{query}", payload=payload)
+        result = await client.fetch(stop_ids)
+
+    assert result == [payload]
+
+
+async def test_fetch_returns_one_response_per_batch(
+    client: ViennaTransportClient,
+    socket_enabled: None,
+) -> None:
+    payload_1 = {
+        "message": {"messageCode": 1},
+        "data": {"monitors": [{"id": 1}]},
+    }
+    payload_2 = {
+        "message": {"messageCode": 1},
+        "data": {"monitors": [{"id": 2}]},
+    }
+
+    async with aiointercept(mock_external_urls=True) as mock:
+        mock.get(
+            f"{_API_URL}?stopId=1&stopId=2&stopId=3&stopId=4&stopId=5",
+            payload=payload_1,
+        )
+        mock.get(f"{_API_URL}?stopId=6", payload=payload_2)
+        result = await client.fetch(["1", "2", "3", "4", "5", "6"])
+
+    assert result == [payload_1, payload_2]
+
+
+async def test_fetch_dedupes_stop_ids(
+    client: ViennaTransportClient,
+    socket_enabled: None,
+) -> None:
+    payload = {"message": {"messageCode": 1}, "data": {"monitors": []}}
+
+    async with aiointercept(mock_external_urls=True) as mock:
+        mock.get(f"{_API_URL}?stopId=1&stopId=2", payload=payload)
+        result = await client.fetch(["1", "2", "1", "2"])
+
+    assert result == [payload]
+
+
+async def test_fetch_fail_fast_on_batch_error(
+    client: ViennaTransportClient,
+    socket_enabled: None,
+) -> None:
+    payload = {"message": {"messageCode": 1}, "data": {"monitors": []}}
+
+    async with aiointercept(mock_external_urls=True) as mock:
+        mock.get(
+            f"{_API_URL}?stopId=1&stopId=2&stopId=3&stopId=4&stopId=5",
+            payload=payload,
+        )
+        mock.get(f"{_API_URL}?stopId=6", status=500)
+
+        with pytest.raises(ClientError, match="Unexpected HTTP status code: 500"):
+            await client.fetch(["1", "2", "3", "4", "5", "6"])

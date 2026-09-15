@@ -63,7 +63,7 @@ async def test_update_data_returns_transport_data(
     mock_parser: MagicMock,
     transport_data: TransportData,
 ) -> None:
-    mock_client.fetch.return_value = {"message": {"messageCode": 1}}
+    mock_client.fetch.return_value = [{"message": {"messageCode": 1}}]
     mock_parser.parse.return_value = transport_data
 
     result = await coordinator._async_update_data()
@@ -77,7 +77,7 @@ async def test_update_data_calls_client_with_stop_ids(
     mock_parser: MagicMock,
     transport_data: TransportData,
 ) -> None:
-    mock_client.fetch.return_value = {}
+    mock_client.fetch.return_value = [{}]
     mock_parser.parse.return_value = transport_data
 
     await coordinator._async_update_data()
@@ -92,12 +92,12 @@ async def test_update_data_passes_raw_response_to_parser(
     transport_data: TransportData,
 ) -> None:
     raw = {"message": {"messageCode": 1}, "data": {"monitors": []}}
-    mock_client.fetch.return_value = raw
+    mock_client.fetch.return_value = [raw]
     mock_parser.parse.return_value = transport_data
 
     await coordinator._async_update_data()
 
-    mock_parser.parse.assert_called_once_with(raw)
+    mock_parser.parse.assert_called_once_with([raw])
 
 
 async def test_update_data_caches_result(
@@ -107,7 +107,7 @@ async def test_update_data_caches_result(
     mock_cache: MagicMock,
     transport_data: TransportData,
 ) -> None:
-    mock_client.fetch.return_value = {}
+    mock_client.fetch.return_value = [{}]
     mock_parser.parse.return_value = transport_data
 
     await coordinator._async_update_data()
@@ -136,7 +136,7 @@ async def test_update_data_returns_cached_on_parser_error(
     mock_cache: MagicMock,
     transport_data: TransportData,
 ) -> None:
-    mock_client.fetch.return_value = {}
+    mock_client.fetch.return_value = [{}]
     mock_parser.parse.side_effect = ParserError("Parse error")
     mock_cache.get.return_value = transport_data
 
@@ -165,7 +165,7 @@ async def test_update_data_fetches_union_across_registered_entries(
     transport_data: TransportData,
 ) -> None:
     registry.register("entry-2", ["1337"])
-    mock_client.fetch.return_value = {}
+    mock_client.fetch.return_value = [{}]
     mock_parser.parse.return_value = transport_data
 
     await coordinator._async_update_data()

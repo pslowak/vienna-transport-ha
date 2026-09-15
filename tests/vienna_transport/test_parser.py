@@ -1,3 +1,4 @@
+import copy
 import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -24,19 +25,19 @@ def parser() -> ViennaTransportParser:
 
 def test_parse_returns_transport_data(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    result = parser.parse(raw)
+    result = parser.parse([raw])
     assert isinstance(result, TransportData)
 
 
 def test_parse_produces_one_stop(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    result = parser.parse(raw)
+    result = parser.parse([raw])
     assert len(result.stops) == 1
 
 
 def test_parse_stop_properties(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    stop = parser.parse(raw).stops[2683]
+    stop = parser.parse([raw]).stops[2683]
 
     assert stop.props.id == 2683
     assert stop.props.name == "Volkertplatz"
@@ -44,25 +45,25 @@ def test_parse_stop_properties(parser: ViennaTransportParser) -> None:
 
 def test_parse_stop_has_one_line(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    stop = parser.parse(raw).stops[2683]
+    stop = parser.parse([raw]).stops[2683]
     assert len(stop.lines) == 1
 
 
 def test_parse_line_name(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    line = parser.parse(raw).stops[2683].lines[0]
+    line = parser.parse([raw]).stops[2683].lines[0]
     assert line.name == "5B"
 
 
 def test_parse_line_has_three_departures(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    line = parser.parse(raw).stops[2683].lines[0]
+    line = parser.parse([raw]).stops[2683].lines[0]
     assert len(line.departures) == 3
 
 
 def test_parse_departure_times(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    departure = parser.parse(raw).stops[2683].lines[0].departures[0]
+    departure = parser.parse([raw]).stops[2683].lines[0].departures[0]
 
     tz = timezone(timedelta(hours=2))
     expected_planned = datetime(2026, 6, 3, 12, 4, 30, tzinfo=tz)
@@ -76,7 +77,7 @@ def test_parse_departure_falls_back_to_time_planned_when_time_real_missing(
     parser: ViennaTransportParser,
 ) -> None:
     raw = load_fixture("single_stop.json")
-    departure = parser.parse(raw).stops[2683].lines[0].departures[1]
+    departure = parser.parse([raw]).stops[2683].lines[0].departures[1]
 
     assert departure.time_real == departure.time_planned
 
@@ -85,7 +86,7 @@ def test_parse_departure_falls_back_to_time_real_when_time_planned_missing(
     parser: ViennaTransportParser,
 ) -> None:
     raw = load_fixture("single_stop.json")
-    departure = parser.parse(raw).stops[2683].lines[0].departures[2]
+    departure = parser.parse([raw]).stops[2683].lines[0].departures[2]
 
     assert departure.time_planned == departure.time_real
 
@@ -119,7 +120,7 @@ def test_parse_departure_times_are_timezone_aware(
     parser: ViennaTransportParser,
 ) -> None:
     raw = load_fixture("single_stop.json")
-    departure: Departure = parser.parse(raw).stops[2683].lines[0].departures[0]
+    departure: Departure = parser.parse([raw]).stops[2683].lines[0].departures[0]
 
     assert departure.time_planned.tzinfo is not None
     assert departure.time_real.tzinfo is not None
@@ -127,7 +128,7 @@ def test_parse_departure_times_are_timezone_aware(
 
 def test_parse_cooled_vehicle(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    vehicle: Vehicle = parser.parse(raw).stops[2683].lines[0].departures[0].vehicle
+    vehicle: Vehicle = parser.parse([raw]).stops[2683].lines[0].departures[0].vehicle
 
     assert vehicle.name == "5B"
     assert vehicle.type == "ptBusCity"
@@ -137,7 +138,7 @@ def test_parse_cooled_vehicle(parser: ViennaTransportParser) -> None:
 
 def test_parse_non_cooled_vehicle(parser: ViennaTransportParser) -> None:
     raw = load_fixture("single_stop.json")
-    vehicle: Vehicle = parser.parse(raw).stops[2683].lines[0].departures[1].vehicle
+    vehicle: Vehicle = parser.parse([raw]).stops[2683].lines[0].departures[1].vehicle
 
     assert vehicle.name == "5B"
     assert vehicle.type == "ptBusCity"
@@ -145,20 +146,12 @@ def test_parse_non_cooled_vehicle(parser: ViennaTransportParser) -> None:
     assert vehicle.cooling is False
 
 
-def test_parse_rate_limit_error(parser: ViennaTransportParser) -> None:
-    raw = {
-        "message": {"messageCode": 316, "value": "Rate limit exceeded"},
-    }
-    with pytest.raises(ParserError, match="rate limit"):
-        parser.parse(raw)
-
-
 def test_parse_unknown_code(parser: ViennaTransportParser) -> None:
     raw = {
         "message": {"messageCode": -1, "value": "Some unknown code"},
     }
     with pytest.raises(ParserError, match="Unexpected message code"):
-        parser.parse(raw)
+        parser.parse([raw])
 
 
 def test_parse_malformed_data(parser: ViennaTransportParser) -> None:
@@ -171,4 +164,45 @@ def test_parse_malformed_data(parser: ViennaTransportParser) -> None:
         },
     }
     with pytest.raises(ParserError, match="unexpected API response"):
-        parser.parse(raw)
+        parser.parse([raw])
+
+
+def _second_stop_raw() -> dict[str, Any]:
+    second = copy.deepcopy(load_fixture("single_stop.json"))
+    props = second["data"]["monitors"][0]["locationStop"]["properties"]
+    props["attributes"]["rbl"] = 1337
+    props["title"] = "Schottentor"
+    return second
+
+
+def test_parse_merges_stops_across_batches(parser: ViennaTransportParser) -> None:
+    result = parser.parse([load_fixture("single_stop.json"), _second_stop_raw()])
+    assert set(result.stops) == {2683, 1337}
+
+
+def test_parse_raises_on_non_ok_batch(parser: ViennaTransportParser) -> None:
+    rate_limited: dict[str, Any] = {
+        "message": {"messageCode": 316, "value": "Rate limit exceeded"},
+    }
+    ok = load_fixture("single_stop.json")
+    with pytest.raises(ParserError, match="rate limit"):
+        parser.parse([ok, rate_limited])
+
+
+def test_parse_raises_on_empty_list(parser: ViennaTransportParser) -> None:
+    with pytest.raises(ParserError, match="No API responses"):
+        parser.parse([])
+
+
+def test_parse_raises_on_malformed_message(parser: ViennaTransportParser) -> None:
+    malformed: dict[str, Any] = {"message": "oops"}
+    ok = load_fixture("single_stop.json")
+    with pytest.raises(ParserError, match="malformed message"):
+        parser.parse([ok, malformed])
+
+
+def test_parse_raises_on_non_dict_batch(parser: ViennaTransportParser) -> None:
+    not_a_dict: Any = ["not", "a", "dict"]
+    ok = load_fixture("single_stop.json")
+    with pytest.raises(ParserError, match="unexpected API response"):
+        parser.parse([ok, not_a_dict])

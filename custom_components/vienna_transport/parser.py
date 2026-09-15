@@ -24,26 +24,48 @@ _MSG_CODE_UNKNOWN = -1
 class ViennaTransportParser:
     """Parser for transforming raw API data into transport models."""
 
-    def parse(self, raw: dict[str, Any]) -> TransportData:
-        """Parse raw API response into transport data.
+    def parse(self, raw_batches: list[dict[str, Any]]) -> TransportData:
+        """Parse batched raw API responses into transport data.
 
         Args:
-            raw: Raw JSON response from Wiener Linien monitor API.
+            raw_batches: Raw JSON responses from Wiener Linien monitor API,
+                one per batch.
 
         Returns:
-            Parsed transport data.
+            Merged transport data across all batches.
 
         Raises:
-            ParserError: If response malformed or message code indicates error.
+            ParserError: If raw_batches is empty or any batch fails.
 
         """
+        if not raw_batches:
+            raise ParserError("No API responses to parse")
+
+        stops: dict[int, Stop] = {}
+        for raw in raw_batches:
+            stops.update(self._parse_one(raw).stops)
+
+        _LOGGER.debug(
+            "Parsed %d stop(s) from %d batch(es)", len(stops), len(raw_batches)
+        )
+        return TransportData(stops=stops)
+
+    @staticmethod
+    def _parse_one(raw: dict[str, Any]) -> TransportData:
         try:
             msg = raw["message"]
+            if not isinstance(msg, dict):
+                raise ParserError(
+                    "unexpected API response: "
+                    f"malformed message of type {type(msg).__name__}"
+                )
             msg_code = msg.get("messageCode", _MSG_CODE_UNKNOWN)
 
             if msg_code == _MSG_CODE_OK:
                 raw_monitors = raw.get("data", {}).get("monitors", [])
-                parsed = [self._parse_stop(stop) for stop in raw_monitors]
+                parsed = [
+                    ViennaTransportParser._parse_stop(stop) for stop in raw_monitors
+                ]
                 stops = {stop.props.id: stop for stop in parsed}
                 return TransportData(stops=stops)
 
@@ -54,7 +76,7 @@ class ViennaTransportParser:
             _LOGGER.warning("Unexpected message code %s", msg_code)
             raise ParserError(f"Unexpected message code {msg_code}")
         except (KeyError, TypeError, ValueError) as e:
-            _LOGGER.exception("Unexpected API response %s", e)
+            _LOGGER.warning("Unexpected API response %s", e)
             _LOGGER.debug("API response raw: %s", raw)
             raise ParserError(f"unexpected API response: {e}") from e
 
