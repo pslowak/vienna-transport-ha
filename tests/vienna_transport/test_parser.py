@@ -223,3 +223,17 @@ def test_parse_raises_when_only_batch_is_malformed(
     malformed: dict[str, Any] = {"message": "oops"}
     with pytest.raises(ParserError, match="malformed message"):
         parser.parse([malformed])
+
+
+def test_parse_skips_non_dict_batch(parser: ViennaTransportParser) -> None:
+    not_a_dict: Any = ["not", "a", "dict"]
+    result = parser.parse([load_fixture("single_stop.json"), not_a_dict])
+    assert set(result.stops) == {2683}
+
+
+def test_parse_raises_when_only_batch_is_not_a_dict(
+    parser: ViennaTransportParser,
+) -> None:
+    not_a_dict: Any = ["not", "a", "dict"]
+    with pytest.raises(ParserError, match="unexpected API response"):
+        parser.parse([not_a_dict])

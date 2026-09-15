@@ -50,8 +50,14 @@ class ViennaTransportParser:
         succeeded = False
 
         for raw in raw_batches:
-            message = raw.get("message", {})
+            if not isinstance(raw, dict):
+                _LOGGER.warning(
+                    "Skipping batch with malformed response of type %s",
+                    type(raw).__name__,
+                )
+                continue
 
+            message = raw.get("message", {})
             if not isinstance(message, dict):
                 _LOGGER.warning(
                     "Skipping batch with malformed message of type %s",
