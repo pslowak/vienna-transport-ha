@@ -27,57 +27,27 @@ class ViennaTransportParser:
     def parse(self, raw_batches: list[dict[str, Any]]) -> TransportData:
         """Parse batched raw API responses into transport data.
 
-        Responses with a non-OK message code are skipped, so a failed
-        batch does not discard the stops of successful batches. If no
-        batch succeeds, the first response is parsed so the error is
-        still surfaced.
-
         Args:
             raw_batches: Raw JSON responses from Wiener Linien monitor API,
                 one per batch.
 
         Returns:
-            Merged transport data across all successful batches.
+            Merged transport data across all batches.
 
         Raises:
-            ParserError: If raw_batches is empty or no batch succeeds.
+            ParserError: If raw_batches is empty or any batch fails.
 
         """
         if not raw_batches:
             raise ParserError("No API responses to parse")
 
         stops: dict[int, Stop] = {}
-        succeeded = False
-
         for raw in raw_batches:
-            if not isinstance(raw, dict):
-                _LOGGER.warning(
-                    "Skipping batch with malformed response of type %s",
-                    type(raw).__name__,
-                )
-                continue
-
-            message = raw.get("message", {})
-            if not isinstance(message, dict):
-                _LOGGER.warning(
-                    "Skipping batch with malformed message of type %s",
-                    type(message).__name__,
-                )
-                continue
-
-            if message.get("messageCode", _MSG_CODE_UNKNOWN) != _MSG_CODE_OK:
-                _LOGGER.debug(
-                    "Skipping batch with message code %s",
-                    message.get("messageCode"),
-                )
-                continue
-
-            succeeded = True
             stops.update(self._parse_one(raw).stops)
 
-        if not succeeded:
-            return self._parse_one(raw_batches[0])
-
+        _LOGGER.debug(
+            "Parsed %d stop(s) from %d batch(es)", len(stops), len(raw_batches)
+        )
         return TransportData(stops=stops)
 
     @staticmethod

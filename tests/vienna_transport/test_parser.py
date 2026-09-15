@@ -146,14 +146,6 @@ def test_parse_non_cooled_vehicle(parser: ViennaTransportParser) -> None:
     assert vehicle.cooling is False
 
 
-def test_parse_rate_limit_error(parser: ViennaTransportParser) -> None:
-    raw = {
-        "message": {"messageCode": 316, "value": "Rate limit exceeded"},
-    }
-    with pytest.raises(ParserError, match="rate limit"):
-        parser.parse([raw])
-
-
 def test_parse_unknown_code(parser: ViennaTransportParser) -> None:
     raw = {
         "message": {"messageCode": -1, "value": "Some unknown code"},
@@ -188,22 +180,13 @@ def test_parse_merges_stops_across_batches(parser: ViennaTransportParser) -> Non
     assert set(result.stops) == {2683, 1337}
 
 
-def test_parse_skips_non_ok_batches(parser: ViennaTransportParser) -> None:
+def test_parse_raises_on_non_ok_batch(parser: ViennaTransportParser) -> None:
     rate_limited: dict[str, Any] = {
         "message": {"messageCode": 316, "value": "Rate limit exceeded"},
     }
-    result = parser.parse([load_fixture("single_stop.json"), rate_limited])
-    assert set(result.stops) == {2683}
-
-
-def test_parse_raises_when_all_batches_fail(
-    parser: ViennaTransportParser,
-) -> None:
-    rate_limited: dict[str, Any] = {
-        "message": {"messageCode": 316, "value": "Rate limit exceeded"},
-    }
+    ok = load_fixture("single_stop.json")
     with pytest.raises(ParserError, match="rate limit"):
-        parser.parse([rate_limited, rate_limited])
+        parser.parse([ok, rate_limited])
 
 
 def test_parse_raises_on_empty_list(parser: ViennaTransportParser) -> None:
@@ -211,29 +194,15 @@ def test_parse_raises_on_empty_list(parser: ViennaTransportParser) -> None:
         parser.parse([])
 
 
-def test_parse_skips_malformed_message(parser: ViennaTransportParser) -> None:
+def test_parse_raises_on_malformed_message(parser: ViennaTransportParser) -> None:
     malformed: dict[str, Any] = {"message": "oops"}
-    result = parser.parse([load_fixture("single_stop.json"), malformed])
-    assert set(result.stops) == {2683}
-
-
-def test_parse_raises_when_only_batch_is_malformed(
-    parser: ViennaTransportParser,
-) -> None:
-    malformed: dict[str, Any] = {"message": "oops"}
+    ok = load_fixture("single_stop.json")
     with pytest.raises(ParserError, match="malformed message"):
-        parser.parse([malformed])
+        parser.parse([ok, malformed])
 
 
-def test_parse_skips_non_dict_batch(parser: ViennaTransportParser) -> None:
+def test_parse_raises_on_non_dict_batch(parser: ViennaTransportParser) -> None:
     not_a_dict: Any = ["not", "a", "dict"]
-    result = parser.parse([load_fixture("single_stop.json"), not_a_dict])
-    assert set(result.stops) == {2683}
-
-
-def test_parse_raises_when_only_batch_is_not_a_dict(
-    parser: ViennaTransportParser,
-) -> None:
-    not_a_dict: Any = ["not", "a", "dict"]
+    ok = load_fixture("single_stop.json")
     with pytest.raises(ParserError, match="unexpected API response"):
-        parser.parse([not_a_dict])
+        parser.parse([ok, not_a_dict])
