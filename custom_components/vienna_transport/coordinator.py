@@ -73,8 +73,8 @@ class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
             return self._cache.get() or TransportData(stops={})
 
         try:
-            raw = await self._client.fetch(stop_ids)
-            parsed = self._parser.parse(raw)
+            raw_batches = await self._client.fetch(stop_ids)
+            parsed = self._parser.parse(raw_batches)
             self._cache.set(parsed)
             _LOGGER.debug("Cache updated")
             return parsed
