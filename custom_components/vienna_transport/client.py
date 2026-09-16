@@ -15,6 +15,7 @@ _REQUEST_TIMEOUT = aiohttp.ClientTimeout(total=10)
 
 _HTTP_OK = 200
 _MAX_STOPS_PER_REQUEST = 5
+_MAX_CONCURRENT_REQUESTS = 3
 
 
 class ViennaTransportClient:
@@ -32,7 +33,8 @@ class ViennaTransportClient:
     async def fetch(self, stop_ids: list[str]) -> list[dict[str, Any]]:
         """Fetch departure data for one or more stops.
 
-        Stops are fetched in batches: One raw response is returned per batch.
+        Stops are fetched in batches with bounded concurrency: One raw
+        response is returned per batch.
 
         Args:
             stop_ids: List of stop IDs to fetch.
@@ -58,21 +60,36 @@ class ViennaTransportClient:
                 "Fetching batch %d/%d for stops %s", index, len(chunks), chunk
             )
 
+        sem = asyncio.Semaphore(_MAX_CONCURRENT_REQUESTS)
+        tasks: list[asyncio.Task[dict[str, Any]]] = []
         try:
-            responses = await asyncio.gather(
-                *(
-                    self._fetch_raw([("stopId", stop_id) for stop_id in chunk], chunk)
-                    for chunk in chunks
-                )
-            )
-        except (aiohttp.ContentTypeError, ValueError) as e:
-            raise ClientError(f"Invalid JSON response: {e}") from e
-        except TimeoutError as e:
-            raise ClientError(f"Timeout error: {e}") from e
-        except aiohttp.ClientError as e:
-            raise ClientError(f"HTTP client error: {e}") from e
+            async with asyncio.TaskGroup() as task_group:
+                for chunk in chunks:
+                    tasks.append(task_group.create_task(self._fetch_batch(sem, chunk)))
+        except BaseExceptionGroup as error_group:
+            raise self._map_error(error_group.exceptions[0]) from error_group
 
-        return list(responses)
+        return [task.result() for task in tasks]
+
+    async def _fetch_batch(
+        self, sem: asyncio.Semaphore, chunk: list[str]
+    ) -> dict[str, Any]:
+        async with sem:
+            return await self._fetch_raw(
+                [("stopId", stop_id) for stop_id in chunk], chunk
+            )
+
+    @staticmethod
+    def _map_error(error: BaseException) -> ClientError:
+        if isinstance(error, ClientError):
+            return error
+        if isinstance(error, (aiohttp.ContentTypeError, ValueError)):
+            return ClientError(f"Invalid JSON response: {error}")
+        if isinstance(error, TimeoutError):
+            return ClientError(f"Timeout error: {error}")
+        if isinstance(error, aiohttp.ClientError):
+            return ClientError(f"HTTP client error: {error}")
+        return ClientError(f"Unexpected batch error: {error}")
 
     @staticmethod
     def _chunk_stop_ids(
