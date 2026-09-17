@@ -197,7 +197,7 @@ def test_parse_raises_on_empty_list(parser: ViennaTransportParser) -> None:
 def test_parse_raises_on_malformed_message(parser: ViennaTransportParser) -> None:
     malformed: dict[str, Any] = {"message": "oops"}
     ok = load_fixture("single_stop.json")
-    with pytest.raises(ParserError, match="malformed message"):
+    with pytest.raises(ParserError, match="unexpected API response"):
         parser.parse([ok, malformed])
 
 
@@ -206,3 +206,28 @@ def test_parse_raises_on_non_dict_batch(parser: ViennaTransportParser) -> None:
     ok = load_fixture("single_stop.json")
     with pytest.raises(ParserError, match="unexpected API response"):
         parser.parse([ok, not_a_dict])
+
+
+def test_parse_raises_on_none_data(parser: ViennaTransportParser) -> None:
+    raw: dict[str, Any] = {
+        "message": {"messageCode": 1, "value": "OK"},
+        "data": None,
+    }
+    with pytest.raises(ParserError, match="unexpected API response"):
+        parser.parse([raw])
+
+
+def test_parse_raises_on_none_departures(parser: ViennaTransportParser) -> None:
+    raw = load_fixture("single_stop.json")
+    raw["data"]["monitors"][0]["lines"][0]["departures"] = None
+    with pytest.raises(ParserError, match="unexpected API response"):
+        parser.parse([raw])
+
+
+def test_parse_raises_on_none_departure_time(parser: ViennaTransportParser) -> None:
+    raw = load_fixture("single_stop.json")
+    raw["data"]["monitors"][0]["lines"][0]["departures"]["departure"][0][
+        "departureTime"
+    ] = None
+    with pytest.raises(ParserError, match="unexpected API response"):
+        parser.parse([raw])

@@ -53,13 +53,7 @@ class ViennaTransportParser:
     @staticmethod
     def _parse_one(raw: dict[str, Any]) -> TransportData:
         try:
-            msg = raw["message"]
-            if not isinstance(msg, dict):
-                raise ParserError(
-                    "unexpected API response: "
-                    f"malformed message of type {type(msg).__name__}"
-                )
-            msg_code = msg.get("messageCode", _MSG_CODE_UNKNOWN)
+            msg_code = raw["message"].get("messageCode", _MSG_CODE_UNKNOWN)
 
             if msg_code == _MSG_CODE_OK:
                 raw_monitors = raw.get("data", {}).get("monitors", [])
@@ -75,7 +69,7 @@ class ViennaTransportParser:
 
             _LOGGER.warning("Unexpected message code %s", msg_code)
             raise ParserError(f"Unexpected message code {msg_code}")
-        except (KeyError, TypeError, ValueError) as e:
+        except (KeyError, TypeError, ValueError, AttributeError) as e:
             _LOGGER.warning("Unexpected API response %s", e)
             _LOGGER.debug("API response raw: %s", raw)
             raise ParserError(f"unexpected API response: {e}") from e
