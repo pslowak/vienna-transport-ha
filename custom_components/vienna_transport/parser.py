@@ -100,19 +100,16 @@ class ViennaTransportParser:
     @staticmethod
     def _parse_departure(raw: dict[str, Any]) -> Departure:
         times = raw["departureTime"]
-        time_planned_raw = times.get("timePlanned")
-        time_real_raw = times.get("timeReal")
+        planned_raw = times.get("timePlanned")
+        real_raw = times.get("timeReal")
 
-        if time_planned_raw is not None and time_real_raw is not None:
-            time_planned = datetime.fromisoformat(time_planned_raw)
-            time_real = datetime.fromisoformat(time_real_raw)
-        elif time_planned_raw is not None:
-            time_planned = datetime.fromisoformat(time_planned_raw)
-            time_real = time_planned
-        elif time_real_raw is not None:
-            time_real = datetime.fromisoformat(time_real_raw)
-            time_planned = time_real
-        else:
+        time_planned = (
+            datetime.fromisoformat(planned_raw) if planned_raw is not None else None
+        )
+        time_real = datetime.fromisoformat(real_raw) if real_raw is not None else None
+        time_planned = time_planned or time_real
+        time_real = time_real or time_planned
+        if time_planned is None or time_real is None:
             raise ParserError("Both timePlanned and timeReal are missing")
 
         vehicle = ViennaTransportParser._parse_vehicle(raw["vehicle"])
