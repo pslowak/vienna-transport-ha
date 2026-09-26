@@ -43,7 +43,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
     static getStubConfig(): TransportCardConfig {
         return {
-            type: "transport-card",
+            type: "custom:transport-card",
             entity: "",
             max_departures: 3,
         };
