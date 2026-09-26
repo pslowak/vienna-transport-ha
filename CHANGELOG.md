@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.2](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.1...v1.1.2) (2026-09-26)
+
+
+### Bug Fixes
+
+* **card:** add prefix to card type ([#140](https://github.com/pslowak/vienna-transport-ha/issues/140)) ([ad7350f](https://github.com/pslowak/vienna-transport-ha/commit/ad7350fb842b0a990ad48d0b78a0ece6f2862706))
+* **docs:** correct ARCHITECTURE.md path in copilot instructions ([#112](https://github.com/pslowak/vienna-transport-ha/issues/112)) ([f56e4ee](https://github.com/pslowak/vienna-transport-ha/commit/f56e4eeabdb54bb225a51ab3d4f0e7a84da59ef6))
+* **parser:** catch `AttributeError` on malformed API responses ([#126](https://github.com/pslowak/vienna-transport-ha/issues/126)) ([320d461](https://github.com/pslowak/vienna-transport-ha/commit/320d46117639f6c27c979382a773cdc989e75386))
+
 ## [1.1.1](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.0...v1.1.1) (2026-09-09)
 
 
