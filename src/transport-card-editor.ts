@@ -106,7 +106,7 @@ export class TransportCardEditor
         const value = ev.detail.value as Partial<TransportCardConfig>;
 
         const newConfig: TransportCardConfig = {
-            type: "transport-card",
+            type: "custom:transport-card",
             entity: "",
             ...this._config,
             ...value,
