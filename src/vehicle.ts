@@ -30,6 +30,10 @@ const VEHICLE_REGISTRY: Record<VehicleType, VehicleInfo> = {
     [VehicleType.UNKNOWN]: { background: "#888", color: "#fff" },
 };
 
+function isVehicleType(value: string): value is VehicleType {
+    return Object.hasOwn(VEHICLE_REGISTRY, value);
+}
+
 function vehicleTypeFromString(type: string, name: string): VehicleType {
     switch (type) {
         case "ptBusCity":
@@ -41,7 +45,7 @@ function vehicleTypeFromString(type: string, name: string): VehicleType {
         case "ptTramWLB":
             return VehicleType.BADEN_TRAM;
         case "ptMetro":
-            return (name as VehicleType) ?? VehicleType.UNKNOWN;
+            return isVehicleType(name) ? name : VehicleType.UNKNOWN;
         default:
             return VehicleType.UNKNOWN;
     }
