@@ -1,57 +1,42 @@
 import type { Line, Vehicle, VehicleInfo } from "./api.ts";
 
-const VehicleType = {
-    U1: "U1",
-    U2: "U2",
-    U3: "U3",
-    U4: "U4",
-    U5: "U5",
-    U6: "U6",
-    BUS: "BUS",
-    NIGHT_BUS: "NIGHT_BUS",
-    TRAM: "TRAM",
-    BADEN_TRAM: "BADEN_TRAM",
-    UNKNOWN: "UNKNOWN",
-} as const;
+const UNKNOWN: VehicleInfo = { background: "#888", color: "#fff" };
 
-type VehicleType = (typeof VehicleType)[keyof typeof VehicleType];
+const BUS = "BUS";
+const NIGHT_BUS = "NIGHT_BUS";
+const TRAM = "TRAM";
+const BADEN_TRAM = "BADEN_TRAM";
 
-const VEHICLE_REGISTRY: Record<VehicleType, VehicleInfo> = {
-    [VehicleType.U1]: { background: "#E3000F", color: "#fff" },
-    [VehicleType.U2]: { background: "#A862A4", color: "#fff" },
-    [VehicleType.U3]: { background: "#EF7C00", color: "#fff" },
-    [VehicleType.U4]: { background: "#00963F", color: "#fff" },
-    [VehicleType.U5]: { background: "#008F95", color: "#fff" },
-    [VehicleType.U6]: { background: "#9D6830", color: "#fff" },
-    [VehicleType.BUS]: { background: "#0a295d", color: "#fff" },
-    [VehicleType.NIGHT_BUS]: { background: "#0a295d", color: "#fef208" },
-    [VehicleType.TRAM]: { background: "#c00808", color: "#fff" },
-    [VehicleType.BADEN_TRAM]: { background: "#015792", color: "#fff" },
-    [VehicleType.UNKNOWN]: { background: "#888", color: "#fff" },
-};
+const VEHICLE_REGISTRY: ReadonlyMap<string, VehicleInfo> = new Map([
+    ["U1", { background: "#E3000F", color: "#fff" }],
+    ["U2", { background: "#A862A4", color: "#fff" }],
+    ["U3", { background: "#EF7C00", color: "#fff" }],
+    ["U4", { background: "#00963F", color: "#fff" }],
+    ["U5", { background: "#008F95", color: "#fff" }],
+    ["U6", { background: "#9D6830", color: "#fff" }],
+    [BUS, { background: "#0a295d", color: "#fff" }],
+    [NIGHT_BUS, { background: "#0a295d", color: "#fef208" }],
+    [TRAM, { background: "#c00808", color: "#fff" }],
+    [BADEN_TRAM, { background: "#015792", color: "#fff" }],
+]);
 
-function isVehicleType(value: string): value is VehicleType {
-    return Object.hasOwn(VEHICLE_REGISTRY, value);
-}
-
-function vehicleTypeFromString(type: string, name: string): VehicleType {
+function vehicleKey(type: string, name: string): string {
     switch (type) {
         case "ptBusCity":
-            return VehicleType.BUS;
+            return BUS;
         case "ptBusNight":
-            return VehicleType.NIGHT_BUS;
+            return NIGHT_BUS;
         case "ptTram":
-            return VehicleType.TRAM;
+            return TRAM;
         case "ptTramWLB":
-            return VehicleType.BADEN_TRAM;
+            return BADEN_TRAM;
         case "ptMetro":
-            return isVehicleType(name) ? name : VehicleType.UNKNOWN;
+            return name;
         default:
-            return VehicleType.UNKNOWN;
+            return "";
     }
 }
 
 export function getVehicleInfo(vehicle: Vehicle, line: Line): VehicleInfo {
-    const type: VehicleType = vehicleTypeFromString(vehicle.type, line.name);
-    return VEHICLE_REGISTRY[type];
+    return VEHICLE_REGISTRY.get(vehicleKey(vehicle.type, line.name)) ?? UNKNOWN;
 }
