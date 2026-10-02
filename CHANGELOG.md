@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.2](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.1...v1.1.2) (2026-10-02)
+
+
+### Bug Fixes
+
+* **card:** add prefix to card type ([#140](https://github.com/pslowak/vienna-transport-ha/issues/140)) ([ad7350f](https://github.com/pslowak/vienna-transport-ha/commit/ad7350fb842b0a990ad48d0b78a0ece6f2862706))
+* **card:** prevent crash on missing metro lines ([#151](https://github.com/pslowak/vienna-transport-ha/issues/151)) ([64d5ec1](https://github.com/pslowak/vienna-transport-ha/commit/64d5ec13537b1a1ef21afbcad6c3951480467b95))
+* **docs:** correct ARCHITECTURE.md path in copilot instructions ([#112](https://github.com/pslowak/vienna-transport-ha/issues/112)) ([f56e4ee](https://github.com/pslowak/vienna-transport-ha/commit/f56e4eeabdb54bb225a51ab3d4f0e7a84da59ef6))
+* **editor:** add prefix to card type ([#143](https://github.com/pslowak/vienna-transport-ha/issues/143)) ([de641b0](https://github.com/pslowak/vienna-transport-ha/commit/de641b0bdb668fdefe3f127ba7f2e8553894fd48))
+* **parser:** catch `AttributeError` on malformed API responses ([#126](https://github.com/pslowak/vienna-transport-ha/issues/126)) ([320d461](https://github.com/pslowak/vienna-transport-ha/commit/320d46117639f6c27c979382a773cdc989e75386))
+
 ## [1.1.1](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.0...v1.1.1) (2026-09-09)
 
 
