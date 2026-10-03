@@ -154,6 +154,36 @@ def test_parse_unknown_code(parser: ViennaTransportParser) -> None:
         parser.parse([raw])
 
 
+def test_parse_db_unavailable(parser: ViennaTransportParser) -> None:
+    raw = {"message": {"messageCode": 311, "value": "DB nicht verfügbar"}}
+    with pytest.raises(ParserError, match="API unavailable"):
+        parser.parse([raw])
+
+
+def test_parse_stop_not_found(parser: ViennaTransportParser) -> None:
+    raw = {"message": {"messageCode": 312, "value": "Haltepunkt existiert nicht"}}
+    with pytest.raises(ParserError, match="Stop not found"):
+        parser.parse([raw])
+
+
+def test_parse_invalid_param(parser: ViennaTransportParser) -> None:
+    raw = {"message": {"messageCode": 320, "value": "GET Abfrage Parameter invalid"}}
+    with pytest.raises(ParserError, match="Invalid query parameter"):
+        parser.parse([raw])
+
+
+def test_parse_missing_param(parser: ViennaTransportParser) -> None:
+    raw = {"message": {"messageCode": 321, "value": "GET Abfrage Parameter fehlt"}}
+    with pytest.raises(ParserError, match="Missing query parameter"):
+        parser.parse([raw])
+
+
+def test_parse_no_data(parser: ViennaTransportParser) -> None:
+    raw = {"message": {"messageCode": 322, "value": "keine Daten in der DB vorhanden"}}
+    with pytest.raises(ParserError, match="No data in API"):
+        parser.parse([raw])
+
+
 def test_parse_malformed_data(parser: ViennaTransportParser) -> None:
     raw = {
         "message": {"messageCode": 1, "value": "OK"},

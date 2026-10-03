@@ -18,6 +18,11 @@ _LOGGER = logging.getLogger(__name__)
 
 _MSG_CODE_OK = 1
 _MSG_CODE_RATE_LIMIT = 316
+_MSG_CODE_DB_UNAVAILABLE = 311
+_MSG_CODE_STOP_NOT_FOUND = 312
+_MSG_CODE_INVALID_PARAM = 320
+_MSG_CODE_MISSING_PARAM = 321
+_MSG_CODE_NO_DATA = 322
 _MSG_CODE_UNKNOWN = -1
 
 
@@ -66,6 +71,26 @@ class ViennaTransportParser:
             if msg_code == _MSG_CODE_RATE_LIMIT:
                 _LOGGER.warning("API rate limit reached (message code %s)", msg_code)
                 raise ParserError(f"API rate limit reached (message code {msg_code})")
+
+            if msg_code == _MSG_CODE_DB_UNAVAILABLE:
+                _LOGGER.warning("API unavailable (message code %s)", msg_code)
+                raise ParserError(f"API unavailable (message code {msg_code})")
+
+            if msg_code == _MSG_CODE_STOP_NOT_FOUND:
+                _LOGGER.warning("Stop not found (message code %s)", msg_code)
+                raise ParserError(f"Stop not found (message code {msg_code})")
+
+            if msg_code == _MSG_CODE_INVALID_PARAM:
+                _LOGGER.warning("Invalid query parameter (message code %s)", msg_code)
+                raise ParserError(f"Invalid query parameter (message code {msg_code})")
+
+            if msg_code == _MSG_CODE_MISSING_PARAM:
+                _LOGGER.warning("Missing query parameter (message code %s)", msg_code)
+                raise ParserError(f"Missing query parameter (message code {msg_code})")
+
+            if msg_code == _MSG_CODE_NO_DATA:
+                _LOGGER.warning("No data in API (message code %s)", msg_code)
+                raise ParserError(f"No data in API (message code {msg_code})")
 
             _LOGGER.warning("Unexpected message code %s", msg_code)
             raise ParserError(f"Unexpected message code {msg_code}")
