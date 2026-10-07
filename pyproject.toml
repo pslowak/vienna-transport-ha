@@ -15,12 +15,12 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "aiointercept>=0.1.12",
-    "freezegun>=1.5.5",
-    "mypy>=2.4.0",
-    "pytest-cov>=7.1.0",
-    "pytest-homeassistant-custom-component>=0.13.368",
-    "ruff>=0.16.10",
+    "aiointercept~=0.1.12",
+    "freezegun~=1.5.5",
+    "mypy~=2.4.0",
+    "pytest-cov~=7.1.0",
+    "pytest-homeassistant-custom-component~=0.13.367",
+    "ruff~=0.16.10",
 ]
 
 [tool.uv]
