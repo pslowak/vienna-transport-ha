@@ -2671,7 +2671,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.14.3" },
     { name = "aiointercept", marker = "extra == 'dev'", specifier = "~=0.1.12" },
     { name = "freezegun", marker = "extra == 'dev'", specifier = "~=1.5.5" },
-    { name = "homeassistant", specifier = ">=2026.6.4" },
+    { name = "homeassistant", specifier = ">=2026.9.4" },
     { name = "mypy", marker = "extra == 'dev'", specifier = "~=2.4.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = "~=7.1.0" },
     { name = "pytest-homeassistant-custom-component", marker = "extra == 'dev'", specifier = "~=0.13.367" },
