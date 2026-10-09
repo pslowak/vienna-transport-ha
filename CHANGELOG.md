@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.2...v1.2.0) (2026-10-09)
+
+
+### Features
+
+* **parser:** handle all Wiener Linien message codes ([#152](https://github.com/pslowak/vienna-transport-ha/issues/152)) ([ae26bc4](https://github.com/pslowak/vienna-transport-ha/commit/ae26bc4773abda838feeadc31d048e1d571b45e2))
+
+
+### Bug Fixes
+
+* **config-flow:** report which stop IDs are invalid ([#164](https://github.com/pslowak/vienna-transport-ha/issues/164)) ([5e0d2e7](https://github.com/pslowak/vienna-transport-ha/commit/5e0d2e7b6eabda73db652efe09bf9f3c210368b9))
+
 ## [1.1.2](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.1...v1.1.2) (2026-10-02)
 
 
