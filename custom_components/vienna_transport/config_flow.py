@@ -50,9 +50,19 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is None:
             return self._show_error_form()
 
-        stop_ids = self._validate_stop_ids(user_input[_KEY_STOP_IDS])
-        if not stop_ids:
-            return self._show_error_form(errors={_KEY_STOP_IDS: "invalid_stop_ids"})
+        stop_ids, invalid_stop_ids = self._validate_stop_ids(user_input[_KEY_STOP_IDS])
+        if not stop_ids and not invalid_stop_ids:
+            return self._show_error_form(errors={_KEY_STOP_IDS: "empty_stop_ids"})
+        if invalid_stop_ids:
+            key = (
+                "invalid_stop_id" if len(invalid_stop_ids) == 1 else "invalid_stop_ids"
+            )
+            return self._show_error_form(
+                errors={_KEY_STOP_IDS: key},
+                placeholders={
+                    "stop_ids": ", ".join(f'"{s}"' for s in invalid_stop_ids)
+                },
+            )
 
         duplicates = set(stop_ids) & self._already_configured_stop_ids()
         if duplicates:
@@ -129,16 +139,11 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
         return parser.parse(raw_batches)
 
     @staticmethod
-    def _validate_stop_ids(raw: list[str]) -> list[str]:
+    def _validate_stop_ids(raw: list[str]) -> tuple[list[str], list[str]]:
         cleaned = [s.strip() for s in raw if s.strip()]
-
-        if not cleaned:
-            return []
-
-        if not all(s.isdigit() for s in cleaned):
-            return []
-
-        return cleaned
+        valid = [s for s in cleaned if s.isascii() and s.isdigit()]
+        invalid = [s for s in cleaned if not (s.isascii() and s.isdigit())]
+        return valid, invalid
 
     @staticmethod
     def _build_title(data: TransportData) -> str:

@@ -14,7 +14,9 @@
     },
     "error": {
       "cannot_connect": "Could not connect to the Wiener Linien API: {detail}. Check your internet connection and try again.",
-      "invalid_stop_ids": "No valid stop IDs found. Enter at least one numeric stop ID.",
+      "empty_stop_ids": "No stop IDs entered. Enter at least one numeric stop ID.",
+      "invalid_stop_id": "The stop ID {stop_ids} is invalid. Enter a valid stop ID.",
+      "invalid_stop_ids": "The stop IDs {stop_ids} are invalid. Enter valid stop IDs.",
       "stop_ids_already_configured": "One sensor per stop ID is supported. These stop IDs are already monitored by another service: {stop_ids}",
       "stop_not_found": "Some stop IDs were not found: {stop_ids}. Check the RBL ID.",
       "unexpected_response": "The Wiener Linien API returned an unexpected response: {detail}.",
