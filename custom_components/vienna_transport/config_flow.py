@@ -141,8 +141,8 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
     @staticmethod
     def _validate_stop_ids(raw: list[str]) -> tuple[list[str], list[str]]:
         cleaned = [s.strip() for s in raw if s.strip()]
-        valid = [s for s in cleaned if s.isdigit()]
-        invalid = [s for s in cleaned if not s.isdigit()]
+        valid = [s for s in cleaned if s.isascii() and s.isdigit()]
+        invalid = [s for s in cleaned if not (s.isascii() and s.isdigit())]
         return valid, invalid
 
     @staticmethod
