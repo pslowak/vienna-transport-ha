@@ -1,7 +1,8 @@
 """Data models for Vienna Transport integration."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
+from enum import StrEnum
 from typing import Any
 
 
@@ -35,6 +36,33 @@ class Vehicle:
             "towards": self.towards,
             "cooling": self.cooling,
         }
+
+
+class TrafficInfoCategory(StrEnum):
+    """Traffic info category."""
+
+    ELEVATOR = "elevator"
+
+
+@dataclass(frozen=True)
+class TrafficInfo:
+    """Traffic information for stop or line.
+
+    Attributes:
+        description: Human-readable description.
+        category: Category of traffic info (e.g., elevator info).
+    """
+
+    description: str
+    category: TrafficInfoCategory
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert to dictionary.
+
+        Returns:
+            Dictionary representation.
+        """
+        return {"description": self.description, "category": self.category.value}
 
 
 @dataclass(frozen=True)
@@ -73,11 +101,12 @@ class Line:
     Attributes:
         name: Line name.
         departures: List of departures.
-
+        traffic_infos: Traffic information for this line.
     """
 
     name: str
     departures: list[Departure]
+    traffic_infos: list[TrafficInfo] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary.
@@ -89,6 +118,7 @@ class Line:
         return {
             "name": self.name,
             "departures": [departure.to_dict() for departure in self.departures],
+            "traffic_infos": [t.to_dict() for t in self.traffic_infos],
         }
 
 
@@ -122,11 +152,12 @@ class Stop:
     Attributes:
         props: Stop properties.
         lines: Lines serving stop.
-
+        traffic_infos: Traffic information for this stop.
     """
 
     props: StopProperties
     lines: list[Line]
+    traffic_infos: list[TrafficInfo] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary.
@@ -138,6 +169,7 @@ class Stop:
         return {
             "props": self.props.to_dict(),
             "lines": [line.to_dict() for line in self.lines],
+            "traffic_infos": [t.to_dict() for t in self.traffic_infos],
         }
 
 
