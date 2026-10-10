@@ -16,6 +16,7 @@ _REQUEST_TIMEOUT = aiohttp.ClientTimeout(total=10)
 _HTTP_OK = 200
 _MAX_STOPS_PER_REQUEST = 5
 _MAX_CONCURRENT_REQUESTS = 3
+_TRAFFIC_INFO_ELEVATOR = "aufzugsinfo"
 
 
 class ViennaTransportClient:
@@ -75,9 +76,7 @@ class ViennaTransportClient:
         self, sem: asyncio.Semaphore, chunk: list[str]
     ) -> dict[str, Any]:
         async with sem:
-            return await self._fetch_raw(
-                [("stopId", stop_id) for stop_id in chunk], chunk
-            )
+            return await self._fetch_raw(chunk)
 
     @staticmethod
     def _map_error(error: BaseException) -> ClientError:
@@ -98,9 +97,11 @@ class ViennaTransportClient:
         unique = sorted(set(stop_ids))
         return [unique[i : i + size] for i in range(0, len(unique), size)]
 
-    async def _fetch_raw(
-        self, params: list[tuple[str, str]], stop_ids: list[str]
-    ) -> dict[str, Any]:
+    async def _fetch_raw(self, stop_ids: list[str]) -> dict[str, Any]:
+        params: list[tuple[str, str]] = [("stopId", stop_id) for stop_id in stop_ids]
+        params.append(("activateTrafficInfo", _TRAFFIC_INFO_ELEVATOR))
+        _LOGGER.debug("Requesting %s with params %s", _API_BASE_URL, params)
+
         async with self._session.get(
             _API_BASE_URL, params=params, timeout=_REQUEST_TIMEOUT
         ) as response:

@@ -38,9 +38,10 @@ async def test_fetch_returns_json_on_200(
     socket_enabled: None,
 ) -> None:
     payload = {"message": {"messageCode": 1}, "data": {"monitors": []}}
+    url = f"{_API_URL}?stopId=1&activateTrafficInfo=aufzugsinfo"
 
     async with aiointercept(mock_external_urls=True) as mock:
-        mock.get(f"{_API_URL}?stopId=1", payload=payload)
+        mock.get(url, payload=payload)
         result = await client.fetch(["1"])
 
     assert result == [payload]
@@ -50,9 +51,10 @@ async def test_fetch_raises_on_403(
     client: ViennaTransportClient,
     socket_enabled: None,
 ) -> None:
+    url = f"{_API_URL}?stopId=1&activateTrafficInfo=aufzugsinfo"
     async with aiointercept(mock_external_urls=True) as mock:
         mock.get(
-            f"{_API_URL}?stopId=1",
+            url,
             status=403,
             payload={"message": {"messageCode": 316}},
         )
@@ -65,8 +67,9 @@ async def test_fetch_raises_client_error_on_non_200(
     client: ViennaTransportClient,
     socket_enabled: None,
 ) -> None:
+    url = f"{_API_URL}?stopId=1&activateTrafficInfo=aufzugsinfo"
     async with aiointercept(mock_external_urls=True) as mock:
-        mock.get(f"{_API_URL}?stopId=1", status=500)
+        mock.get(url, status=500)
 
         with pytest.raises(ClientError, match="Unexpected HTTP status code: 500"):
             await client.fetch(["1"])
@@ -77,9 +80,10 @@ async def test_fetch_sends_multiple_stop_ids(
     socket_enabled: None,
 ) -> None:
     payload = {"message": {"messageCode": 1}, "data": {"monitors": []}}
+    url = f"{_API_URL}?stopId=1&stopId=2&activateTrafficInfo=aufzugsinfo"
 
     async with aiointercept(mock_external_urls=True) as mock:
-        mock.get(f"{_API_URL}?stopId=1&stopId=2", payload=payload)
+        mock.get(url, payload=payload)
         result = await client.fetch(["1", "2"])
 
     assert result == [payload]
@@ -89,8 +93,9 @@ async def test_fetch_raises_update_failed_on_connection_error(
     client: ViennaTransportClient,
     socket_enabled: None,
 ) -> None:
+    url = f"{_API_URL}?stopId=1&activateTrafficInfo=aufzugsinfo"
     async with aiointercept(mock_external_urls=True) as mock:
-        mock.get(f"{_API_URL}?stopId=1", exception=True)
+        mock.get(url, exception=True)
 
         with pytest.raises(ClientError, match="HTTP client error"):
             await client.fetch(["1"])
@@ -114,8 +119,9 @@ async def test_fetch_raises_update_failed_on_timeout(
         await asyncio.sleep(0.2)
         return CallbackResult(status=200)
 
+    url = f"{_API_URL}?stopId=1&activateTrafficInfo=aufzugsinfo"
     async with aiointercept(mock_external_urls=True) as mock:
-        mock.get(f"{_API_URL}?stopId=1", callback=_slow_handler)
+        mock.get(url, callback=_slow_handler)
 
         with pytest.raises(ClientError, match="Timeout error"):
             await client.fetch(["1"])
@@ -171,9 +177,10 @@ async def test_fetch_single_batch_when_within_limit(
     payload = {"message": {"messageCode": 1}, "data": {"monitors": []}}
     stop_ids = ["1", "2", "3", "4", "5"]
     query = "&".join(f"stopId={s}" for s in stop_ids)
+    url = f"{_API_URL}?{query}&activateTrafficInfo=aufzugsinfo"
 
     async with aiointercept(mock_external_urls=True) as mock:
-        mock.get(f"{_API_URL}?{query}", payload=payload)
+        mock.get(url, payload=payload)
         result = await client.fetch(stop_ids)
 
     assert result == [payload]
@@ -191,13 +198,15 @@ async def test_fetch_returns_one_response_per_batch(
         "message": {"messageCode": 1},
         "data": {"monitors": [{"id": 2}]},
     }
+    url_1 = (
+        f"{_API_URL}?stopId=1&stopId=2&stopId=3&stopId=4&stopId=5"
+        "&activateTrafficInfo=aufzugsinfo"
+    )
+    url_2 = f"{_API_URL}?stopId=6&activateTrafficInfo=aufzugsinfo"
 
     async with aiointercept(mock_external_urls=True) as mock:
-        mock.get(
-            f"{_API_URL}?stopId=1&stopId=2&stopId=3&stopId=4&stopId=5",
-            payload=payload_1,
-        )
-        mock.get(f"{_API_URL}?stopId=6", payload=payload_2)
+        mock.get(url_1, payload=payload_1)
+        mock.get(url_2, payload=payload_2)
         result = await client.fetch(["1", "2", "3", "4", "5", "6"])
 
     assert result == [payload_1, payload_2]
@@ -208,9 +217,10 @@ async def test_fetch_dedupes_stop_ids(
     socket_enabled: None,
 ) -> None:
     payload = {"message": {"messageCode": 1}, "data": {"monitors": []}}
+    url = f"{_API_URL}?stopId=1&stopId=2&activateTrafficInfo=aufzugsinfo"
 
     async with aiointercept(mock_external_urls=True) as mock:
-        mock.get(f"{_API_URL}?stopId=1&stopId=2", payload=payload)
+        mock.get(url, payload=payload)
         result = await client.fetch(["1", "2", "1", "2"])
 
     assert result == [payload]
@@ -221,13 +231,15 @@ async def test_fetch_fail_fast_on_batch_error(
     socket_enabled: None,
 ) -> None:
     payload = {"message": {"messageCode": 1}, "data": {"monitors": []}}
+    url_1 = (
+        f"{_API_URL}?stopId=1&stopId=2&stopId=3&stopId=4&stopId=5"
+        "&activateTrafficInfo=aufzugsinfo"
+    )
+    url_2 = f"{_API_URL}?stopId=6&activateTrafficInfo=aufzugsinfo"
 
     async with aiointercept(mock_external_urls=True) as mock:
-        mock.get(
-            f"{_API_URL}?stopId=1&stopId=2&stopId=3&stopId=4&stopId=5",
-            payload=payload,
-        )
-        mock.get(f"{_API_URL}?stopId=6", status=500)
+        mock.get(url_1, payload=payload)
+        mock.get(url_2, status=500)
 
         with pytest.raises(ClientError, match="Unexpected HTTP status code: 500"):
             await client.fetch(["1", "2", "3", "4", "5", "6"])
@@ -248,9 +260,7 @@ async def test_fetch_bounds_concurrent_requests() -> None:
     client = ViennaTransportClient(MagicMock(spec=aiohttp.ClientSession))
     state: dict[str, int] = {"current": 0, "max": 0}
 
-    async def _tracking_fetch(
-        params: list[tuple[str, str]], stop_ids: list[str]
-    ) -> dict[str, Any]:
+    async def _tracking_fetch(stop_ids: list[str]) -> dict[str, Any]:
         state["current"] += 1
         state["max"] = max(state["max"], state["current"])
         try:
@@ -270,9 +280,7 @@ async def test_fetch_cancels_siblings_on_batch_error() -> None:
     client = ViennaTransportClient(MagicMock(spec=aiohttp.ClientSession))
     cancelled: list[bool] = []
 
-    async def _flaky_fetch(
-        params: list[tuple[str, str]], stop_ids: list[str]
-    ) -> dict[str, Any]:
+    async def _flaky_fetch(stop_ids: list[str]) -> dict[str, Any]:
         if "6" in stop_ids:
             raise ClientError("Unexpected HTTP status code: 500")
         try:
