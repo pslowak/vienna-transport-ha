@@ -46,8 +46,10 @@ class ViennaTransportParser:
         if not raw_batches:
             raise ParserError("No API responses to parse")
 
+        _LOGGER.debug("Parsing %d batch(es)", len(raw_batches))
         stops: dict[int, Stop] = {}
-        for raw in raw_batches:
+        for index, raw in enumerate(raw_batches, start=1):
+            _LOGGER.debug("Parsing batch %d/%d", index, len(raw_batches))
             stops.update(self._parse_one(raw).stops)
 
         _LOGGER.debug(
