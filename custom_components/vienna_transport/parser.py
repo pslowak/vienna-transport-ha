@@ -103,7 +103,7 @@ class ViennaTransportParser:
 
     @staticmethod
     def _parse_stop(raw: dict[str, Any]) -> Stop:
-        props = ViennaTransportParser._parse_properties(
+        props = ViennaTransportParser._parse_stop_properties(
             raw["locationStop"]["properties"]
         )
         lines = [
@@ -112,7 +112,7 @@ class ViennaTransportParser:
         return Stop(props=props, lines=lines)
 
     @staticmethod
-    def _parse_properties(raw: dict[str, Any]) -> StopProperties:
+    def _parse_stop_properties(raw: dict[str, Any]) -> StopProperties:
         return StopProperties(id=int(raw["attributes"]["rbl"]), name=raw["title"])
 
     @staticmethod
