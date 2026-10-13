@@ -95,25 +95,7 @@ def test_parse_departure_raises_on_both_times_missing(
     parser: ViennaTransportParser,
 ) -> None:
     with pytest.raises(ParserError):
-        parser._parse_departure(
-            {
-                "departureTime": {},
-                "vehicle": {
-                    "name": "5B",
-                    "towards": "Bhf. Heiligenstadt S U",
-                    "direction": "H",
-                    "platform": "1",
-                    "richtungsId": "1",
-                    "barrierFree": True,
-                    "cooling": True,
-                    "realtimeSupported": False,
-                    "trafficjam": False,
-                    "type": "ptBusCity",
-                    "attributes": {},
-                    "linienId": 205,
-                },
-            }
-        )
+        parser._parse_departure({"departureTime": {}, "vehicle": {}})
 
 
 def test_parse_departure_times_are_timezone_aware(
