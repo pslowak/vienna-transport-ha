@@ -261,3 +261,66 @@ def test_parse_raises_on_none_departure_time(parser: ViennaTransportParser) -> N
     ] = None
     with pytest.raises(ParserError, match="unexpected API response"):
         parser.parse([raw])
+
+
+def _traffic_raw(
+    related: list[str] | None = None, reason: str | None = None
+) -> dict[str, Any]:
+    raw = copy.deepcopy(load_fixture("single_stop.json"))
+    raw["data"]["monitors"][0]["refTrafficInfoNames"] = ["ftazS_566"]
+    info: dict[str, Any] = {
+        "name": "ftazS_566",
+        "description": "Elevator out of service",
+        "refTrafficInfoCategoryId": 1,
+    }
+    if related is not None:
+        info["relatedLines"] = related
+    if reason is not None:
+        info["attributes"] = {"reason": reason}
+    raw["data"]["trafficInfos"] = [info]
+    raw["data"]["trafficInfoCategories"] = [{"id": 1, "name": "aufzugsinfo"}]
+    return raw
+
+
+def test_parse_line_traffic_info_when_related_line_matches(
+    parser: ViennaTransportParser,
+) -> None:
+    stop = parser.parse([_traffic_raw(["5B"])]).stops[2683]
+    assert stop.traffic_infos == []
+    assert len(stop.lines[0].traffic_infos) == 1
+    assert stop.lines[0].traffic_infos[0].description == "Elevator out of service"
+    assert stop.lines[0].traffic_infos[0].category.value == "elevator"
+
+
+def test_parse_stop_traffic_info_when_related_lines_missing(
+    parser: ViennaTransportParser,
+) -> None:
+    stop = parser.parse([_traffic_raw()]).stops[2683]
+    assert len(stop.traffic_infos) == 1
+    assert stop.traffic_infos[0].description == "Elevator out of service"
+    assert stop.lines[0].traffic_infos == []
+
+
+def test_parse_stop_traffic_info_when_related_lines_do_not_match(
+    parser: ViennaTransportParser,
+) -> None:
+    stop = parser.parse([_traffic_raw(["U4"])]).stops[2683]
+    assert len(stop.traffic_infos) == 1
+    assert stop.traffic_infos[0].description == "Elevator out of service"
+    assert stop.lines[0].traffic_infos == []
+
+
+def test_parse_empty_traffic_infos_when_no_refs(
+    parser: ViennaTransportParser,
+) -> None:
+    stop = parser.parse([load_fixture("single_stop.json")]).stops[2683]
+    assert stop.traffic_infos == []
+
+
+def test_parse_traffic_info_appends_reason_to_description(
+    parser: ViennaTransportParser,
+) -> None:
+    stop = parser.parse([_traffic_raw(reason="Out of order until 2030")]).stops[2683]
+    assert stop.traffic_infos[0].description == (
+        "Elevator out of service - Out of order until 2030"
+    )
