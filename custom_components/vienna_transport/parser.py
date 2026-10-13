@@ -10,6 +10,8 @@ from custom_components.vienna_transport.model import (
     Line,
     Stop,
     StopProperties,
+    TrafficInfo,
+    TrafficInfoCategory,
     TransportData,
     Vehicle,
 )
@@ -63,12 +65,23 @@ class ViennaTransportParser:
             msg_code = raw["message"].get("messageCode", _MSG_CODE_UNKNOWN)
 
             if msg_code == _MSG_CODE_OK:
-                raw_monitors = raw.get("data", {}).get("monitors", [])
-                parsed = [
+                data = raw.get("data", {})
+                raw_monitors = data.get("monitors", [])
+
+                stops = [
                     ViennaTransportParser._parse_stop(stop) for stop in raw_monitors
                 ]
-                stops = {stop.props.id: stop for stop in parsed}
-                return TransportData(stops=stops)
+
+                raw_traffic_info_by_name = {
+                    item["name"]: item for item in data.get("trafficInfos", []) or []
+                }
+                for stop, monitor in zip(stops, raw_monitors, strict=True):
+                    refs = monitor.get("refTrafficInfoNames", []) or []
+                    ViennaTransportParser._attach_traffic_infos(
+                        stop, refs, raw_traffic_info_by_name
+                    )
+
+                return TransportData(stops={stop.props.id: stop for stop in stops})
 
             if msg_code == _MSG_CODE_RATE_LIMIT:
                 _LOGGER.warning("API rate limit reached (message code %s)", msg_code)
@@ -109,7 +122,37 @@ class ViennaTransportParser:
         lines = [
             ViennaTransportParser._parse_line(line) for line in raw.get("lines", [])
         ]
-        return Stop(props=props, lines=lines)
+        return Stop(props=props, lines=lines, traffic_infos=[])
+
+    @staticmethod
+    def _attach_traffic_infos(
+        stop: Stop, refs: list[str], info_by_name: dict[str, dict[str, Any]]
+    ) -> None:
+        for ref in dict.fromkeys(refs):
+            info_raw = info_by_name.get(ref)
+            if info_raw is not None:
+                info = ViennaTransportParser._parse_traffic_info(info_raw)
+                target_lines = [
+                    line
+                    for line in stop.lines
+                    if line.name in info_raw.get("relatedLines", [])
+                ]
+
+                if not target_lines:
+                    stop.traffic_infos.append(info)
+                else:
+                    for line in target_lines:
+                        line.traffic_infos.append(info)
+
+    @staticmethod
+    def _parse_traffic_info(raw: dict[str, Any]) -> TrafficInfo:
+        description = raw["description"]
+        reason = (raw.get("attributes", {}) or {}).get("reason", "")
+        if reason:
+            description = f"{description} - {reason}"
+        return TrafficInfo(
+            description=description, category=TrafficInfoCategory.ELEVATOR
+        )
 
     @staticmethod
     def _parse_stop_properties(raw: dict[str, Any]) -> StopProperties:
@@ -122,7 +165,7 @@ class ViennaTransportParser:
             ViennaTransportParser._parse_departure(dep)
             for dep in raw.get("departures", {}).get("departure", [])
         ]
-        return Line(name=name, departures=departures)
+        return Line(name=name, departures=departures, traffic_infos=[])
 
     @staticmethod
     def _parse_departure(raw: dict[str, Any]) -> Departure:
