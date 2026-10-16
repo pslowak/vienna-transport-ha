@@ -60,7 +60,10 @@ export class TransportCard extends LitElement implements LovelaceCard {
             display: flex;
             flex-direction: column;
             padding: 12px;
-            background: var(--ha-card-background, white);
+            background: var(
+                --ha-card-background,
+                var(--card-background-color, white)
+            );
             color: var(--primary-text-color, black);
         }
 
