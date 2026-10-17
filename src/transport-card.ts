@@ -59,7 +59,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
         ha-card {
             display: flex;
             flex-direction: column;
-            padding: 12px;
+            padding: var(--ha-space-3, 12px);
             background: var(
                 --ha-card-background,
                 var(--card-background-color, white)
@@ -70,12 +70,12 @@ export class TransportCard extends LitElement implements LovelaceCard {
         .stop {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: var(--ha-space-1, 4px);
         }
 
         .stop > span {
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: var(--ha-font-size-s, 12px);
             letter-spacing: 0.03em;
             text-transform: uppercase;
             color: var(--secondary-text-color);
@@ -96,7 +96,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
             display: grid;
             grid-template-columns: auto 1fr auto;
             align-items: center;
-            gap: 12px;
+            gap: var(--ha-space-3, 12px);
             padding: 10px 0;
         }
 
@@ -110,9 +110,9 @@ export class TransportCard extends LitElement implements LovelaceCard {
             align-items: center;
             width: 26px;
             height: 26px;
-            border-radius: 6px;
+            border-radius: var(--ha-border-radius-sm, 4px);
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: var(--ha-font-size-s, 12px);
             background: var(--line-bg, var(--secondary-background-color));
             color: var(--line-fg, var(--primary-text-color));
         }
@@ -124,7 +124,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
         .towards-cell {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--ha-space-2, 8px);
             min-width: 0;
             overflow: hidden;
         }
