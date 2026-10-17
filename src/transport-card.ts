@@ -60,57 +60,61 @@ export class TransportCard extends LitElement implements LovelaceCard {
             display: flex;
             flex-direction: column;
             padding: 12px;
-            gap: 12px;
-            background: var(--card-background-color, white);
+            background: var(
+                --ha-card-background,
+                var(--card-background-color, white)
+            );
             color: var(--primary-text-color, black);
-            transition: all 0.3s ease;
         }
 
         .stop {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            padding: 12px;
-            border-radius: 12px;
-            background: var(--secondary-background-color, rgba(0, 0, 0, 0.03));
-            transition: background 0.3s ease;
+            gap: 4px;
         }
 
         .stop > span {
             font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--primary-color, #1976d2);
+            font-size: 0.85rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: var(--secondary-text-color);
         }
 
         .line {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+        }
+
+        .line + .line,
+        .departure + .departure {
+            border-top: 1px solid
+                var(--divider-color, rgba(128, 128, 128, 0.25));
         }
 
         .departure {
             display: grid;
             grid-template-columns: auto 1fr auto;
             align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 10px;
-            background: var(--ha-card-background, #fafafa);
-            transition: background 0.3s ease;
+            gap: 12px;
+            padding: 10px 0;
         }
 
-        .departure div:first-child {
+        .stop > .line:last-child > .departure:last-child {
+            padding-bottom: 0;
+        }
+
+        .badge {
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 8px;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
             font-weight: 600;
-            width: 24px;
-            height: 24px;
-            aspect-ratio: 1 / 1;
-            padding: 6px;
-            color: inherit;
-            background: inherit;
+            font-size: 0.85rem;
+            background: var(--line-bg, var(--secondary-background-color));
+            color: var(--line-fg, var(--primary-text-color));
         }
 
         .delay {
@@ -134,21 +138,6 @@ export class TransportCard extends LitElement implements LovelaceCard {
         ha-icon[icon="mdi:snowflake"] {
             --mdc-icon-size: 14px;
             color: var(--info-color, #4fc3f7);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            ha-card {
-                background: rgba(40, 40, 40, 0.8);
-                color: #f1f1f1;
-            }
-
-            .departure {
-                background: rgba(255, 255, 255, 0.05);
-            }
-
-            .stop {
-                background: rgba(255, 255, 255, 0.04);
-            }
         }
     `;
 
@@ -236,7 +225,10 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
         return html`
             <div class="departure">
-                <div style="background:${info.background};color:${info.color}">
+                <div
+                    class="badge"
+                    style="--line-bg:${info.background};--line-fg:${info.color}"
+                >
                     ${line.name}
                 </div>
                 <div class="towards-cell">
