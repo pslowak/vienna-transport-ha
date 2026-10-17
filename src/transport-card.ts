@@ -60,8 +60,6 @@ export class TransportCard extends LitElement implements LovelaceCard {
             display: flex;
             flex-direction: column;
             padding: var(--ha-space-3, 12px);
-            /* real HA paints ha-card itself; this fallback only exists so the
-               vite mock (which has no ha-card element) still renders a card */
             background: var(
                 --ha-card-background,
                 var(--card-background-color, white)
@@ -102,8 +100,6 @@ export class TransportCard extends LitElement implements LovelaceCard {
             padding: 10px 0;
         }
 
-        /* rows own their vertical spacing; drop it on the card's last row so it
-           doesn't stack with ha-card's bottom padding */
         .stop > .line:last-child > .departure:last-child {
             padding-bottom: 0;
         }
