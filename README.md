@@ -9,7 +9,11 @@
 
 A custom integration and Lovelace card for [Home Assistant](https://www.home-assistant.io/) that displays real-time public transport departures in Vienna, Austria (Wiener Linien).
 
-![Mobile View](docs/images/card-mockup-mobile.jpg)
+ <p align="center">
+  <img src="docs/images/phone-departures.png" alt="Mobile View Departures" width="280">
+  &nbsp;&nbsp;
+  <img src="docs/images/phone-config.png" alt="Mobile View Configuration" width="280">
+</p>
 
 ## Features
 
