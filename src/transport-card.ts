@@ -15,6 +15,7 @@ import {
 } from "./constants.ts";
 import type { HomeAssistant, LovelaceCard } from "./ha.ts";
 import type { TransportCardConfig } from "./transport-card-config.ts";
+import "./registration.ts";
 import "./transport-card-editor.ts";
 import { getHassLanguage, t } from "./i18n.ts";
 
@@ -28,19 +29,6 @@ function trafficInfoIcon(category: TrafficInfoCategory): string {
     const icons: Record<string, string | undefined> = TRAFFIC_INFO_ICONS;
     return icons[category] ?? DEFAULT_TRAFFIC_INFO_ICON;
 }
-
-interface CustomCardsWindow extends Window {
-    customCards?: Array<Record<string, unknown>>;
-}
-(window as unknown as CustomCardsWindow).customCards =
-    (window as unknown as CustomCardsWindow).customCards || [];
-(window as unknown as CustomCardsWindow).customCards!.push({
-    type: TRANSPORT_CARD_NAME,
-    name: "Vienna Public Transport Card",
-    description: "Display departures from Vienna public transport stops",
-    preview: true,
-    documentationURL: "https://github.com/pslowak/vienna-transport-ha",
-});
 
 @customElement(TRANSPORT_CARD_NAME)
 export class TransportCard extends LitElement implements LovelaceCard {
