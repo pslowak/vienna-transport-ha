@@ -41,7 +41,7 @@ const TRAFFIC_INFO_ICONS = {
 
 const DEFAULT_TRAFFIC_INFO_ICON = "mdi:alert";
 
-export function trafficInfoIcon(category: TrafficInfoCategory): string {
+function trafficInfoIcon(category: TrafficInfoCategory): string {
     const icons: Record<string, string | undefined> = TRAFFIC_INFO_ICONS;
     return icons[category] ?? DEFAULT_TRAFFIC_INFO_ICON;
 }
