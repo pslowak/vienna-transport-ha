@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { Departure, Line, Stop, Vehicle } from "./api.ts";
 import type { TransportCardConfig } from "./transport-card-config.ts";
-import { selectLines, visibleDepartures } from "./departures.ts";
+import {
+    departureTiming,
+    formatDelay,
+    formatWait,
+    selectLines,
+    visibleDepartures,
+} from "./departures.ts";
 
 const vehicle: Vehicle = {
     name: "U4",
@@ -13,6 +19,10 @@ const vehicle: Vehicle = {
 /** Timestamp within a fixed local day, returned as UTC ISO to stay timezone safe. */
 function at(hour: number, minute: number, second = 0): string {
     return new Date(2026, 0, 1, hour, minute, second).toISOString();
+}
+
+function localDate(hour: number, minute: number, second = 0): Date {
+    return new Date(at(hour, minute, second));
 }
 
 function departure(planned: string, real: string): Departure {
@@ -84,5 +94,82 @@ describe("visibleDepartures", () => {
 
     it("returns all departures when the maximum exceeds the list", () => {
         expect(visibleDepartures(l, 10)).toEqual(departures);
+    });
+});
+
+describe("departureTiming", () => {
+    it("reports no delay for an on-time departure", () => {
+        const timing = departureTiming(
+            departure(at(8, 0), at(8, 0)),
+            localDate(7, 55),
+        );
+
+        expect(timing.delay).toBe(0);
+        expect(timing.wait).toBe(5);
+        expect(timing.actual.getTime()).toBe(localDate(8, 0).getTime());
+    });
+
+    it("reports a positive delay when the departure is late", () => {
+        expect(
+            departureTiming(departure(at(8, 0), at(8, 3)), localDate(7, 55))
+                .delay,
+        ).toBe(3);
+    });
+
+    it("reports a negative delay when the departure is early", () => {
+        expect(
+            departureTiming(departure(at(8, 0), at(7, 58)), localDate(7, 55))
+                .delay,
+        ).toBe(-2);
+    });
+
+    it("reports a negative wait once the departure has left", () => {
+        expect(
+            departureTiming(departure(at(8, 0), at(8, 3)), localDate(8, 5))
+                .wait,
+        ).toBe(-2);
+    });
+
+    it("rounds the wait to the nearest minute", () => {
+        expect(
+            departureTiming(departure(at(8, 0), at(8, 0)), localDate(7, 59, 30))
+                .wait,
+        ).toBe(1);
+    });
+});
+
+describe("formatWait", () => {
+    const actual = localDate(8, 3);
+
+    it("shows the now label for a departure that is due", () => {
+        expect(formatWait(0, actual, "en")).toBe("now");
+        expect(formatWait(0, actual, "de")).toBe("Jetzt");
+    });
+
+    it("shows the now label for a departure that has left", () => {
+        expect(formatWait(-2, actual, "en")).toBe("now");
+    });
+
+    it("shows minutes below the clock time threshold", () => {
+        expect(formatWait(14, actual, "en")).toBe("14 min");
+        expect(formatWait(14, actual, "de")).toBe("14 Min");
+    });
+
+    it("shows the clock time from the threshold on", () => {
+        expect(formatWait(15, actual, "en")).toBe("08:03");
+    });
+});
+
+describe("formatDelay", () => {
+    it("hides no delay", () => {
+        expect(formatDelay(0, "en")).toBeUndefined();
+    });
+
+    it("signs a delay", () => {
+        expect(formatDelay(3, "en")).toBe("+3");
+    });
+
+    it("signs an early departure", () => {
+        expect(formatDelay(-2, "en")).toBe("-2");
     });
 });

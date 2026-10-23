@@ -17,7 +17,13 @@ import "./registration.ts";
 import "./transport-card-editor.ts";
 import { getHassLanguage, t } from "./i18n.ts";
 import { renderTrafficInfos, trafficInfoStyles } from "./traffic-info.ts";
-import { selectLines, visibleDepartures } from "./departures.ts";
+import {
+    departureTiming,
+    formatDelay,
+    formatWait,
+    selectLines,
+    visibleDepartures,
+} from "./departures.ts";
 
 @customElement(TRANSPORT_CARD_NAME)
 export class TransportCard extends LitElement implements LovelaceCard {
@@ -175,18 +181,22 @@ export class TransportCard extends LitElement implements LovelaceCard {
             `;
         }
 
+        const now = new Date();
+
         return html`
             <ha-card>
                 ${renderTrafficInfos(stop.traffic_infos, this._lang)}
                 <div class="stop">
                     <span>${stop.props.name}</span>
-                    ${lines.map((line: Line) => this.renderLine(line, config))}
+                    ${lines.map((line: Line) =>
+                        this.renderLine(line, config, now),
+                    )}
                 </div>
             </ha-card>
         `;
     }
 
-    private renderLine(line: Line, config: TransportCardConfig) {
+    private renderLine(line: Line, config: TransportCardConfig, now: Date) {
         const departures: Departure[] = visibleDepartures(
             line,
             config.max_departures,
@@ -196,23 +206,14 @@ export class TransportCard extends LitElement implements LovelaceCard {
             <div class="line">
                 ${renderTrafficInfos(line.traffic_infos, this._lang)}
                 ${departures.map((dep: Departure) =>
-                    this.renderDeparture(dep, line),
+                    this.renderDeparture(dep, line, now),
                 )}
             </div>
         `;
     }
 
-    private renderDeparture(dep: Departure, line: Line) {
-        const planned = new Date(dep.time_planned);
-        const actual = new Date(dep.time_real);
-        const now = new Date();
-
-        // in minutes
-        const delay = Math.round(
-            (actual.getTime() - planned.getTime()) / 60_000,
-        );
-        const wait = Math.round((actual.getTime() - now.getTime()) / 60_000);
-
+    private renderDeparture(dep: Departure, line: Line, now: Date) {
+        const { delay, wait, actual } = departureTiming(dep, now);
         const info: VehicleInfo = getVehicleInfo(dep.vehicle, line);
 
         return html`
@@ -243,33 +244,14 @@ export class TransportCard extends LitElement implements LovelaceCard {
     }
 
     private renderWaitingTime(wait: number, actual: Date) {
-        if (wait <= 0) {
-            return html`<span>${t("card.time.now", this._lang)}</span>`;
-        }
-        if (wait < 15) {
-            return html`
-                <span>${wait} ${t("card.time.minute_short", this._lang)}</span>
-            `;
-        }
-        return html`
-            <span
-                >${actual.toLocaleTimeString(this._lang, {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false,
-                })}</span
-            >
-        `;
+        return html`<span>${formatWait(wait, actual, this._lang)}</span>`;
     }
 
     private renderDelay(delay: number) {
-        if (delay == 0) {
+        const formatted = formatDelay(delay, this._lang);
+        if (formatted === undefined) {
             return nothing;
         }
-        return html`<span class="delay">
-            (${Intl.NumberFormat(this._lang, {
-                signDisplay: "always",
-            }).format(delay)})
-        </span>`;
+        return html`<span class="delay"> (${formatted}) </span>`;
     }
 }
