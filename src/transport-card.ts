@@ -17,6 +17,7 @@ import "./registration.ts";
 import "./transport-card-editor.ts";
 import { getHassLanguage, t } from "./i18n.ts";
 import { renderTrafficInfos, trafficInfoStyles } from "./traffic-info.ts";
+import { selectLines, visibleDepartures } from "./departures.ts";
 
 @customElement(TRANSPORT_CARD_NAME)
 export class TransportCard extends LitElement implements LovelaceCard {
@@ -162,17 +163,8 @@ export class TransportCard extends LitElement implements LovelaceCard {
         }
 
         const stop = entity.attributes as unknown as Stop;
-        let lines: Line[] = stop.lines;
-
-        if (
-            this.config!.lines &&
-            Array.isArray(this.config!.lines) &&
-            this.config!.lines.length > 0
-        ) {
-            lines = stop.lines.filter((line: Line) =>
-                this.config!.lines!.includes(line.name),
-            );
-        }
+        const config = this.config;
+        const lines: Line[] = selectLines(stop, config);
 
         if (lines.length === 0) {
             return html`
@@ -188,15 +180,17 @@ export class TransportCard extends LitElement implements LovelaceCard {
                 ${renderTrafficInfos(stop.traffic_infos, this._lang)}
                 <div class="stop">
                     <span>${stop.props.name}</span>
-                    ${lines.map((line: Line) => this.renderLine(line))}
+                    ${lines.map((line: Line) => this.renderLine(line, config))}
                 </div>
             </ha-card>
         `;
     }
 
-    private renderLine(line: Line) {
-        const max = this.config!.max_departures ?? line.departures.length;
-        const departures: Departure[] = line.departures.slice(0, max);
+    private renderLine(line: Line, config: TransportCardConfig) {
+        const departures: Departure[] = visibleDepartures(
+            line,
+            config.max_departures,
+        );
 
         return html`
             <div class="line">
