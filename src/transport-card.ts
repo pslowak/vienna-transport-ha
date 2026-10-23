@@ -5,8 +5,6 @@ import {
     type Departure,
     type Line,
     type Stop,
-    type TrafficInfo,
-    type TrafficInfoCategory,
     type VehicleInfo,
 } from "./api.ts";
 import {
@@ -18,17 +16,7 @@ import type { TransportCardConfig } from "./transport-card-config.ts";
 import "./registration.ts";
 import "./transport-card-editor.ts";
 import { getHassLanguage, t } from "./i18n.ts";
-
-const TRAFFIC_INFO_ICONS = {
-    elevator: "mdi:elevator-passenger",
-} satisfies Record<TrafficInfoCategory, string>;
-
-const DEFAULT_TRAFFIC_INFO_ICON = "mdi:alert";
-
-function trafficInfoIcon(category: TrafficInfoCategory): string {
-    const icons: Record<string, string | undefined> = TRAFFIC_INFO_ICONS;
-    return icons[category] ?? DEFAULT_TRAFFIC_INFO_ICON;
-}
+import { renderTrafficInfos, trafficInfoStyles } from "./traffic-info.ts";
 
 @customElement(TRANSPORT_CARD_NAME)
 export class TransportCard extends LitElement implements LovelaceCard {
@@ -56,123 +44,95 @@ export class TransportCard extends LitElement implements LovelaceCard {
         }
     }
 
-    static styles = css`
-        ha-card {
-            display: flex;
-            flex-direction: column;
-            gap: var(--ha-space-1, 4px);
-            padding: var(--ha-space-3, 12px);
-            background: var(
-                --ha-card-background,
-                var(--card-background-color, white)
-            );
-            color: var(--primary-text-color, black);
-        }
+    static styles = [
+        css`
+            ha-card {
+                display: flex;
+                flex-direction: column;
+                gap: var(--ha-space-1, 4px);
+                padding: var(--ha-space-3, 12px);
+                background: var(
+                    --ha-card-background,
+                    var(--card-background-color, white)
+                );
+                color: var(--primary-text-color, black);
+            }
 
-        .stop {
-            display: flex;
-            flex-direction: column;
-            gap: var(--ha-space-1, 4px);
-        }
+            .stop {
+                display: flex;
+                flex-direction: column;
+                gap: var(--ha-space-1, 4px);
+            }
 
-        .stop > span {
-            font-weight: 600;
-            font-size: var(--ha-font-size-s, 12px);
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            color: var(--secondary-text-color);
-        }
+            .stop > span {
+                font-weight: 600;
+                font-size: var(--ha-font-size-s, 12px);
+                letter-spacing: 0.03em;
+                text-transform: uppercase;
+                color: var(--secondary-text-color);
+            }
 
-        .line {
-            display: flex;
-            flex-direction: column;
-        }
+            .line {
+                display: flex;
+                flex-direction: column;
+            }
 
-        .line + .line,
-        .departure + .departure {
-            border-top: 1px solid
-                var(--divider-color, rgba(128, 128, 128, 0.25));
-        }
+            .line + .line,
+            .departure + .departure {
+                border-top: 1px solid
+                    var(--divider-color, rgba(128, 128, 128, 0.25));
+            }
 
-        .departure {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: var(--ha-space-3, 12px);
-            padding: 10px 0;
-        }
+            .departure {
+                display: grid;
+                grid-template-columns: auto 1fr auto;
+                align-items: center;
+                gap: var(--ha-space-3, 12px);
+                padding: 10px 0;
+            }
 
-        .stop > .line:last-child > .departure:last-child {
-            padding-bottom: 0;
-        }
+            .stop > .line:last-child > .departure:last-child {
+                padding-bottom: 0;
+            }
 
-        .badge {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 26px;
-            height: 26px;
-            border-radius: var(--ha-border-radius-sm, 4px);
-            font-weight: 600;
-            font-size: var(--ha-font-size-s, 12px);
-            background: var(--line-bg, var(--secondary-background-color));
-            color: var(--line-fg, var(--primary-text-color));
-        }
+            .badge {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 26px;
+                height: 26px;
+                border-radius: var(--ha-border-radius-sm, 4px);
+                font-weight: 600;
+                font-size: var(--ha-font-size-s, 12px);
+                background: var(--line-bg, var(--secondary-background-color));
+                color: var(--line-fg, var(--primary-text-color));
+            }
 
-        .delay {
-            color: var(--error-color, #e53935);
-        }
+            .delay {
+                color: var(--error-color, #e53935);
+            }
 
-        .towards-cell {
-            display: flex;
-            align-items: center;
-            gap: var(--ha-space-2, 8px);
-            min-width: 0;
-            overflow: hidden;
-        }
+            .towards-cell {
+                display: flex;
+                align-items: center;
+                gap: var(--ha-space-2, 8px);
+                min-width: 0;
+                overflow: hidden;
+            }
 
-        .towards-text {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+            .towards-text {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
 
-        ha-icon[icon="mdi:snowflake"] {
-            --mdc-icon-size: 14px;
-            color: var(--info-color, #4fc3f7);
-        }
-
-        .traffic-info {
-            display: flex;
-            flex-direction: column;
-            gap: var(--ha-space-1, 4px);
-            padding: 8px 12px;
-            margin: var(--ha-space-1, 4px) 0;
-            border-radius: 10px;
-            border-left: 4px solid var(--warning-color, #ffa726);
-            background: var(
-                --secondary-background-color,
-                rgba(127, 127, 127, 0.08)
-            );
-            font-size: var(--ha-font-size-s, 12px);
-        }
-
-        .traffic-info-header {
-            display: flex;
-            align-items: center;
-            gap: var(--ha-space-2, 8px);
-        }
-
-        .traffic-info ha-icon {
-            --mdc-icon-size: 20px;
-            color: var(--warning-color, #ffa726);
-            flex-shrink: 0;
-        }
-
-        .traffic-info-category {
-            font-weight: 600;
-        }
-    `;
+            ha-icon[icon="mdi:snowflake"] {
+                --mdc-icon-size: 14px;
+                color: var(--info-color, #4fc3f7);
+            }
+        `,
+        trafficInfoStyles,
+    ];
 
     setConfig(config: TransportCardConfig): void {
         if (!config.entity) {
@@ -217,7 +177,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
         if (lines.length === 0) {
             return html`
                 <ha-card>
-                    ${this.renderTrafficInfos(stop.traffic_infos)}
+                    ${renderTrafficInfos(stop.traffic_infos, this._lang)}
                     ${t("card.state.no_departures", this._lang)}
                 </ha-card>
             `;
@@ -225,7 +185,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
         return html`
             <ha-card>
-                ${this.renderTrafficInfos(stop.traffic_infos)}
+                ${renderTrafficInfos(stop.traffic_infos, this._lang)}
                 <div class="stop">
                     <span>${stop.props.name}</span>
                     ${lines.map((line: Line) => this.renderLine(line))}
@@ -240,36 +200,12 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
         return html`
             <div class="line">
-                ${this.renderTrafficInfos(line.traffic_infos)}
+                ${renderTrafficInfos(line.traffic_infos, this._lang)}
                 ${departures.map((dep: Departure) =>
                     this.renderDeparture(dep, line),
                 )}
             </div>
         `;
-    }
-
-    private renderTrafficInfos(infos: TrafficInfo[]) {
-        if (infos.length === 0) {
-            return nothing;
-        }
-        return infos.map(
-            (info) => html`
-                <div class="traffic-info">
-                    <div class="traffic-info-header">
-                        <ha-icon
-                            icon="${trafficInfoIcon(info.category)}"
-                        ></ha-icon>
-                        <span class="traffic-info-category"
-                            >${t(
-                                `card.traffic_info.category.${info.category}`,
-                                this._lang,
-                            )}</span
-                        >
-                    </div>
-                    <span>${info.description}</span>
-                </div>
-            `,
-        );
     }
 
     private renderDeparture(dep: Departure, line: Line) {
