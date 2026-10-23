@@ -226,7 +226,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
             );
         }
 
-        if (lines.length === 0) {
+        if (lines.length === 0 && stop.traffic_infos.length === 0) {
             return html`
                 <ha-card>
                     ${t("card.state.no_departures", this._lang)}
