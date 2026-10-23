@@ -5,6 +5,8 @@ import {
     type Departure,
     type Line,
     type Stop,
+    type TrafficInfo,
+    type TrafficInfoCategory,
     type VehicleInfo,
 } from "./api.ts";
 import {
@@ -15,6 +17,17 @@ import type { HomeAssistant, LovelaceCard } from "./ha.ts";
 import type { TransportCardConfig } from "./transport-card-config.ts";
 import "./transport-card-editor.ts";
 import { getHassLanguage, t } from "./i18n.ts";
+
+const TRAFFIC_INFO_ICONS = {
+    elevator: "mdi:elevator-passenger",
+} satisfies Record<TrafficInfoCategory, string>;
+
+const DEFAULT_TRAFFIC_INFO_ICON = "mdi:alert";
+
+function trafficInfoIcon(category: TrafficInfoCategory): string {
+    const icons: Record<string, string | undefined> = TRAFFIC_INFO_ICONS;
+    return icons[category] ?? DEFAULT_TRAFFIC_INFO_ICON;
+}
 
 interface CustomCardsWindow extends Window {
     customCards?: Array<Record<string, unknown>>;
@@ -59,6 +72,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
         ha-card {
             display: flex;
             flex-direction: column;
+            gap: var(--ha-space-1, 4px);
             padding: var(--ha-space-3, 12px);
             background: var(
                 --ha-card-background,
@@ -139,6 +153,37 @@ export class TransportCard extends LitElement implements LovelaceCard {
             --mdc-icon-size: 14px;
             color: var(--info-color, #4fc3f7);
         }
+
+        .traffic-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--ha-space-1, 4px);
+            padding: 8px 12px;
+            margin: var(--ha-space-1, 4px) 0;
+            border-radius: 10px;
+            border-left: 4px solid var(--warning-color, #ffa726);
+            background: var(
+                --secondary-background-color,
+                rgba(127, 127, 127, 0.08)
+            );
+            font-size: var(--ha-font-size-s, 12px);
+        }
+
+        .traffic-info-header {
+            display: flex;
+            align-items: center;
+            gap: var(--ha-space-2, 8px);
+        }
+
+        .traffic-info ha-icon {
+            --mdc-icon-size: 20px;
+            color: var(--warning-color, #ffa726);
+            flex-shrink: 0;
+        }
+
+        .traffic-info-category {
+            font-weight: 600;
+        }
     `;
 
     setConfig(config: TransportCardConfig): void {
@@ -182,13 +227,16 @@ export class TransportCard extends LitElement implements LovelaceCard {
         }
 
         if (lines.length === 0) {
-            return html` <ha-card
-                >${t("card.state.no_departures", this._lang)}</ha-card
-            >`;
+            return html`
+                <ha-card>
+                    ${t("card.state.no_departures", this._lang)}
+                </ha-card>
+            `;
         }
 
         return html`
             <ha-card>
+                ${this.renderTrafficInfos(stop.traffic_infos)}
                 <div class="stop">
                     <span>${stop.props.name}</span>
                     ${lines.map((line: Line) => this.renderLine(line))}
@@ -203,11 +251,36 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
         return html`
             <div class="line">
+                ${this.renderTrafficInfos(line.traffic_infos)}
                 ${departures.map((dep: Departure) =>
                     this.renderDeparture(dep, line),
                 )}
             </div>
         `;
+    }
+
+    private renderTrafficInfos(infos: TrafficInfo[]) {
+        if (infos.length === 0) {
+            return nothing;
+        }
+        return infos.map(
+            (info) => html`
+                <div class="traffic-info">
+                    <div class="traffic-info-header">
+                        <ha-icon
+                            icon="${trafficInfoIcon(info.category)}"
+                        ></ha-icon>
+                        <span class="traffic-info-category"
+                            >${t(
+                                `card.traffic_info.category.${info.category}`,
+                                this._lang,
+                            )}</span
+                        >
+                    </div>
+                    <span>${info.description}</span>
+                </div>
+            `,
+        );
     }
 
     private renderDeparture(dep: Departure, line: Line) {

@@ -34,6 +34,20 @@ describe("t", () => {
         });
     });
 
+    describe("traffic info categories", () => {
+        it("resolves elevator category in English", () => {
+            expect(t("card.traffic_info.category.elevator", "en")).toBe(
+                "Elevator Info",
+            );
+        });
+
+        it("resolves elevator category in German", () => {
+            expect(t("card.traffic_info.category.elevator", "de")).toBe(
+                "Aufzugsinfo",
+            );
+        });
+    });
+
     describe("missing keys", () => {
         it("returns key if key does not exist", () => {
             const key = "key.does.not.exist";

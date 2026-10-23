@@ -3,14 +3,23 @@ export interface StopProperties {
     name: string;
 }
 
+export type TrafficInfoCategory = "elevator";
+
+export interface TrafficInfo {
+    description: string;
+    category: TrafficInfoCategory;
+}
+
 export interface Stop {
     props: StopProperties;
     lines: Line[];
+    traffic_infos: TrafficInfo[];
 }
 
 export interface Line {
     name: string;
     departures: Departure[];
+    traffic_infos: TrafficInfo[];
 }
 
 export interface Departure {
