@@ -9,7 +9,7 @@ function vehicle(type: string): Vehicle {
 }
 
 function line(name: string): Line {
-    return { name, departures: [] };
+    return { name, departures: [], traffic_infos: [] };
 }
 
 function infoFor(type: string, lineName: string) {

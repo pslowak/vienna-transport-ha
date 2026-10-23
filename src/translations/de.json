@@ -17,6 +17,11 @@
     "time": {
       "minute_short": "Min",
       "now": "Jetzt"
+    },
+    "traffic_info": {
+      "category": {
+        "elevator": "Aufzugsinfo"
+      }
     }
   },
   "editor": {
