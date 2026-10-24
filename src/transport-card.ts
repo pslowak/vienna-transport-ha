@@ -1,12 +1,6 @@
 import { css, html, LitElement, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { getVehicleInfo } from "./vehicle";
-import {
-    type Departure,
-    type Line,
-    type Stop,
-    type VehicleInfo,
-} from "./api.ts";
+import { type Line, type Stop } from "./api.ts";
 import {
     TRANSPORT_CARD_EDITOR_NAME,
     TRANSPORT_CARD_NAME,
@@ -17,13 +11,8 @@ import "./registration.ts";
 import "./transport-card-editor.ts";
 import { getHassLanguage, t } from "./i18n.ts";
 import { renderTrafficInfos, trafficInfoStyles } from "./traffic-info.ts";
-import {
-    departureTiming,
-    formatDelay,
-    formatWait,
-    selectLines,
-    visibleDepartures,
-} from "./departures.ts";
+import { departureRowStyles, renderDepartureRow } from "./departure-row.ts";
+import { selectLines, visibleDepartures } from "./departures.ts";
 
 @customElement(TRANSPORT_CARD_NAME)
 export class TransportCard extends LitElement implements LovelaceCard {
@@ -84,61 +73,17 @@ export class TransportCard extends LitElement implements LovelaceCard {
                 flex-direction: column;
             }
 
-            .line + .line,
-            .departure + .departure {
+            .line + .line {
                 border-top: 1px solid
                     var(--divider-color, rgba(128, 128, 128, 0.25));
-            }
-
-            .departure {
-                display: grid;
-                grid-template-columns: auto 1fr auto;
-                align-items: center;
-                gap: var(--ha-space-3, 12px);
-                padding: 10px 0;
             }
 
             .stop > .line:last-child > .departure:last-child {
                 padding-bottom: 0;
             }
-
-            .badge {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                width: 26px;
-                height: 26px;
-                border-radius: var(--ha-border-radius-sm, 4px);
-                font-weight: 600;
-                font-size: var(--ha-font-size-s, 12px);
-                background: var(--line-bg, var(--secondary-background-color));
-                color: var(--line-fg, var(--primary-text-color));
-            }
-
-            .delay {
-                color: var(--error-color, #e53935);
-            }
-
-            .towards-cell {
-                display: flex;
-                align-items: center;
-                gap: var(--ha-space-2, 8px);
-                min-width: 0;
-                overflow: hidden;
-            }
-
-            .towards-text {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            ha-icon[icon="mdi:snowflake"] {
-                --mdc-icon-size: 14px;
-                color: var(--info-color, #4fc3f7);
-            }
         `,
         trafficInfoStyles,
+        departureRowStyles,
     ];
 
     setConfig(config: TransportCardConfig): void {
@@ -197,61 +142,15 @@ export class TransportCard extends LitElement implements LovelaceCard {
     }
 
     private renderLine(line: Line, config: TransportCardConfig, now: Date) {
-        const departures: Departure[] = visibleDepartures(
-            line,
-            config.max_departures,
-        );
+        const departures = visibleDepartures(line, config.max_departures);
 
         return html`
             <div class="line">
                 ${renderTrafficInfos(line.traffic_infos, this._lang)}
-                ${departures.map((dep: Departure) =>
-                    this.renderDeparture(dep, line, now),
+                ${departures.map((dep) =>
+                    renderDepartureRow(dep, line, this._lang, now),
                 )}
             </div>
         `;
-    }
-
-    private renderDeparture(dep: Departure, line: Line, now: Date) {
-        const { delay, wait, actual } = departureTiming(dep, now);
-        const info: VehicleInfo = getVehicleInfo(dep.vehicle, line);
-
-        return html`
-            <div class="departure">
-                <div
-                    class="badge"
-                    style="--line-bg:${info.background};--line-fg:${info.color}"
-                >
-                    ${line.name}
-                </div>
-                <div class="towards-cell">
-                    <span class="towards-text">${dep.vehicle.towards}</span>
-                    ${this.renderCoolingIndicator(dep.vehicle.cooling)}
-                </div>
-                <div>
-                    ${this.renderWaitingTime(wait, actual)}
-                    ${this.renderDelay(delay)}
-                </div>
-            </div>
-        `;
-    }
-
-    private renderCoolingIndicator(cooling: boolean) {
-        if (!cooling) {
-            return nothing;
-        }
-        return html`<ha-icon icon="mdi:snowflake"></ha-icon>`;
-    }
-
-    private renderWaitingTime(wait: number, actual: Date) {
-        return html`<span>${formatWait(wait, actual, this._lang)}</span>`;
-    }
-
-    private renderDelay(delay: number) {
-        const formatted = formatDelay(delay, this._lang);
-        if (formatted === undefined) {
-            return nothing;
-        }
-        return html`<span class="delay"> (${formatted}) </span>`;
     }
 }
