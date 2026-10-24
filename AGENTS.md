@@ -41,9 +41,15 @@ The core backend architecture is described in `custom_components/vienna_transpor
 
 ### Frontend
 
-- Main card: `src/transport-card.ts` (a `LitElement` that renders the departures)
+- Main card (entry point): `src/transport-card.ts` (a `LitElement` that renders the departures)
+- Card registration: `src/registration.ts` (Home Assistant card picker metadata)
+- Traffic info banner rendering: `src/traffic-info.ts`
+- Departure selection and timing: `src/departures.ts` (pure functions, unit tested)
+- Departure row rendering: `src/departure-row.ts`
 - Card editor: `src/transport-card-editor.ts` (for configuration)
-- Model: `src/api.ts`
+- Vehicle colors: `src/vehicle.ts`
+- Model: `src/api.ts`, `src/ha.ts`, `src/transport-card-config.ts`
+- Translations: `src/i18n.ts` and `src/translations/{en,de}.json`
 
 ## Verification Commands
 
