@@ -22,6 +22,10 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
     @state() private config?: TransportCardConfig;
 
+    @state() private _now: Date = new Date();
+
+    private _timer?: ReturnType<typeof setInterval>;
+
     static getConfigElement(): HTMLElement {
         return document.createElement(TRANSPORT_CARD_EDITOR_NAME);
     }
@@ -32,6 +36,20 @@ export class TransportCard extends LitElement implements LovelaceCard {
             entity: "",
             max_departures: 3,
         };
+    }
+
+    connectedCallback(): void {
+        super.connectedCallback();
+        this._now = new Date();
+        this._timer = setInterval(() => {
+            this._now = new Date();
+        }, 20_000);
+    }
+
+    disconnectedCallback(): void {
+        super.disconnectedCallback();
+        clearInterval(this._timer);
+        this._timer = undefined;
     }
 
     willUpdate(changedProps: PropertyValues): void {
@@ -126,15 +144,13 @@ export class TransportCard extends LitElement implements LovelaceCard {
             `;
         }
 
-        const now = new Date();
-
         return html`
             <ha-card>
                 ${renderTrafficInfos(stop.traffic_infos, this._lang)}
                 <div class="stop">
                     <span>${stop.props.name}</span>
                     ${lines.map((line: Line) =>
-                        this.renderLine(line, config, now),
+                        this.renderLine(line, config, this._now),
                     )}
                 </div>
             </ha-card>
