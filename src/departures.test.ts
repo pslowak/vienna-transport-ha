@@ -83,17 +83,31 @@ describe("visibleDepartures", () => {
         departure(at(8, 20), at(8, 20)),
     ];
     const l = line("U4", departures);
+    const now = localDate(7, 55);
 
     it("returns all departures without a maximum", () => {
-        expect(visibleDepartures(l)).toEqual(departures);
+        expect(visibleDepartures(l, undefined, now)).toEqual(departures);
     });
 
     it("limits to the maximum", () => {
-        expect(visibleDepartures(l, 2)).toEqual(departures.slice(0, 2));
+        expect(visibleDepartures(l, 2, now)).toEqual(departures.slice(0, 2));
     });
 
     it("returns all departures when the maximum exceeds the list", () => {
-        expect(visibleDepartures(l, 10)).toEqual(departures);
+        expect(visibleDepartures(l, 10, now)).toEqual(departures);
+    });
+
+    it("drops departures left more than 30 seconds ago", () => {
+        expect(visibleDepartures(l, undefined, localDate(8, 0, 31))).toEqual([
+            departures[1],
+            departures[2],
+        ]);
+    });
+
+    it("keeps departures left less than 30 seconds ago", () => {
+        expect(visibleDepartures(l, undefined, localDate(8, 0, 29))).toEqual(
+            departures,
+        );
     });
 });
 
@@ -134,7 +148,7 @@ describe("departureTiming", () => {
         expect(
             departureTiming(departure(at(8, 0), at(8, 0)), localDate(7, 59, 30))
                 .wait,
-        ).toBe(1);
+        ).toBe(0);
     });
 });
 

@@ -5,6 +5,9 @@ import { t } from "./i18n.ts";
 /** Wait in minutes from which the actual clock time is shown instead. */
 const CLOCK_TIME_THRESHOLD_MINUTES = 15;
 
+/** Departures left more than this long ago are dropped instead of shown as "now". */
+const DEPARTED_GRACE_MS = 30_000;
+
 export interface DepartureTiming {
     /** Delay in minutes, negative when the departure is early. */
     delay: number;
@@ -25,10 +28,15 @@ export function selectLines(stop: Stop, config: TransportCardConfig): Line[] {
 export function visibleDepartures(
     line: Line,
     maxDepartures?: number,
+    now: Date = new Date(),
 ): Departure[] {
+    const cutoff = now.getTime() - DEPARTED_GRACE_MS;
+    const upcoming = line.departures.filter(
+        (dep) => new Date(dep.time_real).getTime() >= cutoff,
+    );
     return maxDepartures === undefined
-        ? line.departures
-        : line.departures.slice(0, maxDepartures);
+        ? upcoming
+        : upcoming.slice(0, maxDepartures);
 }
 
 export function departureTiming(dep: Departure, now: Date): DepartureTiming {
@@ -37,7 +45,7 @@ export function departureTiming(dep: Departure, now: Date): DepartureTiming {
 
     return {
         delay: Math.round((actual.getTime() - planned.getTime()) / 60_000),
-        wait: Math.round((actual.getTime() - now.getTime()) / 60_000),
+        wait: Math.floor((actual.getTime() - now.getTime()) / 60_000),
         actual,
     };
 }

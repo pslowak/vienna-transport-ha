@@ -158,7 +158,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
     }
 
     private renderLine(line: Line, config: TransportCardConfig, now: Date) {
-        const departures = visibleDepartures(line, config.max_departures);
+        const departures = visibleDepartures(line, config.max_departures, now);
 
         return html`
             <div class="line">
