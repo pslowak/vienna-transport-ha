@@ -64,9 +64,9 @@ export function formatWait(wait: number, actual: Date, lang: string): string {
     });
 }
 
-export function formatDelay(delay: number, lang: string): string | undefined {
+export function formatDelay(delay: number): string | undefined {
     if (delay === 0) {
         return undefined;
     }
-    return Intl.NumberFormat(lang, { signDisplay: "always" }).format(delay);
+    return Intl.NumberFormat("en", { signDisplay: "always" }).format(delay);
 }

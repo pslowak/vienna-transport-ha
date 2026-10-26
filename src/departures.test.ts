@@ -176,14 +176,14 @@ describe("formatWait", () => {
 
 describe("formatDelay", () => {
     it("hides no delay", () => {
-        expect(formatDelay(0, "en")).toBeUndefined();
+        expect(formatDelay(0)).toBeUndefined();
     });
 
     it("signs a delay", () => {
-        expect(formatDelay(3, "en")).toBe("+3");
+        expect(formatDelay(3)).toBe("+3");
     });
 
     it("signs an early departure", () => {
-        expect(formatDelay(-2, "en")).toBe("-2");
+        expect(formatDelay(-2)).toBe("-2");
     });
 });

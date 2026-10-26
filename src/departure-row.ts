@@ -1,4 +1,4 @@
-import { css, html, nothing, type CSSResult } from "lit";
+import { css, type CSSResult, html, nothing } from "lit";
 import type { Departure, Line } from "./api.ts";
 import { departureTiming, formatDelay, formatWait } from "./departures.ts";
 import { getVehicleInfo } from "./vehicle.ts";
@@ -30,7 +30,11 @@ export const departureRowStyles: CSSResult = css`
     }
 
     .delay {
-        color: var(--error-color, #e53935);
+        color: var(--warning-color, #ff9800);
+        font-variant-numeric: tabular-nums;
+        font-size: var(--ha-font-size-s, 12px);
+        margin-left: var(--ha-space-1, 4px);
+        font-weight: 600;
     }
 
     .towards-cell {
@@ -76,7 +80,7 @@ export function renderDepartureRow(
             </div>
             <div>
                 <span>${formatWait(wait, actual, lang)}</span>
-                ${renderDelay(delay, lang)}
+                ${renderDelay(delay)}
             </div>
         </div>
     `;
@@ -89,10 +93,10 @@ function renderCoolingIndicator(cooling: boolean) {
     return html`<ha-icon icon="mdi:snowflake"></ha-icon>`;
 }
 
-function renderDelay(delay: number, lang: string) {
-    const formatted = formatDelay(delay, lang);
+function renderDelay(delay: number) {
+    const formatted = formatDelay(delay);
     if (formatted === undefined) {
         return nothing;
     }
-    return html`<span class="delay"> (${formatted}) </span>`;
+    return html`<span class="delay">${formatted}</span>`;
 }
