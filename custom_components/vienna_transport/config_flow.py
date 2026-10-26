@@ -19,11 +19,7 @@ _LOGGER = logging.getLogger(__name__)
 _KEY_STOP_IDS = "stop_ids"
 _RBL_SEARCH_URL = "https://till.mabe.at/rbl/"
 _STEP_USER_SCHEMA = probatio.Schema(
-    {
-        probatio.Required(_KEY_STOP_IDS): TextSelector(
-            TextSelectorConfig(multiple=True)
-        )
-    }
+    {probatio.Required(_KEY_STOP_IDS): TextSelector(TextSelectorConfig(multiple=True))}
 )
 
 
