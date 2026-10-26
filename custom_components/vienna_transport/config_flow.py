@@ -3,7 +3,7 @@
 import logging
 from typing import Any
 
-import voluptuous
+import probatio
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import TextSelector, TextSelectorConfig
@@ -18,12 +18,8 @@ _LOGGER = logging.getLogger(__name__)
 
 _KEY_STOP_IDS = "stop_ids"
 _RBL_SEARCH_URL = "https://till.mabe.at/rbl/"
-_STEP_USER_SCHEMA = voluptuous.Schema(
-    {
-        voluptuous.Required(_KEY_STOP_IDS): TextSelector(
-            TextSelectorConfig(multiple=True)
-        )
-    }
+_STEP_USER_SCHEMA = probatio.Schema(
+    {probatio.Required(_KEY_STOP_IDS): TextSelector(TextSelectorConfig(multiple=True))}
 )
 
 
