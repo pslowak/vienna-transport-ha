@@ -1,33 +1,18 @@
 import { css, html, LitElement, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { getVehicleInfo } from "./vehicle";
-import {
-    type Departure,
-    type Line,
-    type Stop,
-    type VehicleInfo,
-} from "./api.ts";
+import { type Line, type Stop } from "./api.ts";
 import {
     TRANSPORT_CARD_EDITOR_NAME,
     TRANSPORT_CARD_NAME,
 } from "./constants.ts";
 import type { HomeAssistant, LovelaceCard } from "./ha.ts";
 import type { TransportCardConfig } from "./transport-card-config.ts";
+import "./registration.ts";
 import "./transport-card-editor.ts";
 import { getHassLanguage, t } from "./i18n.ts";
-
-interface CustomCardsWindow extends Window {
-    customCards?: Array<Record<string, unknown>>;
-}
-(window as unknown as CustomCardsWindow).customCards =
-    (window as unknown as CustomCardsWindow).customCards || [];
-(window as unknown as CustomCardsWindow).customCards!.push({
-    type: TRANSPORT_CARD_NAME,
-    name: "Vienna Public Transport Card",
-    description: "Display departures from Vienna public transport stops",
-    preview: true,
-    documentationURL: "https://github.com/pslowak/vienna-transport-ha",
-});
+import { renderTrafficInfos, trafficInfoStyles } from "./traffic-info.ts";
+import { departureRowStyles, renderDepartureRow } from "./departure-row.ts";
+import { selectLines, visibleDepartures } from "./departures.ts";
 
 @customElement(TRANSPORT_CARD_NAME)
 export class TransportCard extends LitElement implements LovelaceCard {
@@ -36,6 +21,10 @@ export class TransportCard extends LitElement implements LovelaceCard {
     @state() private _lang: string = "en";
 
     @state() private config?: TransportCardConfig;
+
+    @state() private _now: Date = new Date();
+
+    private _timer?: ReturnType<typeof setInterval>;
 
     static getConfigElement(): HTMLElement {
         return document.createElement(TRANSPORT_CARD_EDITOR_NAME);
@@ -49,108 +38,71 @@ export class TransportCard extends LitElement implements LovelaceCard {
         };
     }
 
+    connectedCallback(): void {
+        super.connectedCallback();
+        this._now = new Date();
+        this._timer = setInterval(() => {
+            this._now = new Date();
+        }, 20_000);
+    }
+
+    disconnectedCallback(): void {
+        super.disconnectedCallback();
+        clearInterval(this._timer);
+        this._timer = undefined;
+    }
+
     willUpdate(changedProps: PropertyValues): void {
         if (changedProps.has("hass")) {
             this._lang = getHassLanguage(this.hass);
         }
     }
 
-    static styles = css`
-        ha-card {
-            display: flex;
-            flex-direction: column;
-            padding: 12px;
-            gap: 12px;
-            background: var(--card-background-color, white);
-            color: var(--primary-text-color, black);
-            transition: all 0.3s ease;
-        }
-
-        .stop {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 12px;
-            border-radius: 12px;
-            background: var(--secondary-background-color, rgba(0, 0, 0, 0.03));
-            transition: background 0.3s ease;
-        }
-
-        .stop > span {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--primary-color, #1976d2);
-        }
-
-        .line {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .departure {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 10px;
-            background: var(--ha-card-background, #fafafa);
-            transition: background 0.3s ease;
-        }
-
-        .departure div:first-child {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 8px;
-            font-weight: 600;
-            width: 24px;
-            height: 24px;
-            aspect-ratio: 1 / 1;
-            padding: 6px;
-            color: inherit;
-            background: inherit;
-        }
-
-        .delay {
-            color: var(--error-color, #e53935);
-        }
-
-        .towards-cell {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 0;
-            overflow: hidden;
-        }
-
-        .towards-text {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        ha-icon[icon="mdi:snowflake"] {
-            --mdc-icon-size: 14px;
-            color: var(--info-color, #4fc3f7);
-        }
-
-        @media (prefers-color-scheme: dark) {
+    static styles = [
+        css`
             ha-card {
-                background: rgba(40, 40, 40, 0.8);
-                color: #f1f1f1;
-            }
-
-            .departure {
-                background: rgba(255, 255, 255, 0.05);
+                display: flex;
+                flex-direction: column;
+                gap: var(--ha-space-1, 4px);
+                padding: var(--ha-space-3, 12px);
+                background: var(
+                    --ha-card-background,
+                    var(--card-background-color, white)
+                );
+                color: var(--primary-text-color, black);
             }
 
             .stop {
-                background: rgba(255, 255, 255, 0.04);
+                display: flex;
+                flex-direction: column;
+                gap: var(--ha-space-1, 4px);
             }
-        }
-    `;
+
+            .stop > span {
+                font-weight: 600;
+                font-size: var(--ha-font-size-s, 12px);
+                letter-spacing: 0.03em;
+                text-transform: uppercase;
+                color: var(--secondary-text-color);
+            }
+
+            .line {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .line + .line {
+                border-top: 1px solid
+                    var(--divider-color, rgba(128, 128, 128, 0.25));
+            }
+
+            .stop > .line:last-child > .departure:last-child {
+                padding-bottom: 0;
+            }
+        `,
+        trafficInfoStyles,
+        departureRowStyles,
+    ];
 
     setConfig(config: TransportCardConfig): void {
         if (!config.entity) {
@@ -180,112 +132,41 @@ export class TransportCard extends LitElement implements LovelaceCard {
         }
 
         const stop = entity.attributes as unknown as Stop;
-        let lines: Line[] = stop.lines;
-
-        if (
-            this.config!.lines &&
-            Array.isArray(this.config!.lines) &&
-            this.config!.lines.length > 0
-        ) {
-            lines = stop.lines.filter((line: Line) =>
-                this.config!.lines!.includes(line.name),
-            );
-        }
+        const config = this.config;
+        const lines: Line[] = selectLines(stop, config);
 
         if (lines.length === 0) {
-            return html` <ha-card
-                >${t("card.state.no_departures", this._lang)}</ha-card
-            >`;
+            return html`
+                <ha-card>
+                    ${renderTrafficInfos(stop.traffic_infos, this._lang)}
+                    ${t("card.state.no_departures", this._lang)}
+                </ha-card>
+            `;
         }
 
         return html`
             <ha-card>
+                ${renderTrafficInfos(stop.traffic_infos, this._lang)}
                 <div class="stop">
                     <span>${stop.props.name}</span>
-                    ${lines.map((line: Line) => this.renderLine(line))}
+                    ${lines.map((line: Line) =>
+                        this.renderLine(line, config, this._now),
+                    )}
                 </div>
             </ha-card>
         `;
     }
 
-    private renderLine(line: Line) {
-        const max = this.config!.max_departures ?? line.departures.length;
-        const departures: Departure[] = line.departures.slice(0, max);
+    private renderLine(line: Line, config: TransportCardConfig, now: Date) {
+        const departures = visibleDepartures(line, config.max_departures, now);
 
         return html`
             <div class="line">
-                ${departures.map((dep: Departure) =>
-                    this.renderDeparture(dep, line),
+                ${renderTrafficInfos(line.traffic_infos, this._lang)}
+                ${departures.map((dep) =>
+                    renderDepartureRow(dep, line, this._lang, now),
                 )}
             </div>
         `;
-    }
-
-    private renderDeparture(dep: Departure, line: Line) {
-        const planned = new Date(dep.time_planned);
-        const actual = new Date(dep.time_real);
-        const now = new Date();
-
-        // in minutes
-        const delay = Math.round(
-            (actual.getTime() - planned.getTime()) / 60_000,
-        );
-        const wait = Math.round((actual.getTime() - now.getTime()) / 60_000);
-
-        const info: VehicleInfo = getVehicleInfo(dep.vehicle, line);
-
-        return html`
-            <div class="departure">
-                <div style="background:${info.background};color:${info.color}">
-                    ${line.name}
-                </div>
-                <div class="towards-cell">
-                    <span class="towards-text">${dep.vehicle.towards}</span>
-                    ${this.renderCoolingIndicator(dep.vehicle.cooling)}
-                </div>
-                <div>
-                    ${this.renderWaitingTime(wait, actual)}
-                    ${this.renderDelay(delay)}
-                </div>
-            </div>
-        `;
-    }
-
-    private renderCoolingIndicator(cooling: boolean) {
-        if (!cooling) {
-            return nothing;
-        }
-        return html`<ha-icon icon="mdi:snowflake"></ha-icon>`;
-    }
-
-    private renderWaitingTime(wait: number, actual: Date) {
-        if (wait <= 0) {
-            return html`<span>${t("card.time.now", this._lang)}</span>`;
-        }
-        if (wait < 15) {
-            return html`
-                <span>${wait} ${t("card.time.minute_short", this._lang)}</span>
-            `;
-        }
-        return html`
-            <span
-                >${actual.toLocaleTimeString(this._lang, {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false,
-                })}</span
-            >
-        `;
-    }
-
-    private renderDelay(delay: number) {
-        if (delay == 0) {
-            return nothing;
-        }
-        return html`<span class="delay">
-            (${Intl.NumberFormat(this._lang, {
-                signDisplay: "always",
-            }).format(delay)})
-        </span>`;
     }
 }

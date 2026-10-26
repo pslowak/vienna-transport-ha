@@ -11,24 +11,31 @@ from custom_components.vienna_transport.model import Stop, StopProperties, Trans
 
 
 def test_validate_stop_ids_returns_cleaned_list() -> None:
-    result = ViennaTransportConfigFlow._validate_stop_ids(["2683", " 1337 "])
-    assert result == ["2683", "1337"]
+    valid, invalid = ViennaTransportConfigFlow._validate_stop_ids(["2683", " 1337 "])
+    assert valid == ["2683", "1337"]
+    assert invalid == []
 
 
 def test_validate_stop_ids_returns_empty_on_blank_input() -> None:
-    assert ViennaTransportConfigFlow._validate_stop_ids([""]) == []
-    assert ViennaTransportConfigFlow._validate_stop_ids(["  "]) == []
-    assert ViennaTransportConfigFlow._validate_stop_ids([]) == []
+    assert ViennaTransportConfigFlow._validate_stop_ids([""]) == ([], [])
+    assert ViennaTransportConfigFlow._validate_stop_ids(["  "]) == ([], [])
+    assert ViennaTransportConfigFlow._validate_stop_ids([]) == ([], [])
 
 
-def test_validate_stop_ids_returns_empty_on_non_numeric() -> None:
-    assert ViennaTransportConfigFlow._validate_stop_ids(["abc"]) == []
-    assert ViennaTransportConfigFlow._validate_stop_ids(["2683", "abc"]) == []
+def test_validate_stop_ids_splits_valid_and_invalid() -> None:
+    assert ViennaTransportConfigFlow._validate_stop_ids(["abc"]) == ([], ["abc"])
+    assert ViennaTransportConfigFlow._validate_stop_ids(["2683", "abc"]) == (
+        ["2683"],
+        ["abc"],
+    )
 
 
 def test_validate_stop_ids_accepts_multiple_valid_ids() -> None:
-    result = ViennaTransportConfigFlow._validate_stop_ids(["2683", "1337", "5566"])
-    assert result == ["2683", "1337", "5566"]
+    valid, invalid = ViennaTransportConfigFlow._validate_stop_ids(
+        ["2683", "1337", "5566"]
+    )
+    assert valid == ["2683", "1337", "5566"]
+    assert invalid == []
 
 
 def test_build_title_uses_singular_stop() -> None:
@@ -229,3 +236,42 @@ async def test_step_user_shows_stop_not_found_on_partial_response(
     assert placeholders is not None
     assert placeholders["stop_ids"] == "9999"
     assert "rbl_url" in placeholders
+
+
+async def test_step_user_shows_empty_stop_ids_on_blank_input(
+    hass: HomeAssistant,
+) -> None:
+    flow = make_flow(hass)
+
+    result = await flow.async_step_user(user_input={"stop_ids": ["  "]})
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["errors"] == {"stop_ids": "empty_stop_ids"}
+
+
+async def test_step_user_shows_invalid_stop_id_with_placeholder(
+    hass: HomeAssistant,
+) -> None:
+    flow = make_flow(hass)
+
+    result = await flow.async_step_user(user_input={"stop_ids": ["a stop"]})
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["errors"] == {"stop_ids": "invalid_stop_id"}
+    placeholders = result.get("description_placeholders")
+    assert placeholders is not None
+    assert placeholders["stop_ids"] == '"a stop"'
+
+
+async def test_step_user_shows_all_invalid_stop_ids_with_placeholder(
+    hass: HomeAssistant,
+) -> None:
+    flow = make_flow(hass)
+
+    result = await flow.async_step_user(user_input={"stop_ids": ["2683", "abc", "def"]})
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["errors"] == {"stop_ids": "invalid_stop_ids"}
+    placeholders = result.get("description_placeholders")
+    assert placeholders is not None
+    assert placeholders["stop_ids"] == '"abc", "def"'

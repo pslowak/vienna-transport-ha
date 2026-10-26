@@ -9,8 +9,8 @@ authors = [
 license = { text = "MIT" }
 
 dependencies = [
-    "homeassistant>=2026.6.4",
-    "aiohttp>=3.14.3",
+    "homeassistant>=2026.10.0",
+    "aiohttp~=3.14.3",
 ]
 
 [project.optional-dependencies]
@@ -19,8 +19,8 @@ dev = [
     "freezegun~=1.5.5",
     "mypy~=2.4.0",
     "pytest-cov~=7.1.0",
-    "pytest-homeassistant-custom-component~=0.13.368",
-    "ruff~=0.16.10",
+    "pytest-homeassistant-custom-component~=0.13.367",
+    "ruff~=0.17.2",
 ]
 
 [tool.uv]
