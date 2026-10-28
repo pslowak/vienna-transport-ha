@@ -43,7 +43,6 @@ fail_under = 80
 output = "coverage.xml"
 
 [tool.mypy]
-python_version = "3.14"
 strict = true
 explicit_package_bases = true
 mypy_path = ["."]
