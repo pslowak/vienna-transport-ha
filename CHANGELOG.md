@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.2.0](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.2...v1.2.0) (2026-10-27)
+
+
+### Features
+
+* **backend:** add elevator disrutption infos to sensor ([#165](https://github.com/pslowak/vienna-transport-ha/issues/165)) ([5821a79](https://github.com/pslowak/vienna-transport-ha/commit/5821a79eee62ea21bad1a70e9e599fd7f2260569))
+* **card:** display elevator infos ([#183](https://github.com/pslowak/vienna-transport-ha/issues/183)) ([71d6d02](https://github.com/pslowak/vienna-transport-ha/commit/71d6d02e562ca639f7d682a58210970591eff714))
+* **card:** replace gray panels with a flat divided list ([#175](https://github.com/pslowak/vienna-transport-ha/issues/175)) ([e5cc1c9](https://github.com/pslowak/vienna-transport-ha/commit/e5cc1c991137db018e24c14349cae8867fd92668))
+* **parser:** handle all Wiener Linien message codes ([#152](https://github.com/pslowak/vienna-transport-ha/issues/152)) ([ae26bc4](https://github.com/pslowak/vienna-transport-ha/commit/ae26bc4773abda838feeadc31d048e1d571b45e2))
+
+
+### Bug Fixes
+
+* **card:** drop departed rows after grace window ([#191](https://github.com/pslowak/vienna-transport-ha/issues/191)) ([79203ce](https://github.com/pslowak/vienna-transport-ha/commit/79203ce7414b8d1ae0e0719b839d4aefa2766cc5))
+* **card:** keep departure countdown fresh while visible ([#190](https://github.com/pslowak/vienna-transport-ha/issues/190)) ([a15d1a8](https://github.com/pslowak/vienna-transport-ha/commit/a15d1a8374543759059edd5ced182ef3638047c1))
+* **config-flow:** report which stop IDs are invalid ([#164](https://github.com/pslowak/vienna-transport-ha/issues/164)) ([5e0d2e7](https://github.com/pslowak/vienna-transport-ha/commit/5e0d2e7b6eabda73db652efe09bf9f3c210368b9))
+
 ## [1.1.2](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.1...v1.1.2) (2026-10-02)
 
 
