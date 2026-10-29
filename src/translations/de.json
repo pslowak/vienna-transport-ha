@@ -34,6 +34,10 @@
         "label": "Maximale Abfahrten",
         "helper": "Maximale Anzahl der anzuzeigenden Abfahrten. Leer lassen, um alle anzuzeigen."
       },
+      "show_traffic_infos": {
+        "label": "Verkehrsinfos anzeigen",
+        "helper": "Aufzugsinfos für Haltestellen und Linien anzeigen."
+      },
       "lines": {
         "label": "Linien",
         "helper": "Liniennamen hinzufügen (z.B. U1). Leer lassen, um alle verfügbaren anzuzeigen."
