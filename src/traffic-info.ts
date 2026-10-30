@@ -1,4 +1,4 @@
-import { css, html, nothing, type CSSResult } from "lit";
+import { css, type CSSResult, html, nothing } from "lit";
 import { t } from "./i18n.ts";
 import type { TrafficInfo, TrafficInfoCategory } from "./api.ts";
 
@@ -46,8 +46,12 @@ function trafficInfoIcon(category: TrafficInfoCategory): string {
     return icons[category] ?? DEFAULT_TRAFFIC_INFO_ICON;
 }
 
-export function renderTrafficInfos(infos: TrafficInfo[], lang: string) {
-    if (infos.length === 0) {
+export function renderTrafficInfos(
+    infos: TrafficInfo[],
+    lang: string,
+    enabled = true,
+) {
+    if (!enabled || infos.length === 0) {
         return nothing;
     }
     return infos.map(

@@ -5,4 +5,5 @@ export interface TransportCardConfig extends LovelaceCardConfig {
     entity: string;
     lines?: Array<string>;
     max_departures?: number;
+    show_traffic_infos?: boolean;
 }

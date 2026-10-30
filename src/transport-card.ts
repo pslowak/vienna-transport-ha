@@ -35,6 +35,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
             type: "custom:transport-card",
             entity: "",
             max_departures: 3,
+            show_traffic_infos: true,
         };
     }
 
@@ -133,12 +134,13 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
         const stop = entity.attributes as unknown as Stop;
         const config = this.config;
+        const showTrafficInfos = config.show_traffic_infos !== false;
         const lines: Line[] = selectLines(stop, config);
 
         if (lines.length === 0) {
             return html`
                 <ha-card>
-                    ${renderTrafficInfos(stop.traffic_infos, this._lang)}
+                    ${renderTrafficInfos(stop.traffic_infos, this._lang, showTrafficInfos)}
                     ${t("card.state.no_departures", this._lang)}
                 </ha-card>
             `;
@@ -146,7 +148,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
         return html`
             <ha-card>
-                ${renderTrafficInfos(stop.traffic_infos, this._lang)}
+                ${renderTrafficInfos(stop.traffic_infos, this._lang, showTrafficInfos)}
                 <div class="stop">
                     <span>${stop.props.name}</span>
                     ${lines.map((line: Line) =>
@@ -162,7 +164,11 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
         return html`
             <div class="line">
-                ${renderTrafficInfos(line.traffic_infos, this._lang)}
+                ${renderTrafficInfos(
+                    line.traffic_infos,
+                    this._lang,
+                    config.show_traffic_infos !== false,
+                )}
                 ${departures.map((dep) =>
                     renderDepartureRow(dep, line, this._lang, now),
                 )}

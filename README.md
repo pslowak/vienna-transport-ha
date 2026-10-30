@@ -57,12 +57,13 @@ max_departures: 3
 
 ### Options
 
-| Option           | Type   | Required | Default | Description                                    |
-|:-----------------|:-------|:---------|:--------|:-----------------------------------------------|
-| `type`           | string | required | -       | Must be `custom:transport-card`                |
-| `entity`         | string | required | -       | Sensor entity ID                               |
-| `lines`          | array  | optional | all     | List of lines to show                          |
-| `max_departures` | number | optional | all     | Maximum number of departures to show           |
+| Option               | Type    | Required | Default | Description                          |
+|:---------------------|:--------|:---------|:--------|:-------------------------------------|
+| `type`               | string  | required | -       | Must be `custom:transport-card`      |
+| `entity`             | string  | required | -       | Sensor entity ID                     |
+| `lines`              | array   | optional | all     | List of lines to show                |
+| `max_departures`     | number  | optional | all     | Maximum number of departures to show |
+| `show_traffic_infos` | boolean | optional | `true`  | Show elevator notices                |
 
 ## Development
 

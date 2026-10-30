@@ -34,6 +34,10 @@
         "label": "Maximum departures",
         "helper": "Maximum number of departures to show. Leave empty to show all."
       },
+      "show_traffic_infos": {
+        "label": "Show traffic infos",
+        "helper": "Show elevator notices for stops and lines."
+      },
       "lines": {
         "label": "Lines",
         "helper": "Add line names (e.g., U1). Leave empty to show all."

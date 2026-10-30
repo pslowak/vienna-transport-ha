@@ -33,7 +33,10 @@ export class TransportCardEditor
     `;
 
     setConfig(config: TransportCardConfig): void {
-        this._config = config;
+        this._config = {
+            ...config,
+            show_traffic_infos: config.show_traffic_infos ?? true,
+        };
     }
 
     render() {
@@ -68,6 +71,12 @@ export class TransportCardEditor
                 },
             },
             {
+                name: "show_traffic_infos",
+                selector: {
+                    boolean: {},
+                },
+            },
+            {
                 name: "lines",
                 selector: {
                     text: { multiple: true },
@@ -82,6 +91,8 @@ export class TransportCardEditor
                 return t("editor.fields.entity.label", this._lang);
             case "max_departures":
                 return t("editor.fields.max_departures.label", this._lang);
+            case "show_traffic_infos":
+                return t("editor.fields.show_traffic_infos.label", this._lang);
             case "lines":
                 return t("editor.fields.lines.label", this._lang);
         }
@@ -95,6 +106,8 @@ export class TransportCardEditor
                 return t("editor.fields.entity.helper", this._lang);
             case "max_departures":
                 return t("editor.fields.max_departures.helper", this._lang);
+            case "show_traffic_infos":
+                return t("editor.fields.show_traffic_infos.helper", this._lang);
             case "lines":
                 return t("editor.fields.lines.helper", this._lang);
         }
