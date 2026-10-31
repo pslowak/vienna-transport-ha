@@ -74,6 +74,7 @@ Run these commands to verify changes made to frontend code:
 
 ## Version Control Guidelines (Git)
 
-- Use conventional commit messages 
+- Use conventional commit messages
 - Include a scope in the commit message
-- Add a body to the commit message if necessary
+- Only add a body for non-trivial changes (e.g. skip it for dependency bumps) 
+- Keep the body a short prose description of the change's intent
