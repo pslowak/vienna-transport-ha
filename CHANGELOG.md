@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/pslowak/vienna-transport-ha/compare/v1.2.0...v1.3.0) (2026-10-31)
+
+
+### Features
+
+* **card:** add toggle to show traffic infos ([#201](https://github.com/pslowak/vienna-transport-ha/issues/201)) ([e5cce35](https://github.com/pslowak/vienna-transport-ha/commit/e5cce35cfdece64a6bc9bad0482ee3086d501b75))
+
 ## [1.2.0](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.2...v1.2.0) (2026-10-27)
 
 
