@@ -78,3 +78,12 @@ Run these commands to verify changes made to frontend code:
 - Include a scope in the commit message
 - Only add a body for non-trivial changes (e.g. skip it for dependency bumps) 
 - Keep the body a short prose description of the change's intent
+
+### Branching
+
+- Introduce a separate branch for each independent task
+- Start each branch from an up-to-date `main` with a clean working tree
+- Open a GitHub PR for every branch, never commit or push directly to `main`
+- If two changes don't depend on each other, they belong in two branches
+- Name branches with a type prefix matching the commit type, using lowercase kebab-case (e.g. `feature/traffic-infos-toggle`)
+- Sequence dependent work: land the prerequisite (e.g. a refactor) in its own branch and wait until it is merged to `main` before starting the dependent work on top of it
