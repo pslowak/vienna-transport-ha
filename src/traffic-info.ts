@@ -1,39 +1,9 @@
-import { css, type CSSResult, html, nothing } from "lit";
+import { type CSSResult, html, nothing, unsafeCSS } from "lit";
 import { t } from "./i18n.ts";
 import type { TrafficInfo, TrafficInfoCategory } from "./api.ts";
+import infoStyles from "./traffic-info.css?inline";
 
-export const trafficInfoStyles: CSSResult = css`
-    .traffic-info {
-        display: flex;
-        flex-direction: column;
-        gap: var(--ha-space-1, 4px);
-        padding: 8px 12px;
-        margin: var(--ha-space-1, 4px) 0;
-        border-radius: 10px;
-        border-left: 4px solid var(--warning-color, #ffa726);
-        background: var(
-            --secondary-background-color,
-            rgba(127, 127, 127, 0.08)
-        );
-        font-size: var(--ha-font-size-s, 12px);
-    }
-
-    .traffic-info-header {
-        display: flex;
-        align-items: center;
-        gap: var(--ha-space-2, 8px);
-    }
-
-    .traffic-info ha-icon {
-        --mdc-icon-size: 20px;
-        color: var(--warning-color, #ffa726);
-        flex-shrink: 0;
-    }
-
-    .traffic-info-category {
-        font-weight: 600;
-    }
-`;
+export const trafficInfoStyles: CSSResult = unsafeCSS(infoStyles);
 
 const TRAFFIC_INFO_ICONS = {
     elevator: "mdi:elevator-passenger",

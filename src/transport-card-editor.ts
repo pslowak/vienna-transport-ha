@@ -1,9 +1,10 @@
-import { css, html, LitElement, nothing, type PropertyValues } from "lit";
+import { html, LitElement, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { TRANSPORT_CARD_EDITOR_NAME } from "./constants.ts";
 import type { HomeAssistant, LovelaceCardEditor } from "./ha.ts";
 import type { TransportCardConfig } from "./transport-card-config.ts";
 import { getHassLanguage, t } from "./i18n.ts";
+import editorStyles from "./transport-card-editor.css?inline";
 
 interface EditorSchema {
     name: string;
@@ -25,12 +26,7 @@ export class TransportCardEditor
         }
     }
 
-    static styles = css`
-        ha-form {
-            display: block;
-            margin-bottom: 24px;
-        }
-    `;
+    static styles = unsafeCSS(editorStyles);
 
     setConfig(config: TransportCardConfig): void {
         this._config = {

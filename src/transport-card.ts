@@ -1,4 +1,4 @@
-import { css, html, LitElement, nothing, type PropertyValues } from "lit";
+import { html, LitElement, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { type Line, type Stop } from "./api.ts";
 import {
@@ -13,6 +13,7 @@ import { getHassLanguage, t } from "./i18n.ts";
 import { renderTrafficInfos, trafficInfoStyles } from "./traffic-info.ts";
 import { departureRowStyles, renderDepartureRow } from "./departure-row.ts";
 import { selectLines, visibleDepartures } from "./departures.ts";
+import cardStyles from "./transport-card.css?inline";
 
 @customElement(TRANSPORT_CARD_NAME)
 export class TransportCard extends LitElement implements LovelaceCard {
@@ -60,47 +61,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
     }
 
     static styles = [
-        css`
-            ha-card {
-                display: flex;
-                flex-direction: column;
-                gap: var(--ha-space-1, 4px);
-                padding: var(--ha-space-3, 12px);
-                background: var(
-                    --ha-card-background,
-                    var(--card-background-color, white)
-                );
-                color: var(--primary-text-color, black);
-            }
-
-            .stop {
-                display: flex;
-                flex-direction: column;
-                gap: var(--ha-space-1, 4px);
-            }
-
-            .stop > span {
-                font-weight: 600;
-                font-size: var(--ha-font-size-s, 12px);
-                letter-spacing: 0.03em;
-                text-transform: uppercase;
-                color: var(--secondary-text-color);
-            }
-
-            .line {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .line + .line {
-                border-top: 1px solid
-                    var(--divider-color, rgba(128, 128, 128, 0.25));
-            }
-
-            .stop > .line:last-child > .departure:last-child {
-                padding-bottom: 0;
-            }
-        `,
+        unsafeCSS(cardStyles),
         trafficInfoStyles,
         departureRowStyles,
     ];
