@@ -3,6 +3,54 @@
   <head>
     <meta charset="UTF-8" />
     <title>Transport Card Mock</title>
+    <style>
+      /* Home Assistant default light theme (home-assistant/frontend) */
+      :root {
+        --primary-text-color: #141414;
+        --secondary-text-color: #5e5e5e;
+        --card-background-color: #ffffff;
+        --ha-card-background: var(--card-background-color);
+        --primary-background-color: #fafafa;
+        --secondary-background-color: #e5e5e5;
+        --divider-color: rgba(0, 0, 0, 0.12);
+        --warning-color: #ffa600;
+        --info-color: #039be5;
+
+        --ha-space-1: 4px;
+        --ha-space-2: 8px;
+        --ha-space-3: 12px;
+
+        --ha-border-radius-sm: 4px;
+        --ha-border-radius-lg: 12px;
+
+        --ha-font-family-body: Roboto, Noto, sans-serif;
+        --ha-font-size-s: 12px;
+      }
+
+      body {
+        margin: 0;
+        padding: 24px;
+        background: var(--primary-background-color);
+        color: var(--primary-text-color);
+        font-family: var(--ha-font-family-body);
+      }
+
+      /* Mirrors the defaults of HA's ha-card component */
+      ha-card {
+        display: block;
+        box-sizing: border-box;
+        background: var(--ha-card-background);
+        border: 1px solid var(--divider-color);
+        border-radius: var(--ha-border-radius-lg);
+        color: var(--primary-text-color);
+      }
+
+      #card {
+        display: block;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+    </style>
     <script type="module" src="/src/transport-card.ts"></script>
     <script type="module" src="/src/transport-card-editor.ts"></script>
   </head>
@@ -10,23 +58,34 @@
     <transport-card id="card"></transport-card>
 
     <script type="module">
-      import resp from "./public/mocks/mock-data.json" with { type: "json" };
+      import { createMockStop } from "./dev/mock-data.ts";
+      import "./dev/ha-stubs.ts";
 
       const card = document.getElementById("card");
-      card.hass = {
-        states: {
-          "sensor.mock_station": {
-            state: "OK",
-            attributes: resp,
-          },
-        },
-      };
-      card.config = {
-        title: "Volkertplatz",
+
+      card.setConfig({
+        type: "custom:transport-card",
         entity: "sensor.mock_station",
-        lines: ["5B"],
         max_departures: 3,
-      };
+        show_traffic_infos: true,
+      });
+
+      function update() {
+        card.hass = {
+          states: {
+            "sensor.mock_station": {
+              entity_id: "sensor.mock_station",
+              state: "ok",
+              attributes: createMockStop(),
+            },
+          },
+          locale: { language: "en" },
+          language: "en",
+        };
+      }
+
+      update();
+      setInterval(update, 60_000);
     </script>
   </body>
 </html>
