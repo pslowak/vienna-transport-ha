@@ -50,11 +50,47 @@
         max-width: 400px;
         margin: 0 auto;
       }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--ha-space-2);
+        max-width: 400px;
+        margin: 0 auto 24px;
+        padding: var(--ha-space-2) var(--ha-space-3);
+        background: var(--ha-card-background);
+        border: 1px solid var(--divider-color);
+        border-radius: var(--ha-border-radius-sm);
+        box-sizing: border-box;
+      }
+
+      .controls label {
+        color: var(--secondary-text-color);
+        font-size: var(--ha-font-size-s);
+      }
+
+      .controls select {
+        font: inherit;
+        color: var(--primary-text-color);
+        background: var(--primary-background-color);
+        border: 1px solid var(--divider-color);
+        border-radius: var(--ha-border-radius-sm);
+        padding: var(--ha-space-1) var(--ha-space-2);
+      }
     </style>
     <script type="module" src="/src/transport-card.ts"></script>
     <script type="module" src="/src/transport-card-editor.ts"></script>
   </head>
   <body>
+    <div class="controls">
+      <label for="locale">Locale</label>
+      <select id="locale">
+        <option value="en">EN</option>
+        <option value="de">DE</option>
+      </select>
+    </div>
+
     <transport-card id="card"></transport-card>
 
     <script type="module">
@@ -62,6 +98,13 @@
       import "./dev/ha-stubs.ts";
 
       const card = document.getElementById("card");
+      const localeSelect = document.getElementById("locale");
+      let language = "en";
+
+      localeSelect.addEventListener("change", () => {
+        language = localeSelect.value;
+        update();
+      });
 
       card.setConfig({
         type: "custom:transport-card",
@@ -79,8 +122,8 @@
               attributes: createMockStop(),
             },
           },
-          locale: { language: "en" },
-          language: "en",
+          locale: { language },
+          language,
         };
       }
 
