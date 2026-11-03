@@ -67,9 +67,8 @@
 
       .controls {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--ha-space-2);
+        flex-direction: column;
+        gap: var(--ha-space-1);
         max-width: 400px;
         margin: 0 auto 24px;
         padding: var(--ha-space-2) var(--ha-space-3);
@@ -87,6 +86,7 @@
       .control {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: var(--ha-space-2);
       }
 
@@ -113,8 +113,8 @@
       </div>
 
       <div class="control">
-        <input type="checkbox" id="theme" />
         <label for="theme">Dark</label>
+        <input type="checkbox" id="theme" />
       </div>
     </div>
 
