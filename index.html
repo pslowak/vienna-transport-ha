@@ -6,6 +6,8 @@
     <style>
       /* Home Assistant default light theme (home-assistant/frontend) */
       :root {
+        color-scheme: light;
+
         --primary-text-color: #141414;
         --secondary-text-color: #5e5e5e;
         --card-background-color: #ffffff;
@@ -25,6 +27,18 @@
 
         --ha-font-family-body: Roboto, Noto, sans-serif;
         --ha-font-size-s: 12px;
+      }
+
+      /* Home Assistant default dark theme (darkColorStyles, home-assistant/frontend) */
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+
+        --primary-text-color: #e1e1e1;
+        --secondary-text-color: #9b9b9b;
+        --card-background-color: #1c1c1c;
+        --primary-background-color: #111111;
+        --secondary-background-color: #282828;
+        --divider-color: rgba(225, 225, 225, 0.12);
       }
 
       body {
@@ -70,6 +84,12 @@
         font-size: var(--ha-font-size-s);
       }
 
+      .control {
+        display: flex;
+        align-items: center;
+        gap: var(--ha-space-2);
+      }
+
       .controls select {
         font: inherit;
         color: var(--primary-text-color);
@@ -84,11 +104,18 @@
   </head>
   <body>
     <div class="controls">
-      <label for="locale">Locale</label>
-      <select id="locale">
-        <option value="en">EN</option>
-        <option value="de">DE</option>
-      </select>
+      <div class="control">
+        <label for="locale">Locale</label>
+        <select id="locale">
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <input type="checkbox" id="theme" />
+        <label for="theme">Dark</label>
+      </div>
     </div>
 
     <transport-card id="card"></transport-card>
@@ -99,11 +126,18 @@
 
       const card = document.getElementById("card");
       const localeSelect = document.getElementById("locale");
+      const themeToggle = document.getElementById("theme");
       let language = "en";
 
       localeSelect.addEventListener("change", () => {
         language = localeSelect.value;
         update();
+      });
+
+      themeToggle.addEventListener("change", () => {
+        document.documentElement.dataset.theme = themeToggle.checked
+          ? "dark"
+          : "light";
       });
 
       card.setConfig({
