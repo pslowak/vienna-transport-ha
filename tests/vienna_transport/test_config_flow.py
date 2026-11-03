@@ -4,6 +4,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component import common
 
+from custom_components.vienna_transport.client import ViennaTransportClient
 from custom_components.vienna_transport.config_flow import ViennaTransportConfigFlow
 from custom_components.vienna_transport.const import DOMAIN
 from custom_components.vienna_transport.exceptions import ClientError, ParserError
@@ -162,6 +163,24 @@ async def test_step_user_shows_unexpected_response_on_parser_error(
     placeholders = result.get("description_placeholders")
     assert placeholders is not None
     assert placeholders["detail"] == "API rate limit reached (message code 316)"
+
+
+async def test_step_user_shows_unexpected_response_on_validation_error(
+    hass: HomeAssistant,
+) -> None:
+    flow = make_flow(hass)
+    malformed = {"message": {"messageCode": 1}, "data": None}
+
+    with patch.object(
+        ViennaTransportClient, "fetch", new=AsyncMock(return_value=[malformed])
+    ):
+        result = await flow.async_step_user(user_input={"stop_ids": ["1337"]})
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["errors"] == {"stop_ids": "unexpected_response"}
+    placeholders = result.get("description_placeholders")
+    assert placeholders is not None
+    assert placeholders["detail"].startswith("unexpected API response: data: ")
 
 
 async def test_step_user_shows_unknown_on_unexpected_error(

@@ -56,6 +56,7 @@ def make_coordinator(
     coordinator = ViennaTransportCoordinator(
         hass=hass,
         client=MagicMock(),
+        validator=MagicMock(),
         parser=MagicMock(),
         cache=MagicMock(),
         registry=StopRegistry(),

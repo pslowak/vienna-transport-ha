@@ -18,9 +18,9 @@ the diagram below:
   polling and state. The Hub is the integration singleton: the first entry
   builds it, later entries register with it, removal tears it down when empty.
   The Registry tracks the union of stop IDs per entry.
-* **Infrastructure** — Client and Parser handle I/O. The Client talks to the
-  external Wiener Linien API, the Parser converts the raw response into typed
-  data.
+* **Infrastructure** — Client, Validator and Parser handle I/O. The Client talks
+  to the external Wiener Linien API, the Validator checks the structure of the
+  raw response, the Parser converts it into typed data.
 * **Domain** — Data model. 
 
 ## Components
@@ -41,6 +41,7 @@ flowchart LR
 
     subgraph Infrastructure ["Infrastructure"]
         CL2["Client"]
+        V2["Validator"]
         P2["Parser"]
     end
 
@@ -56,7 +57,8 @@ flowchart LR
     R2 --> C2
     C2 --> CL2
     CL2 <--> API2
-    CL2 --> P2
+    CL2 --> V2
+    V2 --> P2
     P2 --> M2
     M2 --> C2
     C2 --> S2
@@ -72,9 +74,10 @@ flowchart LR
 | HA Platform    | `async_register_card`        | `frontend.py`    | Serves Lovelace card and registers it as a module resource.                                                                         |
 | Orchestration  | `ViennaTransportHub`         | `hub.py`         | Integration singleton. Holds Registry and Coordinator, maps entry lifecycle to registry updates and coordinator refresh/shutdown.   |
 | Orchestration  | `StopRegistry`               | `registry.py`    | Tracks which stop IDs belong to which config entry. Exposes the union of all stops.                                                 |
-| Orchestration  | `ViennaTransportCoordinator` | `coordinator.py` | Polls the registered stops every 60s and dispatches `TransportData` to sensors. Falls back to Cache on client or parser errors.     |
+| Orchestration  | `ViennaTransportCoordinator` | `coordinator.py` | Polls the registered stops every 60s and dispatches `TransportData` to sensors. Falls back to Cache on client, validation or parser errors. |
 | Orchestration  | `ExpiringCache`              | `cache.py`       | TTL cache of last good `TransportData` for resilience during API outages.                                                           |
 | Infrastructure | `ViennaTransportClient`      | `client.py`      | Fetches raw departure data from the Wiener Linien API for all registered stops.                                                     |
+| Infrastructure | `ViennaTransportValidator`   | `validator.py`   | Checks the structure of raw API responses with pydantic, before they are parsed.                                                    |
 | Infrastructure | `ViennaTransportParser`      | `parser.py`      | Converts raw API response into typed `Model` data.                                                                                  |
 | External       | `Wiener Linien API`          | —                | External HTTPS service.                                                                                                             |
 | Domain         | `Model`                      | `model.py`       | Domain Model.                                                                                                                       |

@@ -1,0 +1,137 @@
+"""Validator for Wiener Linien API responses."""
+
+import logging
+from typing import Any, Self
+
+import pydantic
+from pydantic import AwareDatetime, BaseModel, Field, model_validator
+
+from custom_components.vienna_transport.exceptions import ValidationError
+
+_LOGGER = logging.getLogger(__name__)
+
+_MSG_CODE_OK = 1
+_MSG_CODE_UNKNOWN = -1
+
+
+class _Message(BaseModel):
+    message_code: int = Field(default=_MSG_CODE_UNKNOWN, alias="messageCode")
+
+
+class _Envelope(BaseModel):
+    message: _Message
+    data: Any = Field(default_factory=dict)
+
+
+class _StopAttributes(BaseModel):
+    rbl: int
+
+
+class _StopProperties(BaseModel):
+    title: str
+    attributes: _StopAttributes
+
+
+class _LocationStop(BaseModel):
+    properties: _StopProperties
+
+
+class _Vehicle(BaseModel):
+    name: str
+    type: str
+    towards: str
+    cooling: bool = False
+
+
+class _DepartureTime(BaseModel):
+    time_planned: AwareDatetime | None = Field(default=None, alias="timePlanned")
+    time_real: AwareDatetime | None = Field(default=None, alias="timeReal")
+
+    @model_validator(mode="after")
+    def _require_one_time(self) -> Self:
+        if self.time_planned is None and self.time_real is None:
+            raise ValueError("Both timePlanned and timeReal are missing")
+        return self
+
+
+class _Departure(BaseModel):
+    departure_time: _DepartureTime = Field(alias="departureTime")
+    vehicle: _Vehicle | None = None
+
+
+class _Departures(BaseModel):
+    departure: list[_Departure] = Field(default_factory=list)
+
+
+class _Line(BaseModel):
+    name: str
+    departures: _Departures = Field(default_factory=_Departures)
+
+
+class _Monitor(BaseModel):
+    location_stop: _LocationStop = Field(alias="locationStop")
+    lines: list[_Line] = Field(default_factory=list)
+    ref_traffic_info_names: list[str] | None = Field(
+        default=None, alias="refTrafficInfoNames"
+    )
+
+
+class _TrafficInfoAttributes(BaseModel):
+    reason: str | None = None
+
+
+class _TrafficInfo(BaseModel):
+    name: str
+    description: str
+    attributes: _TrafficInfoAttributes | None = None
+    related_lines: list[str] = Field(default_factory=list, alias="relatedLines")
+
+
+class _MonitorData(BaseModel):
+    monitors: list[_Monitor] = Field(default_factory=list)
+    traffic_infos: list[_TrafficInfo] | None = Field(default=None, alias="trafficInfos")
+
+
+class ViennaTransportValidator:
+    """Validator for checking raw API data before it is parsed."""
+
+    def validate(self, raw_batches: list[dict[str, Any]]) -> None:
+        """Validate batched raw API responses.
+
+        Only successful responses are checked in full: Responses with any other
+        message code carry no data and are left for the parser to report.
+
+        Args:
+            raw_batches: Raw JSON responses from Wiener Linien monitor API,
+                one per batch.
+
+        Raises:
+            ValidationError: If any batch does not match the expected structure.
+
+        """
+        _LOGGER.debug("Validating %d batch(es)", len(raw_batches))
+        for raw in raw_batches:
+            self._validate_one(raw)
+
+    @staticmethod
+    def _validate_one(raw: dict[str, Any]) -> None:
+        location = ""
+        try:
+            envelope = _Envelope.model_validate(raw)
+            if envelope.message.message_code == _MSG_CODE_OK:
+                location = "data"
+                _MonitorData.model_validate(envelope.data)
+        except pydantic.ValidationError as e:
+            error = ViennaTransportValidator._to_validation_error(e, location)
+            _LOGGER.warning("%s", error)
+            _LOGGER.debug("API response raw: %s", raw)
+            raise error from e
+
+    @staticmethod
+    def _to_validation_error(
+        error: pydantic.ValidationError, location: str
+    ) -> ValidationError:
+        first = error.errors(include_url=False, include_input=False)[0]
+        parts = [location, *(str(part) for part in first["loc"])]
+        path = ".".join(part for part in parts if part) or "response"
+        return ValidationError(f"unexpected API response: {path}: {first['msg']}")
