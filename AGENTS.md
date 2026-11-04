@@ -79,6 +79,7 @@ Run these commands to verify changes made to frontend code:
 - Include a scope in the commit message
 - Only add a body for non-trivial changes (e.g. skip it for dependency bumps) 
 - Keep the body a short prose description of the change's intent
+- Never force-push or rewrite pushed history: address review feedback with new commits
 
 ### Branching
 
