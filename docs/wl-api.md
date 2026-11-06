@@ -8,7 +8,7 @@ Reference for the Wiener Linien realtime API.
 
 ## Overview
 
-The API provides real-time departures for Vienna's public transport stops for the next 70 minutes, including vehicle details.
+The API provides real-time departures for Vienna's public transport stops for the next 70 minutes, including vehicle details and possible disruptions.
 
 | Property             | Value                                                                                            |
 |----------------------|--------------------------------------------------------------------------------------------------|
@@ -23,11 +23,23 @@ The API provides real-time departures for Vienna's public transport stops for th
 GET /monitor?stopId=…
 ```
 
-| Parameter | Type    | Req | Description                                                             |
-|-----------|---------|-----|-------------------------------------------------------------------------|
-| `stopId`  | integer | Yes | Stop ID. Repeatable.                                                    |
-| `diva`    | integer | No  | Returns all stops with this DIVA number.                                |
-| `aArea`   | integer | No  | `1` = also return all stops sharing a DIVA number with the given stops. |
+| Parameter             | Type    | Req | Description                                                             |
+|-----------------------|---------|-----|-------------------------------------------------------------------------|
+| `stopId`              | integer | Yes | Stop ID. Repeatable.                                                    |
+| `diva`                | integer | No  | Returns all stops with this DIVA number.                                |
+| `aArea`               | integer | No  | `1` = also return all stops sharing a DIVA number with the given stops. |
+| `activateTrafficInfo` | string  | No  | Disruption types to include. Repeatable. See below.                     |
+| `languageId`          | string  | No  | Also return disruption texts in another language: `de` or `en`.         |
+
+### Disruption Types
+
+| `activateTrafficInfo` | Meaning                              |
+|-----------------------|--------------------------------------|
+| `stoerungkurz`        | Line-specific text shown on displays |
+| `stoerunglang`        | Disruptions from the control centre  |
+| `aufzugsinfo`         | Elevator outages                     |
+| `fahrtreppeninfo`     | Escalator outages                    |
+| `information`         | General information about a stop     |
 
 ## Message
 
