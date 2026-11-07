@@ -235,6 +235,10 @@ def _delete(container: dict[str, Any], key: str) -> None:
             "data.monitors.0.lines.0.departures.departure.0.vehicle.cooling",
         ),
         (
+            lambda r: departure(r)["vehicle"].update(cooling="true"),
+            "data.monitors.0.lines.0.departures.departure.0.vehicle.cooling",
+        ),
+        (
             lambda r: _delete(departure(r)["vehicle"], "type"),
             "data.monitors.0.lines.0.departures.departure.0.vehicle.type",
         ),

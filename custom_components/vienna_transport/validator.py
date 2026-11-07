@@ -1,10 +1,14 @@
-"""Validator for Wiener Linien API responses."""
+"""Validator for Wiener Linien API responses.
+
+The schema follows docs/wl-api.md, but only covers the fields the parser reads.
+A field is required only if both the API reference and the parser require it.
+"""
 
 import logging
 from typing import Any, Self
 
 import pydantic
-from pydantic import AwareDatetime, BaseModel, Field, model_validator
+from pydantic import AwareDatetime, BaseModel, Field, StrictBool, model_validator
 
 from custom_components.vienna_transport.exceptions import ValidationError
 
@@ -24,6 +28,7 @@ class _Envelope(BaseModel):
 
 
 class _StopAttributes(BaseModel):
+    # Documented as a string but sent as an integer: lax int accepts both.
     rbl: int
 
 
@@ -40,10 +45,12 @@ class _Vehicle(BaseModel):
     name: str
     type: str
     towards: str
-    cooling: bool = False
+    cooling: StrictBool = False
 
 
 class _DepartureTime(BaseModel):
+    # timePlanned is documented as required, but the parser falls back to
+    # timeReal, so either one is enough.
     time_planned: AwareDatetime | None = Field(default=None, alias="timePlanned")
     time_real: AwareDatetime | None = Field(default=None, alias="timeReal")
 
