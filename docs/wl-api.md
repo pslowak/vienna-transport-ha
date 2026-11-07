@@ -142,3 +142,24 @@ A single departure of a line, with its planned and real-time times.
 | `departureTime.timeReal`    | datetime | No  | Predicted (real-time) time.                                   |
 | `departureTime.countdown`   | integer  | Yes | Minutes until departure.                                      |
 | `vehicle`                   | object   | No  | Only if it differs from the line; otherwise the line applies. |
+
+### Vehicle
+
+The vehicle of a departure, if it differs from the line.
+
+`monitors[].lines[].departures.departure[].vehicle`
+
+| Field               | Type    | Req | Description                                    |
+|---------------------|---------|-----|------------------------------------------------|
+| `name`              | string  | Yes | Line name.                                     |
+| `towards`           | string  | Yes | Destination.                                   |
+| `direction`         | string  | Yes | `H` (outbound) or `R` (return).                |
+| `richtungsId`       | string  | Yes | Unique direction ID.                           |
+| `type`              | string  | Yes | Vehicle type, for example `ptTram`.            |
+| `linienId`          | integer | Yes | Unique line ID.                                |
+| `barrierFree`       | boolean | Yes | Suitable for passengers with reduced mobility. |
+| `foldingRamp`       | boolean | No  | Has a folding ramp.                            |
+| `cooling`           | boolean | No  | Is air-conditioned.                            |
+| `onStop`            | boolean | Yes | A metro train is at the stop.                  |
+| `realtimeSupported` | boolean | Yes | Real-time data generally available.            |
+| `trafficjam`        | boolean | Yes | Traffic jam on the approach.                   |
