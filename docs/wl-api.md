@@ -165,3 +165,115 @@ The vehicle of a departure, if it differs from the line.
 | `onStop`            | boolean | Yes | A metro train is at the stop.                  |
 | `realtimeSupported` | boolean | Yes | Real-time data generally available.            |
 | `trafficjam`        | boolean | Yes | Traffic jam on the approach.                   |
+
+## Traffic Infos
+
+```
+data
+|-- trafficInfos[]
+|   |-- languages[]
+|   |-- attributes
+|   `-- relatedLinesDetails[]
+|-- trafficInfoCategories[]
+`-- trafficInfoCategoryGroups[]
+```
+
+Only sent if disruption types are requested via `activateTrafficInfo` and disruptions exist. A monitor references traffic infos by `name`, a traffic info references its category by `id`, and a category references its group by `id`.
+
+### Traffic Info
+
+A disruption or information affecting lines or stops.
+
+`trafficInfos[]`
+
+| Field                      | Type      | Req | Description                                                            |
+|----------------------------|-----------|-----|------------------------------------------------------------------------|
+| `name`                     | string    | Yes | Unique name, referenced by `refTrafficInfoNames`.                      |
+| `parentName`               | string    | Yes | Name of the original message; equal to `name` if this is the original. |
+| `refTrafficInfoCategoryId` | integer   | Yes | ID of the category.                                                    |
+| `priority`                 | string    | No  | Priority.                                                              |
+| `owner`                    | string    | No  | Data provider.                                                         |
+| `title`                    | string    | Yes | Title.                                                                 |
+| `description`              | string    | Yes | Description as plain text.                                             |
+| `descriptionHTML`          | string    | Yes | Description as HTML.                                                   |
+| `elevatorId`               | string    | No  | Elevator ID, only for elevator outages.                                |
+| `languages`                | object[]  | No  | Texts in other languages.                                              |
+| `time.start`               | datetime  | No  | Start of the disruption.                                               |
+| `time.end`                 | datetime  | No  | End of the disruption.                                                 |
+| `time.resume`              | datetime  | No  | Service resumes during the disruption.                                 |
+| `time.created`             | datetime  | No  | Creation of the message.                                               |
+| `time.lastupdate`          | datetime  | No  | Last change of the message.                                            |
+| `location`                 | string    | No  | Address, if available.                                                 |
+| `status`                   | string    | Yes | `active` or `resolved`.                                                |
+| `pictures`                 | object[]  | No  | Links to pictures.                                                     |
+| `infoChannels`             | object[]  | No  | Available output channels.                                             |
+| `attributes`               | object    | No  | Additional information about a traffic info.                           |
+| `relatedLines`             | string[]  | No  | Names of the affected lines.                                           |
+| `relatedLinesDetails`      | object[]  | No  | Details of the affected lines.                                         |
+| `relatedStops`             | integer[] | No  | IDs of the affected stops.                                             |
+
+### Language
+
+The texts of a traffic info in another language, keyed by language ID.
+
+`trafficInfos[].languages[].<languageId>`
+
+| Field              | Type   | Req | Description                |
+|--------------------|--------|-----|----------------------------|
+| `title`            | string | Yes | Title.                     |
+| `descriptionPlain` | string | Yes | Description as plain text. |
+| `descriptionHtml`  | string | Yes | Description as HTML.       |
+
+### Attributes
+
+Additional information about a traffic info.
+
+`trafficInfos[].attributes`
+
+| Field          | Type      | Req | Description                                     |
+|----------------|-----------|-----|-------------------------------------------------|
+| `reason`       | string    | No  | Reason of the outage.                           |
+| `relatedLines` | string[]  | No  | Names of the affected lines.                    |
+| `station`      | string    | No  | Affected stop.                                  |
+| `location`     | string    | No  | Location of the elevator.                       |
+| `towards`      | string    | No  | Direction of the line, if only one is affected. |
+| `relatedStops` | integer[] | No  | IDs of the affected stops.                      |
+| `status`       | string    | No  | Status, for example out of service.             |
+
+### Related Line
+
+An affected line with its details.
+
+`trafficInfos[].relatedLinesDetails[]`
+
+| Field          | Type      | Req | Description                             |
+|----------------|-----------|-----|-----------------------------------------|
+| `lineId`       | integer   | Yes | Unique line ID.                         |
+| `lineName`     | string    | Yes | Line name, for example `13A`.           |
+| `vehicleType`  | string    | Yes | Vehicle type, for example `ptTram`.     |
+| `relatedStops` | integer[] | No  | IDs of the stops affected on this line. |
+
+### Category
+
+The category of a traffic info.
+
+`trafficInfoCategories[]`
+
+| Field                           | Type    | Req | Description                                                             |
+|---------------------------------|---------|-----|-------------------------------------------------------------------------|
+| `id`                            | integer | Yes | Unique category ID.                                                     |
+| `refTrafficInfoCategoryGroupId` | integer | Yes | ID of the group.                                                        |
+| `name`                          | string  | Yes | Disruption type, see [Disruption Types](#disruption-types).             |
+| `trafficInfoNameList`           | string  | Yes | Comma-separated names of the linked traffic infos, e.g. `v41_2, v41_1`. |
+| `title`                         | string  | Yes | Title.                                                                  |
+
+### Category Group
+
+The group of a category.
+
+`trafficInfoCategoryGroups[]`
+
+| Field  | Type    | Req | Description      |
+|--------|---------|-----|------------------|
+| `id`   | integer | Yes | Unique group ID. |
+| `name` | string  | Yes | Always `pt`.     |
