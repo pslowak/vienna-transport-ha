@@ -66,18 +66,18 @@ flowchart LR
     K2 -.-> C2
 ```
 
-| Layer          | Name                         | File             | Responsibility                                                                                                                      |
-|----------------|------------------------------|------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| HA Platform    | `ViennaTransportConfigFlow`  | `config_flow.py` | Setup wizard: validates stop IDs, rejects duplicates across entries, probes API connectivity.                                       |
-| HA Platform    | `async_setup_entry`          | `__init__.py`    | Lifecycle glue: builds Hub on first entry, delegates register/unregister to Hub, forwards platform setups, registers frontend once. |
-| HA Platform    | `ViennaTransportSensor`      | `sensor.py`      | One entity per stop ID. Reads `Model` from coordinator's `TransportData`.                                                           |
-| HA Platform    | `async_register_card`        | `frontend.py`    | Serves Lovelace card and registers it as a module resource.                                                                         |
-| Orchestration  | `ViennaTransportHub`         | `hub.py`         | Integration singleton. Holds Registry and Coordinator, maps entry lifecycle to registry updates and coordinator refresh/shutdown.   |
-| Orchestration  | `StopRegistry`               | `registry.py`    | Tracks which stop IDs belong to which config entry. Exposes the union of all stops.                                                 |
+| Layer          | Name                         | File             | Responsibility                                                                                                                              |
+|----------------|------------------------------|------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| HA Platform    | `ViennaTransportConfigFlow`  | `config_flow.py` | Setup wizard: validates stop IDs, rejects duplicates across entries, probes API connectivity.                                               |
+| HA Platform    | `async_setup_entry`          | `__init__.py`    | Lifecycle glue: builds Hub on first entry, delegates register/unregister to Hub, forwards platform setups, registers frontend once.         |
+| HA Platform    | `ViennaTransportSensor`      | `sensor.py`      | One entity per stop ID. Reads `Model` from coordinator's `TransportData`.                                                                   |
+| HA Platform    | `async_register_card`        | `frontend.py`    | Serves Lovelace card and registers it as a module resource.                                                                                 |
+| Orchestration  | `ViennaTransportHub`         | `hub.py`         | Integration singleton. Holds Registry and Coordinator, maps entry lifecycle to registry updates and coordinator refresh/shutdown.           |
+| Orchestration  | `StopRegistry`               | `registry.py`    | Tracks which stop IDs belong to which config entry. Exposes the union of all stops.                                                         |
 | Orchestration  | `ViennaTransportCoordinator` | `coordinator.py` | Polls the registered stops every 60s and dispatches `TransportData` to sensors. Falls back to Cache on client, validation or parser errors. |
-| Orchestration  | `ExpiringCache`              | `cache.py`       | TTL cache of last good `TransportData` for resilience during API outages.                                                           |
-| Infrastructure | `ViennaTransportClient`      | `client.py`      | Fetches raw departure data from the Wiener Linien API for all registered stops.                                                     |
-| Infrastructure | `ViennaTransportValidator`   | `validator.py`   | Checks the structure of raw API responses with pydantic, before they are parsed.                                                    |
-| Infrastructure | `ViennaTransportParser`      | `parser.py`      | Converts raw API response into typed `Model` data.                                                                                  |
-| External       | `Wiener Linien API`          | —                | External HTTPS service.                                                                                                             |
-| Domain         | `Model`                      | `model.py`       | Domain Model.                                                                                                                       |
+| Orchestration  | `ExpiringCache`              | `cache.py`       | TTL cache of last good `TransportData` for resilience during API outages.                                                                   |
+| Infrastructure | `ViennaTransportClient`      | `client.py`      | Fetches raw departure data from the Wiener Linien API for all registered stops.                                                             |
+| Infrastructure | `ViennaTransportValidator`   | `validator.py`   | Checks the structure of raw API responses with pydantic, before they are parsed.                                                            |
+| Infrastructure | `ViennaTransportParser`      | `parser.py`      | Converts raw API response into typed `Model` data.                                                                                          |
+| External       | `Wiener Linien API`          | —                | External HTTPS service.                                                                                                                     |
+| Domain         | `Model`                      | `model.py`       | Domain Model.                                                                                                                               |
