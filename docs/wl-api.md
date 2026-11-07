@@ -129,3 +129,16 @@ A line serving the stop, with its upcoming departures.
 | `realtimeSupported`    | boolean  | No  | Real-time data generally available.            |
 | `trafficjam`           | boolean  | No  | Traffic jam on the approach.                   |
 | `departures.departure` | object[] | No  | Departures.                                    |
+
+### Departure
+
+A single departure of a line, with its planned and real-time times.
+
+`monitors[].lines[].departures.departure[]`
+
+| Field                       | Type     | Req | Description                                                   |
+|-----------------------------|----------|-----|---------------------------------------------------------------|
+| `departureTime.timePlanned` | datetime | Yes | Scheduled time.                                               |
+| `departureTime.timeReal`    | datetime | No  | Predicted (real-time) time.                                   |
+| `departureTime.countdown`   | integer  | Yes | Minutes until departure.                                      |
+| `vehicle`                   | object   | No  | Only if it differs from the line; otherwise the line applies. |
