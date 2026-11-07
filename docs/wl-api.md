@@ -109,3 +109,23 @@ The stop's properties and location.
 | `properties.coordName`      | string           | Yes | Always `WGS84`.                 |
 | `properties.gate`           | string           | No  | Track or platform.              |
 | `properties.attributes.rbl` | string           | Yes | Stop ID, as passed in `stopId`. |
+
+### Line
+
+A line serving the stop, with its upcoming departures.
+
+`monitors[].lines[]`
+
+| Field                  | Type     | Req | Description                                    |
+|------------------------|----------|-----|------------------------------------------------|
+| `name`                 | string   | Yes | Line name, for example `13A`.                  |
+| `towards`              | string   | Yes | Destination.                                   |
+| `direction`            | string   | Yes | `H` (outbound) or `R` (return).                |
+| `richtungsId`          | string   | Yes | Unique direction ID.                           |
+| `platform`             | string   | No  | Platform, for example `1`.                     |
+| `type`                 | string   | Yes | Vehicle type, for example `ptTram`.            |
+| `lineId`               | integer  | No  | Unique line ID.                                |
+| `barrierFree`          | boolean  | No  | Suitable for passengers with reduced mobility. |
+| `realtimeSupported`    | boolean  | No  | Real-time data generally available.            |
+| `trafficjam`           | boolean  | No  | Traffic jam on the approach.                   |
+| `departures.departure` | object[] | No  | Departures.                                    |
