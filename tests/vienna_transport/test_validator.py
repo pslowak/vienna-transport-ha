@@ -262,6 +262,15 @@ def test_validate_raises_on_none_data(validator: ViennaTransportValidator) -> No
         validator.validate([{"message": {"messageCode": 1}, "data": None}])
 
 
+def test_validate_raises_on_string_message_code(
+    validator: ViennaTransportValidator,
+) -> None:
+    with pytest.raises(
+        ValidationError, match="unexpected API response: message.messageCode: "
+    ):
+        validator.validate([{"message": {"messageCode": "1"}}])
+
+
 def test_validate_raises_on_malformed_message(
     validator: ViennaTransportValidator,
 ) -> None:

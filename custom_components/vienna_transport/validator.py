@@ -8,7 +8,14 @@ import logging
 from typing import Any, Self
 
 import pydantic
-from pydantic import AwareDatetime, BaseModel, Field, StrictBool, model_validator
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    Field,
+    StrictBool,
+    StrictInt,
+    model_validator,
+)
 
 from custom_components.vienna_transport.exceptions import ValidationError
 
@@ -19,7 +26,7 @@ _MSG_CODE_UNKNOWN = -1
 
 
 class _Message(BaseModel):
-    message_code: int = Field(default=_MSG_CODE_UNKNOWN, alias="messageCode")
+    message_code: StrictInt = Field(default=_MSG_CODE_UNKNOWN, alias="messageCode")
 
 
 class _Envelope(BaseModel):
