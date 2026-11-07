@@ -89,3 +89,23 @@ The departures at a stop, grouped by line.
 | `locationStop` | object   | Yes | Information about the queried stop. |
 | `lines`        | object[] | No  | Lines at the stop.                  |
 | `attributes`   | object   | Yes | Currently not populated.            |
+
+### Location Stop
+
+The stop's properties and location.
+
+`monitors[].locationStop`
+
+| Field                       | Type             | Req | Description                     |
+|-----------------------------|------------------|-----|---------------------------------|
+| `type`                      | string           | Yes | GeoJSON type, `Feature`.        |
+| `geometry.type`             | string           | Yes | Always `Point`.                 |
+| `geometry.coordinates`      | [double, double] | Yes | Longitude, latitude (WGS84).    |
+| `properties.name`           | string           | Yes | DIVA number of the stop.        |
+| `properties.title`          | string           | Yes | Stop name.                      |
+| `properties.municipality`   | string           | Yes | City name.                      |
+| `properties.municipalityId` | string           | Yes | City ID.                        |
+| `properties.type`           | string           | Yes | Always `stop`.                  |
+| `properties.coordName`      | string           | Yes | Always `WGS84`.                 |
+| `properties.gate`           | string           | No  | Track or platform.              |
+| `properties.attributes.rbl` | string           | Yes | Stop ID, as passed in `stopId`. |
