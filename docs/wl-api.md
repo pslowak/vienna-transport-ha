@@ -72,7 +72,8 @@ data
     |       `-- departure[]
     |           |-- departureTime
     |           `-- vehicle
-    `-- attributes
+    |-- attributes
+    `-- refTrafficInfoNames[]
 message
 ```
 
@@ -84,11 +85,12 @@ The departures at a stop, grouped by line.
 
 `monitors[]`
 
-| Field          | Type     | Req | Description                         |
-|----------------|----------|-----|-------------------------------------|
-| `locationStop` | object   | Yes | Information about the queried stop. |
-| `lines`        | object[] | No  | Lines at the stop.                  |
-| `attributes`   | object   | Yes | Currently not populated.            |
+| Field                 | Type     | Req | Description                                     |
+|-----------------------|----------|-----|-------------------------------------------------|
+| `locationStop`        | object   | Yes | Information about the queried stop.             |
+| `lines`               | object[] | No  | Lines at the stop.                              |
+| `attributes`          | object   | Yes | Currently not populated.                        |
+| `refTrafficInfoNames` | string[] | No  | Names of the disruptions linked to the monitor. |
 
 ### Location Stop
 
