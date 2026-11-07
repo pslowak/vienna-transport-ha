@@ -16,6 +16,7 @@ from custom_components.vienna_transport.coordinator import (
 )
 from custom_components.vienna_transport.parser import ViennaTransportParser
 from custom_components.vienna_transport.registry import StopRegistry
+from custom_components.vienna_transport.validator import ViennaTransportValidator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -96,12 +97,14 @@ def build_hub(hass: HomeAssistant) -> ViennaTransportHub:
 
     """
     client = ViennaTransportClient(session=aiohttp_client.async_get_clientsession(hass))
+    validator = ViennaTransportValidator()
     parser = ViennaTransportParser()
     cache = ExpiringCache()
     registry = StopRegistry()
     coordinator = ViennaTransportCoordinator(
         hass=hass,
         client=client,
+        validator=validator,
         parser=parser,
         cache=cache,
         registry=registry,

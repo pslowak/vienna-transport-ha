@@ -6,9 +6,14 @@ from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from custom_components.vienna_transport.cache import ExpiringCache
 from custom_components.vienna_transport.coordinator import ViennaTransportCoordinator
-from custom_components.vienna_transport.exceptions import ClientError, ParserError
+from custom_components.vienna_transport.exceptions import (
+    ClientError,
+    ParserError,
+    ValidationError,
+)
 from custom_components.vienna_transport.model import Stop, TransportData
 from custom_components.vienna_transport.registry import StopRegistry
+from custom_components.vienna_transport.validator import ViennaTransportValidator
 
 
 @pytest.fixture
@@ -16,6 +21,11 @@ def mock_client() -> MagicMock:
     client = MagicMock()
     client.fetch = AsyncMock()
     return client
+
+
+@pytest.fixture
+def mock_validator() -> MagicMock:
+    return MagicMock(spec=ViennaTransportValidator)
 
 
 @pytest.fixture
@@ -44,6 +54,7 @@ def transport_data() -> TransportData:
 def coordinator(
     hass: HomeAssistant,
     mock_client: MagicMock,
+    mock_validator: MagicMock,
     mock_parser: MagicMock,
     mock_cache: MagicMock,
     registry: StopRegistry,
@@ -51,6 +62,7 @@ def coordinator(
     return ViennaTransportCoordinator(
         hass=hass,
         client=mock_client,
+        validator=mock_validator,
         parser=mock_parser,
         cache=mock_cache,
         registry=registry,
@@ -143,6 +155,55 @@ async def test_update_data_returns_cached_on_parser_error(
     result = await coordinator._async_update_data()
 
     assert result is transport_data
+
+
+async def test_update_data_validates_raw_response_before_parsing(
+    coordinator: ViennaTransportCoordinator,
+    mock_client: MagicMock,
+    mock_validator: MagicMock,
+    mock_parser: MagicMock,
+    transport_data: TransportData,
+) -> None:
+    raw = {"message": {"messageCode": 1}}
+    mock_client.fetch.return_value = [raw]
+    mock_parser.parse.return_value = transport_data
+
+    await coordinator._async_update_data()
+
+    mock_validator.validate.assert_called_once_with([raw])
+
+
+async def test_update_data_returns_cached_on_validation_error(
+    coordinator: ViennaTransportCoordinator,
+    mock_client: MagicMock,
+    mock_validator: MagicMock,
+    mock_parser: MagicMock,
+    mock_cache: MagicMock,
+    transport_data: TransportData,
+) -> None:
+    mock_client.fetch.return_value = [{}]
+    mock_validator.validate.side_effect = ValidationError("Invalid response")
+    mock_cache.get.return_value = transport_data
+
+    result = await coordinator._async_update_data()
+
+    assert result is transport_data
+    mock_parser.parse.assert_not_called()
+    mock_cache.set.assert_not_called()
+
+
+async def test_update_data_raises_update_failed_on_validation_error_without_cache(
+    coordinator: ViennaTransportCoordinator,
+    mock_client: MagicMock,
+    mock_validator: MagicMock,
+    mock_cache: MagicMock,
+) -> None:
+    mock_client.fetch.return_value = [{}]
+    mock_validator.validate.side_effect = ValidationError("Invalid response")
+    mock_cache.get.return_value = None
+
+    with pytest.raises(UpdateFailed, match="Invalid response"):
+        await coordinator._async_update_data()
 
 
 async def test_update_data_raises_update_failed_on_error_without_cache(

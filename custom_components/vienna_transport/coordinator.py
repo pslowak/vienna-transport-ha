@@ -14,10 +14,15 @@ from homeassistant.helpers.update_coordinator import (
 
 from custom_components.vienna_transport.cache import ExpiringCache
 from custom_components.vienna_transport.client import ViennaTransportClient
-from custom_components.vienna_transport.exceptions import ClientError, ParserError
+from custom_components.vienna_transport.exceptions import (
+    ClientError,
+    ParserError,
+    ValidationError,
+)
 from custom_components.vienna_transport.model import TransportData
 from custom_components.vienna_transport.parser import ViennaTransportParser
 from custom_components.vienna_transport.registry import StopRegistry
+from custom_components.vienna_transport.validator import ViennaTransportValidator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,14 +38,15 @@ class PlatformData:
 class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
     """Coordinator for fetching and caching transport data.
 
-    Fetches data via API client, parses it, and caches results.
-    Falls back to cached data on client or parser errors.
+    Fetches data via API client, validates and parses it, and caches results.
+    Falls back to cached data on client, validation or parser errors.
     """
 
     def __init__(
         self,
         hass: HomeAssistant,
         client: ViennaTransportClient,
+        validator: ViennaTransportValidator,
         parser: ViennaTransportParser,
         cache: ExpiringCache,
         registry: StopRegistry,
@@ -50,6 +56,7 @@ class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
         Args:
             hass: Home Assistant instance.
             client: API client for fetching data.
+            validator: Validator for API responses.
             parser: Parser for API responses.
             cache: Cache for transport data.
             registry: Registry of stop IDs.
@@ -62,6 +69,7 @@ class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
             update_interval=timedelta(seconds=60),
         )
         self._client = client
+        self._validator = validator
         self._parser = parser
         self._cache = cache
         self._registry = registry
@@ -74,11 +82,12 @@ class ViennaTransportCoordinator(DataUpdateCoordinator[TransportData]):
 
         try:
             raw_batches = await self._client.fetch(stop_ids)
+            self._validator.validate(raw_batches)
             parsed = self._parser.parse(raw_batches)
             self._cache.set(parsed)
             _LOGGER.debug("Cache updated")
             return parsed
-        except (ClientError, ParserError) as e:
+        except (ClientError, ValidationError, ParserError) as e:
             cached = self._cache.get()
             if cached is not None:
                 _LOGGER.info(
