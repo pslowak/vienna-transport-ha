@@ -14,13 +14,12 @@ The API provides real-time departures for Vienna's public transport stops for th
 |----------------------|--------------------------------------------------------------------------------------------------|
 | Base URL             | `https://www.wienerlinien.at/ogd_realtime/`                                                      |
 | HTTP method          | `GET`                                                                                            |
-| Response MIME type   | `application/json`                                                                               |
-| Timestamp Format     | ISO 8601 with milliseconds and an offset without a colon (e.g. `2026-11-06T11:02:25.000+0100`)   |
+| Response MIME Type   | `application/json`                                                                               |
 
 ## Request
 
 ```http request
-GET /monitor?stopId=…
+GET /monitor?stopId=...
 ```
 
 | Parameter             | Type    | Req | Description                                                             |
@@ -59,3 +58,34 @@ GET /monitor?stopId=…
 | `320` | Invalid query parameter |
 | `321` | Missing query parameter |
 | `322` | No data in the database |
+
+## Monitor
+
+```
+data
+`-- monitors[]
+    |-- locationStop
+    |   |-- geometry
+    |   `-- properties
+    |-- lines[]
+    |   `-- departures
+    |       `-- departure[]
+    |           |-- departureTime
+    |           `-- vehicle
+    `-- attributes
+message
+```
+
+The same stop ID can appear in several monitors, for example one per line.
+
+### Monitor
+
+The departures at a stop, grouped by line.
+
+`monitors[]`
+
+| Field          | Type     | Req | Description                         |
+|----------------|----------|-----|-------------------------------------|
+| `locationStop` | object   | Yes | Information about the queried stop. |
+| `lines`        | object[] | No  | Lines at the stop.                  |
+| `attributes`   | object   | Yes | Currently not populated.            |
