@@ -76,5 +76,5 @@ flowchart LR
 | Orchestration  | `ExpiringCache`              | `cache.py`       | TTL cache of last good `TransportData` for resilience during API outages.                                                           |
 | Infrastructure | `ViennaTransportClient`      | `client.py`      | Fetches raw departure data from the Wiener Linien API for all registered stops.                                                     |
 | Infrastructure | `ViennaTransportParser`      | `parser.py`      | Converts raw API response into typed `Model` data.                                                                                  |
-| External       | `Wiener Linien API`          | —                | External HTTPS service.                                                                                                             |
+| External       | `Wiener Linien API`          | —                | External HTTPS service. Contract in [`docs/wl-api.md`](../../docs/wl-api.md).                                                       |
 | Domain         | `Model`                      | `model.py`       | Domain Model.                                                                                                                       |

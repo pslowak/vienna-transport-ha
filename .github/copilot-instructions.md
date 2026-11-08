@@ -13,12 +13,16 @@ The codebase is organized into key architectural layers:
 - `custom_components/vienna_transport/`: Backend Home Assistant integration
 - `src/`: Frontend Lovelace card
 - `tests/`: Unit and integration tests for the backend
+- `docs/`: Reference documentation
 
 ### Core Architecture
 
 #### Backend
 
 The core backend architecture is described in `custom_components/vienna_transport/ARCHITECTURE.md`.
+
+The Wiener Linien API contract (request parameters, response schema, message codes) is described in `docs/wl-api.md`.
+Flag changes to code that requests or reads API data if they contradict this contract.
 
 #### Frontend
 
