@@ -186,11 +186,14 @@ class ViennaTransportParser:
             raise ParserError("Both timePlanned and timeReal are missing")
 
         raw_vehicle: dict[str, Any] | None = raw.get("vehicle")
-        vehicle = (
-            ViennaTransportParser._parse_vehicle(raw_vehicle)
-            if raw_vehicle is not None
-            else line_vehicle
-        )
+        if raw_vehicle is None:
+            _LOGGER.debug(
+                "No vehicle info provided for line %s, falling back to line properties",
+                line_vehicle.name,
+            )
+            vehicle = line_vehicle
+        else:
+            vehicle = ViennaTransportParser._parse_vehicle(raw_vehicle)
         return Departure(
             time_planned=time_planned, time_real=time_real, vehicle=vehicle
         )
