@@ -29,11 +29,6 @@ class _Message(BaseModel):
     message_code: StrictInt = Field(default=_MSG_CODE_UNKNOWN, alias="messageCode")
 
 
-class _Envelope(BaseModel):
-    message: _Message
-    data: Any = Field(default_factory=dict)
-
-
 class _StopAttributes(BaseModel):
     # Documented as a string but sent as an integer: lax int accepts both.
     rbl: int
@@ -106,6 +101,14 @@ class _MonitorData(BaseModel):
     traffic_infos: list[_TrafficInfo] | None = Field(default=None, alias="trafficInfos")
 
 
+class _Response(BaseModel):
+    message: _Message
+
+
+class _OkResponse(_Response):
+    data: _MonitorData = Field(default_factory=_MonitorData)
+
+
 class ViennaTransportValidator:
     """Validator for checking raw API data before it is parsed."""
 
@@ -129,23 +132,18 @@ class ViennaTransportValidator:
 
     @staticmethod
     def _validate_one(raw: dict[str, Any]) -> None:
-        location = ""
         try:
-            envelope = _Envelope.model_validate(raw)
-            if envelope.message.message_code == _MSG_CODE_OK:
-                location = "data"
-                _MonitorData.model_validate(envelope.data)
+            response = _Response.model_validate(raw)
+            if response.message.message_code == _MSG_CODE_OK:
+                _OkResponse.model_validate(raw)
         except pydantic.ValidationError as e:
-            error = ViennaTransportValidator._to_validation_error(e, location)
+            error = ViennaTransportValidator._to_validation_error(e)
             _LOGGER.warning("%s", error)
             _LOGGER.debug("API response raw: %s", raw)
             raise error from e
 
     @staticmethod
-    def _to_validation_error(
-        error: pydantic.ValidationError, location: str
-    ) -> ValidationError:
+    def _to_validation_error(error: pydantic.ValidationError) -> ValidationError:
         first = error.errors(include_url=False, include_input=False)[0]
-        parts = [location, *(str(part) for part in first["loc"])]
-        path = ".".join(part for part in parts if part) or "response"
+        path = ".".join(str(part) for part in first["loc"]) or "response"
         return ValidationError(f"unexpected API response: {path}: {first['msg']}")
