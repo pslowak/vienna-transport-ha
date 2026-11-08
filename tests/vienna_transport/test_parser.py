@@ -95,7 +95,12 @@ def test_parse_departure_raises_on_both_times_missing(
     parser: ViennaTransportParser,
 ) -> None:
     with pytest.raises(ParserError):
-        parser._parse_departure({"departureTime": {}, "vehicle": {}})
+        parser._parse_departure(
+            {"departureTime": {}, "vehicle": {}},
+            Vehicle(
+                name="5B", type="ptBusCity", towards="Heiligenstadt", cooling=False
+            ),
+        )
 
 
 def test_parse_departure_times_are_timezone_aware(
@@ -126,6 +131,31 @@ def test_parse_non_cooled_vehicle(parser: ViennaTransportParser) -> None:
     assert vehicle.type == "ptBusCity"
     assert vehicle.towards == "Bhf. Heiligenstadt S U"
     assert vehicle.cooling is False
+
+
+def test_parse_vehicle_falls_back_to_line_when_missing(
+    parser: ViennaTransportParser,
+) -> None:
+    raw = load_fixture("single_stop.json")
+    line = raw["data"]["monitors"][0]["lines"][0]
+    line["towards"] = "Line Destination"
+    del line["departures"]["departure"][0]["vehicle"]
+    vehicle: Vehicle = parser.parse([raw]).stops[2683].lines[0].departures[0].vehicle
+
+    assert vehicle.name == "5B"
+    assert vehicle.type == "ptBusCity"
+    assert vehicle.towards == "Line Destination"
+    assert vehicle.cooling is False
+
+
+def test_parse_vehicle_overrides_line_when_present(
+    parser: ViennaTransportParser,
+) -> None:
+    raw = load_fixture("single_stop.json")
+    raw["data"]["monitors"][0]["lines"][0]["towards"] = "Line Destination"
+    vehicle: Vehicle = parser.parse([raw]).stops[2683].lines[0].departures[0].vehicle
+
+    assert vehicle.towards == "Bhf. Heiligenstadt S U"
 
 
 def test_parse_unknown_code(parser: ViennaTransportParser) -> None:
