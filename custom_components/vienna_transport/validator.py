@@ -74,6 +74,8 @@ class _Departures(BaseModel):
 
 class _Line(BaseModel):
     name: str
+    towards: str
+    type: str
     departures: _Departures = Field(default_factory=_Departures)
 
 
