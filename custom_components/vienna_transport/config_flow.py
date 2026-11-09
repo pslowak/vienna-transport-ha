@@ -10,9 +10,14 @@ from homeassistant.helpers.selector import TextSelector, TextSelectorConfig
 
 from custom_components.vienna_transport.client import ViennaTransportClient
 from custom_components.vienna_transport.const import DOMAIN
-from custom_components.vienna_transport.exceptions import ClientError, ParserError
+from custom_components.vienna_transport.exceptions import (
+    ClientError,
+    ParserError,
+    ValidationError,
+)
 from custom_components.vienna_transport.model import TransportData
 from custom_components.vienna_transport.parser import ViennaTransportParser
+from custom_components.vienna_transport.validator import ViennaTransportValidator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -75,7 +80,7 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors={_KEY_STOP_IDS: "cannot_connect"},
                 placeholders={"detail": str(err)},
             )
-        except ParserError as err:
+        except (ValidationError, ParserError) as err:
             _LOGGER.warning(
                 "Unexpected Wiener Linien API response during setup: %s", err
             )
@@ -130,8 +135,10 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
     async def _test_connection(self, stop_ids: list[str]) -> TransportData:
         session = async_get_clientsession(self.hass)
         client = ViennaTransportClient(session=session)
+        validator = ViennaTransportValidator()
         parser = ViennaTransportParser()
         raw_batches = await client.fetch(stop_ids)
+        validator.validate(raw_batches)
         return parser.parse(raw_batches)
 
     @staticmethod
