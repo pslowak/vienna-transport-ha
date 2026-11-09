@@ -75,7 +75,7 @@ flowchart LR
 | Orchestration  | `ViennaTransportHub`         | `hub.py`         | Integration singleton. Holds Registry and Coordinator, maps entry lifecycle to registry updates and coordinator refresh/shutdown.           |
 | Orchestration  | `StopRegistry`               | `registry.py`    | Tracks which stop IDs belong to which config entry. Exposes the union of all stops.                                                         |
 | Orchestration  | `ViennaTransportCoordinator` | `coordinator.py` | Polls the registered stops every 60s and dispatches `TransportData` to sensors. Falls back to Cache on client, validation or parser errors. |
-| Orchestration  | `ExpiringCache`              | `cache.py`       | TTL cache of last good `TransportData` for resilience during API outages.                                                                   |
+| Orchestration  | `ExpiringCache`              | `cache.py`       | TTL cache of last good `Stop` per stop ID for resilience during API outages.                                                                |
 | Infrastructure | `ViennaTransportClient`      | `client.py`      | Fetches raw departure data from the Wiener Linien API for all registered stops.                                                             |
 | Infrastructure | `ViennaTransportValidator`   | `validator.py`   | Checks the structure of raw API responses with pydantic, before they are parsed.                                                            |
 | Infrastructure | `ViennaTransportParser`      | `parser.py`      | Converts raw API response into typed `Model` data.                                                                                          |
