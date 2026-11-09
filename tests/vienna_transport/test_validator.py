@@ -205,6 +205,14 @@ def _delete(container: dict[str, Any], key: str) -> None:
             "data.monitors.0.lines.0.name",
         ),
         (
+            lambda r: _delete(line(r), "towards"),
+            "data.monitors.0.lines.0.towards",
+        ),
+        (
+            lambda r: _delete(line(r), "type"),
+            "data.monitors.0.lines.0.type",
+        ),
+        (
             lambda r: line(r).update(departures=None),
             "data.monitors.0.lines.0.departures",
         ),
