@@ -112,7 +112,7 @@ async def test_update_data_caches_result(
 
     await coordinator._async_update_data()
 
-    mock_cache.set.assert_called_once_with(transport_data)
+    mock_cache.set.assert_called_once_with(transport_data.stops[2683])
 
 
 async def test_update_data_returns_cached_on_client_error(
@@ -122,11 +122,13 @@ async def test_update_data_returns_cached_on_client_error(
     transport_data: TransportData,
 ) -> None:
     mock_client.fetch.side_effect = ClientError("API error")
-    mock_cache.get.return_value = transport_data
+    stop = transport_data.stops[2683]
+    mock_cache.get.return_value = stop
 
     result = await coordinator._async_update_data()
 
-    assert result is transport_data
+    mock_cache.get.assert_called_once_with(2683)
+    assert result == TransportData(stops={2683: stop})
 
 
 async def test_update_data_returns_cached_on_parser_error(
@@ -138,11 +140,13 @@ async def test_update_data_returns_cached_on_parser_error(
 ) -> None:
     mock_client.fetch.return_value = [{}]
     mock_parser.parse.side_effect = ParserError("Parse error")
-    mock_cache.get.return_value = transport_data
+    stop = transport_data.stops[2683]
+    mock_cache.get.return_value = stop
 
     result = await coordinator._async_update_data()
 
-    assert result is transport_data
+    mock_cache.get.assert_called_once_with(2683)
+    assert result == TransportData(stops={2683: stop})
 
 
 async def test_update_data_raises_update_failed_on_error_without_cache(
@@ -182,7 +186,23 @@ async def test_update_data_skips_fetch_when_no_stops_registered(
     registry: StopRegistry,
 ) -> None:
     registry.unregister("entry-1")
-    mock_cache.get.return_value = None
     result = await coordinator._async_update_data()
     mock_client.fetch.assert_not_called()
+    mock_cache.get.assert_not_called()
     assert result == TransportData(stops={})
+
+
+async def test_update_data_returns_only_cached_stops_on_error(
+    coordinator: ViennaTransportCoordinator,
+    mock_client: MagicMock,
+    mock_cache: MagicMock,
+    registry: StopRegistry,
+) -> None:
+    registry.register("entry-2", ["1337"])
+    stop = MagicMock(spec=Stop)
+    mock_client.fetch.side_effect = ClientError("API error")
+    mock_cache.get.side_effect = lambda stop_id: stop if stop_id == 2683 else None
+
+    result = await coordinator._async_update_data()
+
+    assert result == TransportData(stops={2683: stop})
