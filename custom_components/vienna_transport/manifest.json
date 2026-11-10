@@ -15,6 +15,8 @@
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/pslowak/vienna-transport-ha/issues",
-  "requirements": [],
+  "requirements": [
+    "pydantic>=2,<3"
+  ],
   "version": "1.2.0"
 }

@@ -161,14 +161,17 @@ class ViennaTransportParser:
     @staticmethod
     def _parse_line(raw: dict[str, Any]) -> Line:
         name = raw["name"]
+        line_vehicle = Vehicle(
+            name=name, type=raw["type"], towards=raw["towards"], cooling=False
+        )
         departures = [
-            ViennaTransportParser._parse_departure(dep)
+            ViennaTransportParser._parse_departure(dep, line_vehicle)
             for dep in raw.get("departures", {}).get("departure", [])
         ]
         return Line(name=name, departures=departures, traffic_infos=[])
 
     @staticmethod
-    def _parse_departure(raw: dict[str, Any]) -> Departure:
+    def _parse_departure(raw: dict[str, Any], line_vehicle: Vehicle) -> Departure:
         times = raw["departureTime"]
         planned_raw = times.get("timePlanned")
         real_raw = times.get("timeReal")
@@ -182,7 +185,15 @@ class ViennaTransportParser:
         if time_planned is None or time_real is None:
             raise ParserError("Both timePlanned and timeReal are missing")
 
-        vehicle = ViennaTransportParser._parse_vehicle(raw["vehicle"])
+        raw_vehicle: dict[str, Any] | None = raw.get("vehicle")
+        if raw_vehicle is None:
+            _LOGGER.debug(
+                "No vehicle info provided for line %s, falling back to line properties",
+                line_vehicle.name,
+            )
+            vehicle = line_vehicle
+        else:
+            vehicle = ViennaTransportParser._parse_vehicle(raw_vehicle)
         return Departure(
             time_planned=time_planned, time_real=time_real, vehicle=vehicle
         )
