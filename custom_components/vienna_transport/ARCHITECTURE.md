@@ -79,5 +79,5 @@ flowchart LR
 | Infrastructure | `ViennaTransportClient`      | `client.py`      | Fetches raw departure data from the Wiener Linien API for all registered stops.                                                             |
 | Infrastructure | `ViennaTransportValidator`   | `validator.py`   | Checks the structure of raw API responses with pydantic, before they are parsed.                                                            |
 | Infrastructure | `ViennaTransportParser`      | `parser.py`      | Converts raw API response into typed `Model` data.                                                                                          |
-| External       | `Wiener Linien API`          | —                | External HTTPS service.                                                                                                                     |
+| External       | `Wiener Linien API`          | —                | External HTTPS service. Contract in [`docs/wl-api.md`](../../docs/wl-api.md).                                                               |
 | Domain         | `Model`                      | `model.py`       | Domain Model.                                                                                                                               |

@@ -31,6 +31,7 @@ Vienna Public Transport is a custom Home Assistant integration for real-time pub
 - `src/`: Frontend Lovelace card
 - `dev/`: Mock sensor data and an `ha-icon` stub
 - `tests/`: Unit and integration tests for the backend
+- `docs/`: Reference documentation
 - `pyproject.toml`: Backend dependencies and scripts
 - `package.json`: Frontend dependencies and scripts
 
@@ -39,6 +40,9 @@ Vienna Public Transport is a custom Home Assistant integration for real-time pub
 ### Backend
 
 The core backend architecture is described in `custom_components/vienna_transport/ARCHITECTURE.md`.
+
+The Wiener Linien API contract (request parameters, response schema, message codes) is described in `docs/wl-api.md`.
+Consult it before changing code that requests or reads API data, and keep it in sync if the upstream contract changes.
 
 ### Frontend
 
