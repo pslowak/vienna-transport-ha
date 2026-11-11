@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "custom_components/**"
+      - "scripts/**"
       - "tests/**"
       - "pyproject.toml"
       - "uv.lock"
@@ -13,6 +14,7 @@ on:
     branches: [main]
     paths:
       - "custom_components/**"
+      - "scripts/**"
       - "tests/**"
       - "pyproject.toml"
       - "uv.lock"
