@@ -94,8 +94,9 @@ Run these commands to verify changes made to frontend code:
 - Name branches with a type prefix matching the commit type, using lowercase kebab-case (e.g. `feature/traffic-infos-toggle`)
 - Sequence dependent work: land the prerequisite (e.g. a refactor) in its own branch and wait until it is merged to `main` before starting the dependent work on top of it
 
-### Pull Request Labels
+### Pull Requests (PRs)
 
+- Assign the PR to its author when opening it (e.g. with `gh pr create --assignee @me`)
 - Add labels when opening a PR (e.g. with `gh pr create --label`)
 - Add exactly one type label matching the commit type:
   - `enhancement` for `feat`
