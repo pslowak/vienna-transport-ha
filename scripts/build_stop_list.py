@@ -33,7 +33,7 @@ _ENCODING = "utf-8-sig"
 _REQUEST_TIMEOUT = 30
 _DELIMITER = ";"
 
-_DEFAULT_OUTPUT = Path("stops.csv")
+_DEFAULT_OUTPUT = Path("custom_components/vienna_transport/data/stops.csv")
 _STOP_LIST_HEADER = ("stop_id", "name", "line", "towards")
 
 
