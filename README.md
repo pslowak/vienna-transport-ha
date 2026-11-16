@@ -85,3 +85,9 @@ npm run build                 # Build the card
 npm run build:release         # Build the card for release
 npm run test                  # Run tests
 ```
+
+## Data Source
+
+Departures and the stop list are based on open data from Wiener Linien, published by the City of Vienna under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+Data source: City of Vienna – [data.wien.gv.at](https://data.wien.gv.at)
