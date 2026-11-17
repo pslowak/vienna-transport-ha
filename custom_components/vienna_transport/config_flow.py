@@ -28,6 +28,22 @@ _STEP_USER_SCHEMA = probatio.Schema(
 )
 
 
+class _StopCheckError(Exception):
+    """Raised when stops can't be added, with the error to show on the form."""
+
+    def __init__(self, key: str, placeholders: dict[str, str] | None = None) -> None:
+        """Initialize error.
+
+        Args:
+            key: Translation key of the error.
+            placeholders: Values for the placeholders of the error message.
+
+        """
+        super().__init__(key)
+        self.key = key
+        self.placeholders = placeholders or {}
+
+
 class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
     """Config flow for Vienna Transport.
 
@@ -65,45 +81,52 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
                 },
             )
 
+        try:
+            data = await self._async_check_stops(stop_ids)
+        except _StopCheckError as err:
+            return self._show_error_form(
+                errors={_KEY_STOP_IDS: err.key}, placeholders=err.placeholders
+            )
+        return self._create_entry(stop_ids, data)
+
+    async def _async_check_stops(self, stop_ids: list[str]) -> TransportData:
         duplicates = set(stop_ids) & self._already_configured_stop_ids()
         if duplicates:
-            return self._show_error_form(
-                errors={_KEY_STOP_IDS: "stop_ids_already_configured"},
-                placeholders={"stop_ids": ", ".join(duplicates)},
+            raise _StopCheckError(
+                "stop_ids_already_configured", {"stop_ids": ", ".join(duplicates)}
             )
 
         try:
             data = await self._test_connection(stop_ids)
         except ClientError as err:
             _LOGGER.warning("Wiener Linien API unreachable during setup: %s", err)
-            return self._show_error_form(
-                errors={_KEY_STOP_IDS: "cannot_connect"},
-                placeholders={"detail": str(err)},
-            )
+            raise _StopCheckError("cannot_connect", {"detail": str(err)}) from err
         except (ValidationError, ParserError) as err:
             _LOGGER.warning(
                 "Unexpected Wiener Linien API response during setup: %s", err
             )
-            return self._show_error_form(
-                errors={_KEY_STOP_IDS: "unexpected_response"},
-                placeholders={"detail": str(err)},
-            )
+            raise _StopCheckError("unexpected_response", {"detail": str(err)}) from err
         except Exception as err:
             _LOGGER.exception(
                 "Unexpected error while connecting to Vienna Transport API: %s", err
             )
-            return self._show_error_form(errors={_KEY_STOP_IDS: "unknown"})
+            raise _StopCheckError("unknown") from err
 
         requested = {int(s) for s in stop_ids}
         present = set(data.stops.keys())
         missing = requested - present
         if missing:
             _LOGGER.warning("Stop IDs not found in API response: %s", missing)
-            return self._show_error_form(
-                errors={_KEY_STOP_IDS: "stop_not_found"},
-                placeholders={"stop_ids": ", ".join(str(m) for m in sorted(missing))},
+            raise _StopCheckError(
+                "stop_not_found",
+                {"stop_ids": ", ".join(str(m) for m in sorted(missing))},
             )
 
+        return data
+
+    def _create_entry(
+        self, stop_ids: list[str], data: TransportData
+    ) -> ConfigFlowResult:
         return self.async_create_entry(
             title=self._build_title(data),
             data={_KEY_STOP_IDS: stop_ids},
