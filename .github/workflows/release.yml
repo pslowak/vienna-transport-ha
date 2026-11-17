@@ -47,9 +47,26 @@ jobs:
       - name: Build frontend
         run: npm run build:release
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version-file: .python-version
+
+      - name: Sync dependencies
+        run: uv sync --extra dev --frozen --no-install-project
+
+      - name: Build stop list
+        run: uv run scripts/build_stop_list.py
+
       - name: Package component
         run: |
           zip -r vienna-transport.zip custom_components/
+
+      - name: List package contents
+        run: unzip -l vienna-transport.zip
 
       - name: Attach assets to release
         uses: softprops/action-gh-release@v3
