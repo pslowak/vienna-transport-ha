@@ -83,3 +83,4 @@ flowchart LR
 | External       | `Wiener Linien API`          | —                     | External HTTPS service. Contract in [`docs/wl-api.md`](../../docs/wl-api.md).                                                               |
 | Domain         | `Model`                      | `model.py`            | Domain Model.                                                                                                                               |
 | Domain         | `StopListEntry`              | `stop_list.py`        | Stop, line and direction selectable during setup.                                                                                           |
+| Domain         | `StopListQuery`              | `stop_list_query.py`  | Lines, directions and stops of the stop list for picking a stop.                                                                            |
