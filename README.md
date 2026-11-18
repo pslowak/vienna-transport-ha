@@ -74,7 +74,11 @@ uv sync --extra dev                   # Install dependencies
 uv run pytest                         # Run tests
 uv run ruff check                     # Linting
 uv run mypy custom_components tests   # Type checking
+uv run scripts/build_stop_list.py     # Build the stop list
 ```
+
+The stop list is built from Wiener Linien open data into `custom_components/vienna_transport/data/stops.csv`. 
+It is not committed, but built as part of each release.
 
 ### Frontend (Lovelace card)
 
