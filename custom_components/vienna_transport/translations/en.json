@@ -1,6 +1,39 @@
 {
   "config": {
     "step": {
+      "user": {
+        "title": "Set up Vienna Transport",
+        "description": "Choose how to find the stop you want to monitor.",
+        "menu_options": {
+          "pick_line": "Find stop by line",
+          "manual": "Enter stop ID"
+        },
+        "menu_option_descriptions": {
+          "pick_line": "Pick a line, its direction and a stop.",
+          "manual": "Enter one or more RBL stop IDs directly."
+        }
+      },
+      "pick_line": {
+        "title": "Find stop by line",
+        "description": "Pick the line of the stop you want to monitor.",
+        "data": {
+          "line": "Line"
+        }
+      },
+      "pick_direction": {
+        "title": "Find stop by line",
+        "description": "Pick the direction for line **{line}**.",
+        "data": {
+          "towards": "Direction"
+        }
+      },
+      "pick_stop": {
+        "title": "Find stop by line",
+        "description": "Pick the stop for line **{line}** towards **{towards}**.",
+        "data": {
+          "stop": "Stop"
+        }
+      },
       "manual": {
         "title": "Set up Vienna Transport",
         "description": "Enter the RBL stop IDs you want to monitor. You can find stop IDs via the [RBL search]({rbl_url}).",

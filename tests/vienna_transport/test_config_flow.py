@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -13,6 +14,15 @@ from custom_components.vienna_transport.config_flow import (
 from custom_components.vienna_transport.const import DOMAIN
 from custom_components.vienna_transport.exceptions import ClientError, ParserError
 from custom_components.vienna_transport.model import Stop, StopProperties, TransportData
+from custom_components.vienna_transport.stop_list import StopListEntry
+
+_LOAD = "custom_components.vienna_transport.config_flow.StopListLoader.load"
+_ENTRIES = [
+    StopListEntry(stop_id=4113, name="Schwedenplatz", line="U1", towards="Leopoldau"),
+    StopListEntry(stop_id=4116, name="Schwedenplatz", line="U1", towards="Oberlaa"),
+    StopListEntry(stop_id=4119, name="Stephansplatz", line="U1", towards="Oberlaa"),
+    StopListEntry(stop_id=5650, name="Schwedenplatz", line="1", towards="Prater"),
+]
 
 
 def test_validate_stop_ids_returns_cleaned_list() -> None:
@@ -330,14 +340,41 @@ async def test_check_stops_raises_for_configured_stop(
     assert exc_info.value.placeholders == {"stop_ids": "2683"}
 
 
-async def test_step_user_shows_manual_form(hass: HomeAssistant) -> None:
+async def test_step_user_shows_menu_with_stop_list(hass: HomeAssistant) -> None:
     flow = make_flow(hass)
 
-    result = await flow.async_step_user()
+    with patch(_LOAD, return_value=_ENTRIES):
+        result = await flow.async_step_user()
+
+    assert result["type"] == FlowResultType.MENU
+    assert result["step_id"] == "user"
+    assert result["menu_options"] == ["pick_line", "manual"]
+
+
+async def test_step_user_shows_manual_form_without_stop_list(
+    hass: HomeAssistant,
+) -> None:
+    flow = make_flow(hass)
+
+    with patch(_LOAD, side_effect=FileNotFoundError):
+        result = await flow.async_step_user()
 
     assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "manual"
     assert result["errors"] == {}
+
+
+async def test_step_user_shows_manual_form_for_empty_stop_list(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
+    flow = make_flow(hass)
+
+    with patch(_LOAD, return_value=[]):
+        result = await flow.async_step_user()
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "manual"
+    assert "Stop list is empty" in caplog.text
 
 
 async def test_step_user_passes_input_to_manual_step(hass: HomeAssistant) -> None:
@@ -351,3 +388,91 @@ async def test_step_user_passes_input_to_manual_step(hass: HomeAssistant) -> Non
 
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"]["stop_ids"] == ["1337"]
+
+
+async def _picked_flow(hass: HomeAssistant) -> ViennaTransportConfigFlow:
+    flow = make_flow(hass)
+    with patch(_LOAD, return_value=_ENTRIES):
+        await flow.async_step_user()
+    await flow.async_step_pick_line(user_input={"line": "U1"})
+    await flow.async_step_pick_direction(user_input={"towards": "Oberlaa"})
+    return flow
+
+
+def _options(result: Any, key: str) -> Any:
+    return result["data_schema"].schema[key].config["options"]
+
+
+async def test_step_pick_line_offers_lines(hass: HomeAssistant) -> None:
+    flow = make_flow(hass)
+    with patch(_LOAD, return_value=_ENTRIES):
+        await flow.async_step_user()
+
+    result = await flow.async_step_pick_line()
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "pick_line"
+    assert _options(result, "line") == ["1", "U1"]
+
+
+async def test_step_pick_line_shows_directions_of_line(hass: HomeAssistant) -> None:
+    flow = make_flow(hass)
+    with patch(_LOAD, return_value=_ENTRIES):
+        await flow.async_step_user()
+
+    result = await flow.async_step_pick_line(user_input={"line": "U1"})
+
+    assert result["step_id"] == "pick_direction"
+    assert _options(result, "towards") == ["Leopoldau", "Oberlaa"]
+    placeholders = result.get("description_placeholders")
+    assert placeholders == {"line": "U1"}
+
+
+async def test_step_pick_direction_shows_stops_of_direction(
+    hass: HomeAssistant,
+) -> None:
+    flow = await _picked_flow(hass)
+
+    result = await flow.async_step_pick_stop()
+
+    assert result["step_id"] == "pick_stop"
+    assert _options(result, "stop") == [
+        {"value": "4116", "label": "Schwedenplatz"},
+        {"value": "4119", "label": "Stephansplatz"},
+    ]
+    placeholders = result.get("description_placeholders")
+    assert placeholders == {"line": "U1", "towards": "Oberlaa"}
+
+
+async def test_step_pick_stop_creates_entry(hass: HomeAssistant) -> None:
+    flow = await _picked_flow(hass)
+    data = TransportData(
+        stops={
+            4116: Stop(props=StopProperties(id=4116, name="Schwedenplatz"), lines=[])
+        }
+    )
+
+    with patch.object(flow, "_test_connection", new=AsyncMock(return_value=data)):
+        result = await flow.async_step_pick_stop(user_input={"stop": "4116"})
+
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["title"] == "Stop: Schwedenplatz (ID: 4116)"
+    assert result["data"] == {"stop_ids": ["4116"]}
+
+
+async def test_step_pick_stop_shows_error_on_pick_stop_form(
+    hass: HomeAssistant,
+) -> None:
+    common.MockConfigEntry(
+        domain=DOMAIN,
+        data={"stop_ids": ["4116"]},
+    ).add_to_hass(hass)
+    flow = await _picked_flow(hass)
+
+    result = await flow.async_step_pick_stop(user_input={"stop": "4116"})
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "pick_stop"
+    assert result["errors"] == {"stop": "stop_ids_already_configured"}
+    placeholders = result.get("description_placeholders")
+    assert placeholders == {"line": "U1", "towards": "Oberlaa", "stop_ids": "4116"}
