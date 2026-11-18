@@ -23,7 +23,7 @@ _LOGGER = logging.getLogger(__name__)
 
 _KEY_STOP_IDS = "stop_ids"
 _RBL_SEARCH_URL = "https://till.mabe.at/rbl/"
-_STEP_USER_SCHEMA = probatio.Schema(
+_STEP_MANUAL_SCHEMA = probatio.Schema(
     {probatio.Required(_KEY_STOP_IDS): TextSelector(TextSelectorConfig(multiple=True))}
 )
 
@@ -56,6 +56,20 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle initial user step.
+
+        Args:
+            user_input: User input with stop IDs or None for initial form.
+
+        Returns:
+            Config flow result of the manual step.
+
+        """
+        return await self.async_step_manual(user_input)
+
+    async def async_step_manual(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle manual stop ID entry.
 
         Args:
             user_input: User input with stop IDs or None for initial form.
@@ -139,8 +153,8 @@ class ViennaTransportConfigFlow(ConfigFlow, domain=DOMAIN):
         placeholders: dict[str, str] | None = None,
     ) -> ConfigFlowResult:
         return self.async_show_form(
-            step_id="user",
-            data_schema=_STEP_USER_SCHEMA,
+            step_id="manual",
+            data_schema=_STEP_MANUAL_SCHEMA,
             errors=errors or {},
             description_placeholders={
                 "rbl_url": _RBL_SEARCH_URL,

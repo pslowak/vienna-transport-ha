@@ -72,7 +72,7 @@ def make_flow(hass: HomeAssistant) -> ViennaTransportConfigFlow:
     return flow
 
 
-async def test_step_user_rejects_stop_already_configured(
+async def test_step_manual_rejects_stop_already_configured(
     hass: HomeAssistant,
 ) -> None:
     common.MockConfigEntry(
@@ -82,7 +82,7 @@ async def test_step_user_rejects_stop_already_configured(
 
     flow = make_flow(hass)
 
-    result = await flow.async_step_user(user_input={"stop_ids": ["2683", "1337"]})
+    result = await flow.async_step_manual(user_input={"stop_ids": ["2683", "1337"]})
 
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "stop_ids_already_configured"}
@@ -91,7 +91,7 @@ async def test_step_user_rejects_stop_already_configured(
     assert placeholders["stop_ids"] == "2683"
 
 
-async def test_step_user_allows_new_stop(hass: HomeAssistant) -> None:
+async def test_step_manual_allows_new_stop(hass: HomeAssistant) -> None:
     common.MockConfigEntry(
         domain=DOMAIN,
         data={"stop_ids": ["2683"]},
@@ -112,14 +112,14 @@ async def test_step_user_allows_new_stop(hass: HomeAssistant) -> None:
             )
         ),
     ) as test_connection:
-        result = await flow.async_step_user(user_input={"stop_ids": ["1337"]})
+        result = await flow.async_step_manual(user_input={"stop_ids": ["1337"]})
 
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"]["stop_ids"] == ["1337"]
     test_connection.assert_awaited_once()
 
 
-async def test_step_user_shows_cannot_connect_on_client_error(
+async def test_step_manual_shows_cannot_connect_on_client_error(
     hass: HomeAssistant,
 ) -> None:
     common.MockConfigEntry(
@@ -134,7 +134,7 @@ async def test_step_user_shows_cannot_connect_on_client_error(
         "_test_connection",
         new=AsyncMock(side_effect=ClientError("Timeout error: request timed out")),
     ):
-        result = await flow.async_step_user(user_input={"stop_ids": ["1337"]})
+        result = await flow.async_step_manual(user_input={"stop_ids": ["1337"]})
 
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "cannot_connect"}
@@ -143,7 +143,7 @@ async def test_step_user_shows_cannot_connect_on_client_error(
     assert placeholders["detail"] == "Timeout error: request timed out"
 
 
-async def test_step_user_shows_unexpected_response_on_parser_error(
+async def test_step_manual_shows_unexpected_response_on_parser_error(
     hass: HomeAssistant,
 ) -> None:
     common.MockConfigEntry(
@@ -160,7 +160,7 @@ async def test_step_user_shows_unexpected_response_on_parser_error(
             side_effect=ParserError("API rate limit reached (message code 316)")
         ),
     ):
-        result = await flow.async_step_user(user_input={"stop_ids": ["1337"]})
+        result = await flow.async_step_manual(user_input={"stop_ids": ["1337"]})
 
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "unexpected_response"}
@@ -169,7 +169,7 @@ async def test_step_user_shows_unexpected_response_on_parser_error(
     assert placeholders["detail"] == "API rate limit reached (message code 316)"
 
 
-async def test_step_user_shows_unexpected_response_on_validation_error(
+async def test_step_manual_shows_unexpected_response_on_validation_error(
     hass: HomeAssistant,
 ) -> None:
     flow = make_flow(hass)
@@ -178,7 +178,7 @@ async def test_step_user_shows_unexpected_response_on_validation_error(
     with patch.object(
         ViennaTransportClient, "fetch", new=AsyncMock(return_value=[malformed])
     ):
-        result = await flow.async_step_user(user_input={"stop_ids": ["1337"]})
+        result = await flow.async_step_manual(user_input={"stop_ids": ["1337"]})
 
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "unexpected_response"}
@@ -187,7 +187,7 @@ async def test_step_user_shows_unexpected_response_on_validation_error(
     assert placeholders["detail"].startswith("unexpected API response: data: ")
 
 
-async def test_step_user_shows_unknown_on_unexpected_error(
+async def test_step_manual_shows_unknown_on_unexpected_error(
     hass: HomeAssistant,
 ) -> None:
     common.MockConfigEntry(
@@ -202,14 +202,14 @@ async def test_step_user_shows_unknown_on_unexpected_error(
         "_test_connection",
         new=AsyncMock(side_effect=RuntimeError("boom")),
     ) as test_connection:
-        result = await flow.async_step_user(user_input={"stop_ids": ["1337"]})
+        result = await flow.async_step_manual(user_input={"stop_ids": ["1337"]})
 
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "unknown"}
     test_connection.assert_awaited_once()
 
 
-async def test_step_user_shows_stop_not_found_on_empty_response(
+async def test_step_manual_shows_stop_not_found_on_empty_response(
     hass: HomeAssistant,
 ) -> None:
     flow = make_flow(hass)
@@ -219,7 +219,7 @@ async def test_step_user_shows_stop_not_found_on_empty_response(
         "_test_connection",
         new=AsyncMock(return_value=TransportData(stops={})),
     ):
-        result = await flow.async_step_user(user_input={"stop_ids": ["9999"]})
+        result = await flow.async_step_manual(user_input={"stop_ids": ["9999"]})
 
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "stop_not_found"}
@@ -228,7 +228,7 @@ async def test_step_user_shows_stop_not_found_on_empty_response(
     assert placeholders["stop_ids"] == "9999"
 
 
-async def test_step_user_shows_stop_not_found_on_partial_response(
+async def test_step_manual_shows_stop_not_found_on_partial_response(
     hass: HomeAssistant,
 ) -> None:
     common.MockConfigEntry(
@@ -251,7 +251,7 @@ async def test_step_user_shows_stop_not_found_on_partial_response(
             )
         ),
     ):
-        result = await flow.async_step_user(user_input={"stop_ids": ["2683", "9999"]})
+        result = await flow.async_step_manual(user_input={"stop_ids": ["2683", "9999"]})
 
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "stop_not_found"}
@@ -261,23 +261,23 @@ async def test_step_user_shows_stop_not_found_on_partial_response(
     assert "rbl_url" in placeholders
 
 
-async def test_step_user_shows_empty_stop_ids_on_blank_input(
+async def test_step_manual_shows_empty_stop_ids_on_blank_input(
     hass: HomeAssistant,
 ) -> None:
     flow = make_flow(hass)
 
-    result = await flow.async_step_user(user_input={"stop_ids": ["  "]})
+    result = await flow.async_step_manual(user_input={"stop_ids": ["  "]})
 
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "empty_stop_ids"}
 
 
-async def test_step_user_shows_invalid_stop_id_with_placeholder(
+async def test_step_manual_shows_invalid_stop_id_with_placeholder(
     hass: HomeAssistant,
 ) -> None:
     flow = make_flow(hass)
 
-    result = await flow.async_step_user(user_input={"stop_ids": ["a stop"]})
+    result = await flow.async_step_manual(user_input={"stop_ids": ["a stop"]})
 
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "invalid_stop_id"}
@@ -286,12 +286,14 @@ async def test_step_user_shows_invalid_stop_id_with_placeholder(
     assert placeholders["stop_ids"] == '"a stop"'
 
 
-async def test_step_user_shows_all_invalid_stop_ids_with_placeholder(
+async def test_step_manual_shows_all_invalid_stop_ids_with_placeholder(
     hass: HomeAssistant,
 ) -> None:
     flow = make_flow(hass)
 
-    result = await flow.async_step_user(user_input={"stop_ids": ["2683", "abc", "def"]})
+    result = await flow.async_step_manual(
+        user_input={"stop_ids": ["2683", "abc", "def"]}
+    )
 
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"stop_ids": "invalid_stop_ids"}
@@ -326,3 +328,26 @@ async def test_check_stops_raises_for_configured_stop(
 
     assert exc_info.value.key == "stop_ids_already_configured"
     assert exc_info.value.placeholders == {"stop_ids": "2683"}
+
+
+async def test_step_user_shows_manual_form(hass: HomeAssistant) -> None:
+    flow = make_flow(hass)
+
+    result = await flow.async_step_user()
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "manual"
+    assert result["errors"] == {}
+
+
+async def test_step_user_passes_input_to_manual_step(hass: HomeAssistant) -> None:
+    flow = make_flow(hass)
+    data = TransportData(
+        stops={1337: Stop(props=StopProperties(id=1337, name="Schottentor"), lines=[])}
+    )
+
+    with patch.object(flow, "_test_connection", new=AsyncMock(return_value=data)):
+        result = await flow.async_step_user(user_input={"stop_ids": ["1337"]})
+
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["data"]["stop_ids"] == ["1337"]
