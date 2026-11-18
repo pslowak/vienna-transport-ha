@@ -20,6 +20,7 @@ A custom integration and Lovelace card for [Home Assistant](https://www.home-ass
 - **Live departures** from Wiener Linien
 - **Delay indicator** - know exactly which departure is running late and by how much
 - **Cooling indicator** - know exactly which vehicles are air-conditioned
+- **Elevator disruptions** - know which elevators at your stop are out of service
 - **Auto-registered Lovelace card** - no manual resource setup
 - **One sensor per stop** - multiple stops per config entry
 
