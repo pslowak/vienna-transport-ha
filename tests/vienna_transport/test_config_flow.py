@@ -1,11 +1,15 @@
 from unittest.mock import AsyncMock, patch
 
+import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component import common
 
 from custom_components.vienna_transport.client import ViennaTransportClient
-from custom_components.vienna_transport.config_flow import ViennaTransportConfigFlow
+from custom_components.vienna_transport.config_flow import (
+    ViennaTransportConfigFlow,
+    _StopCheckError,
+)
 from custom_components.vienna_transport.const import DOMAIN
 from custom_components.vienna_transport.exceptions import ClientError, ParserError
 from custom_components.vienna_transport.model import Stop, StopProperties, TransportData
@@ -294,3 +298,31 @@ async def test_step_user_shows_all_invalid_stop_ids_with_placeholder(
     placeholders = result.get("description_placeholders")
     assert placeholders is not None
     assert placeholders["stop_ids"] == '"abc", "def"'
+
+
+async def test_check_stops_returns_data_for_new_stop(hass: HomeAssistant) -> None:
+    flow = make_flow(hass)
+    data = TransportData(
+        stops={1337: Stop(props=StopProperties(id=1337, name="Schottentor"), lines=[])}
+    )
+
+    with patch.object(flow, "_test_connection", new=AsyncMock(return_value=data)):
+        result = await flow._async_check_stops(["1337"])
+
+    assert result is data
+
+
+async def test_check_stops_raises_for_configured_stop(
+    hass: HomeAssistant,
+) -> None:
+    common.MockConfigEntry(
+        domain=DOMAIN,
+        data={"stop_ids": ["2683"]},
+    ).add_to_hass(hass)
+    flow = make_flow(hass)
+
+    with pytest.raises(_StopCheckError) as exc_info:
+        await flow._async_check_stops(["2683"])
+
+    assert exc_info.value.key == "stop_ids_already_configured"
+    assert exc_info.value.placeholders == {"stop_ids": "2683"}
