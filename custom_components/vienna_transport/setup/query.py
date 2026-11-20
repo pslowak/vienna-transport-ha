@@ -3,7 +3,7 @@
 import re
 from collections import Counter
 
-from custom_components.vienna_transport.stop_list import StopListEntry
+from custom_components.vienna_transport.setup.model import StopListEntry
 
 _DIGITS = re.compile(r"(\d+)")
 

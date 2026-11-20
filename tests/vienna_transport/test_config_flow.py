@@ -14,7 +14,7 @@ from custom_components.vienna_transport.config_flow import (
 from custom_components.vienna_transport.const import DOMAIN
 from custom_components.vienna_transport.exceptions import ClientError, ParserError
 from custom_components.vienna_transport.model import Stop, StopProperties, TransportData
-from custom_components.vienna_transport.stop_list import StopListEntry
+from custom_components.vienna_transport.setup.model import StopListEntry
 
 _LOAD = "custom_components.vienna_transport.config_flow.StopListLoader.load"
 _ENTRIES = [
