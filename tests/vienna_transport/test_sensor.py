@@ -1,10 +1,14 @@
+import json
 from collections.abc import Iterable
 from datetime import datetime, timedelta, timezone
 from typing import cast
 from unittest.mock import MagicMock
 
-from homeassistant.core import HomeAssistant
+from homeassistant.components.recorder.db_schema import StateAttributes
+from homeassistant.const import EVENT_STATE_CHANGED
+from homeassistant.core import Event, EventStateChangedData, HomeAssistant
 from homeassistant.helpers.entity import Entity
+from pytest_homeassistant_custom_component.common import MockEntityPlatform
 
 from custom_components.vienna_transport.coordinator import (
     PlatformData,
@@ -121,6 +125,27 @@ def test_sensor_only_returns_its_own_stop(hass: HomeAssistant) -> None:
     )
     sensor = make_sensor(hass, data=data, stop_id=2683)
     assert sensor.extra_state_attributes["props"]["name"] == "Volkertplatz"
+
+
+async def test_recorder_skips_departures_but_keeps_stop_props(
+    hass: HomeAssistant,
+) -> None:
+    data = TransportData(stops={2683: make_stop()})
+    sensor = make_sensor(hass, data=data)
+    await MockEntityPlatform(hass).async_add_entities([sensor])
+
+    state = hass.states.get(sensor.entity_id)
+    assert state is not None
+    assert {"props", "lines", "traffic_infos"} <= state.attributes.keys()
+
+    event: Event[EventStateChangedData] = Event(
+        EVENT_STATE_CHANGED,
+        {"entity_id": sensor.entity_id, "old_state": None, "new_state": state},
+    )
+    recorded = json.loads(StateAttributes.shared_attrs_bytes_from_event(event, None))
+    assert "lines" not in recorded
+    assert "traffic_infos" not in recorded
+    assert recorded["props"] == {"id": 2683, "name": "Volkertplatz"}
 
 
 async def test_async_setup_entry_creates_one_sensor_per_stop_id(
