@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.3.0](https://github.com/pslowak/vienna-transport-ha/compare/v1.2.0...v1.3.0) (2026-11-21)
+
+
+### Features
+
+* **backend:** add stop list queries ([#243](https://github.com/pslowak/vienna-transport-ha/issues/243)) ([76391c4](https://github.com/pslowak/vienna-transport-ha/commit/76391c41c0b81f429d1c34b3a0e44262f0d0464d))
+* **card:** add toggle to show traffic infos ([#201](https://github.com/pslowak/vienna-transport-ha/issues/201)) ([e5cce35](https://github.com/pslowak/vienna-transport-ha/commit/e5cce35cfdece64a6bc9bad0482ee3086d501b75))
+* **config-flow:** pick stops by line during setup ([#247](https://github.com/pslowak/vienna-transport-ha/issues/247)) ([aaa0f84](https://github.com/pslowak/vienna-transport-ha/commit/aaa0f845870fd51c04decd9f94bcc36ab0409d15))
+* **loader:** add stop list loader ([#242](https://github.com/pslowak/vienna-transport-ha/issues/242)) ([11f64ff](https://github.com/pslowak/vienna-transport-ha/commit/11f64ff080eb1584576a10b41139587a83422cd9))
+* **scripts:** add script to build stop list from Wiener Linien open data ([e3a6116](https://github.com/pslowak/vienna-transport-ha/commit/e3a61161e765286acce3b4f48db3e8372342cbab))
+
+
+### Bug Fixes
+
+* **parser:** fall back to line when departure vehicle is missing ([#229](https://github.com/pslowak/vienna-transport-ha/issues/229)) ([7af6585](https://github.com/pslowak/vienna-transport-ha/commit/7af65852fb24445de7e636a98bb7396cec3ff808))
+
 ## [1.2.0](https://github.com/pslowak/vienna-transport-ha/compare/v1.1.2...v1.2.0) (2026-10-27)
 
 
