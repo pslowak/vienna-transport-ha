@@ -5,7 +5,10 @@
   },
   "card": {
     "config": {
-      "entity_required": "Du musst eine Entität angeben."
+      "entity_required": "Du musst eine Entität angeben.",
+      "invalid_lines": "lines muss eine Liste von Liniennamen sein.",
+      "invalid_max_departures": "max_departures muss eine ganze Zahl ab 1 sein.",
+      "invalid_show_traffic_infos": "show_traffic_infos muss true oder false sein."
     },
     "errors": {
       "entity_not_found": "Entität {entity} nicht gefunden.",
