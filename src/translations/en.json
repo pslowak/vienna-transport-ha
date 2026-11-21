@@ -5,10 +5,7 @@
   },
   "card": {
     "config": {
-      "entity_required": "You need to define an entity.",
-      "invalid_lines": "lines must be a list of line names.",
-      "invalid_max_departures": "max_departures must be a whole number of at least 1.",
-      "invalid_show_traffic_infos": "show_traffic_infos must be true or false."
+      "entity_required": "You need to define an entity."
     },
     "errors": {
       "entity_not_found": "Entity {entity} not found.",

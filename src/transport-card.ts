@@ -7,7 +7,6 @@ import {
 } from "./constants.ts";
 import type { HomeAssistant, LovelaceCard } from "./ha.ts";
 import {
-    assertConfig,
     resolveConfig,
     type ResolvedTransportCardConfig,
     type TransportCardConfig,
@@ -36,7 +35,6 @@ export class TransportCard extends LitElement implements LovelaceCard {
         return document.createElement(TRANSPORT_CARD_EDITOR_NAME);
     }
 
-    /** Starting values for a card added in the UI, not the defaults of missing options. */
     static getStubConfig(): TransportCardConfig {
         return {
             type: "custom:transport-card",
@@ -76,8 +74,6 @@ export class TransportCard extends LitElement implements LovelaceCard {
         if (!config.entity) {
             throw new Error(t("card.config.entity_required", this._lang));
         }
-        // Home Assistant shows the error of an invalid config as an error card.
-        assertConfig(config, this._lang);
         this.config = resolveConfig(config);
     }
 

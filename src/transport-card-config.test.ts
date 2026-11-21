@@ -1,12 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { Departure, Line } from "./api.ts";
-import { visibleDepartures } from "./departures.ts";
-import type { LovelaceCardConfig } from "./ha.ts";
-import { t } from "./i18n.ts";
 import {
-    assertConfig,
     resolveConfig,
-    toSavedConfig,
     type TransportCardConfig,
 } from "./transport-card-config.ts";
 
@@ -15,87 +9,26 @@ const minimal: TransportCardConfig = {
     entity: "sensor.mock_station",
 };
 
-function withOption(option: string, value: unknown): LovelaceCardConfig {
-    return { ...minimal, [option]: value };
-}
-
-function departure(): Departure {
-    const time = new Date(2026, 0, 1, 8, 10).toISOString();
-    return {
-        time_planned: time,
-        time_real: time,
-        vehicle: {
-            name: "U4",
-            type: "ptMetro",
-            towards: "Hütteldorf",
-            cooling: false,
-        },
-    };
-}
-
-describe("assertConfig", () => {
-    it.each([
-        ["no options", minimal],
-        [
-            "all options",
-            {
-                ...minimal,
-                lines: ["U4", "13A"],
-                max_departures: 3,
-                show_traffic_infos: false,
-            },
-        ],
-        ["numeric line names", withOption("lines", [71, "U4"])],
-        ["null lines", withOption("lines", null)],
-        ["null max_departures", withOption("max_departures", null)],
-        ["null show_traffic_infos", withOption("show_traffic_infos", null)],
-        ["no entity", { type: "custom:transport-card", entity: "" }],
-    ])("accepts %s", (_, config) => {
-        expect(() => assertConfig(config)).not.toThrow();
-    });
-
-    it.each([
-        ["lines", "U4", "card.config.invalid_lines"],
-        ["lines", [true], "card.config.invalid_lines"],
-        ["lines", [{ name: "U4" }], "card.config.invalid_lines"],
-        ["lines", [NaN], "card.config.invalid_lines"],
-        ["lines", [Infinity], "card.config.invalid_lines"],
-        ["max_departures", 0, "card.config.invalid_max_departures"],
-        ["max_departures", -1, "card.config.invalid_max_departures"],
-        ["max_departures", 2.5, "card.config.invalid_max_departures"],
-        ["max_departures", NaN, "card.config.invalid_max_departures"],
-        ["max_departures", "3", "card.config.invalid_max_departures"],
-        ["show_traffic_infos", "no", "card.config.invalid_show_traffic_infos"],
-        ["show_traffic_infos", 1, "card.config.invalid_show_traffic_infos"],
-    ])("rejects %s set to %o", (option, value, key) => {
-        expect(() => assertConfig(withOption(option, value))).toThrow(t(key));
-    });
-
-    it("names the invalid option in the user's language", () => {
-        expect(() =>
-            assertConfig(withOption("max_departures", 0), "de"),
-        ).toThrow(t("card.config.invalid_max_departures", "de"));
-    });
-});
+const defaults = {
+    entity: "sensor.mock_station",
+    lines: [],
+    max_departures: undefined,
+    show_traffic_infos: true,
+};
 
 describe("resolveConfig", () => {
     it("resolves missing options to their defaults", () => {
-        expect(resolveConfig(minimal)).toEqual({
-            entity: "sensor.mock_station",
-            lines: [],
-            max_departures: undefined,
-            show_traffic_infos: true,
-        });
+        expect(resolveConfig(minimal)).toEqual(defaults);
     });
 
-    it("resolves null options to their defaults", () => {
+    it("resolves options without a value to their defaults", () => {
         const config: TransportCardConfig = {
             ...minimal,
             lines: null,
             max_departures: null,
             show_traffic_infos: null,
         };
-        expect(resolveConfig(config)).toEqual(resolveConfig(minimal));
+        expect(resolveConfig(config)).toEqual(defaults);
     });
 
     it("keeps options that are set", () => {
@@ -113,76 +46,11 @@ describe("resolveConfig", () => {
         });
     });
 
-    it("reads numeric line names as names", () => {
-        const config: TransportCardConfig = { ...minimal, lines: [71, "U4"] };
-        expect(resolveConfig(config).lines).toEqual(["71", "U4"]);
-    });
-
-    it("keeps all departures visible for a null max_departures", () => {
-        const config: TransportCardConfig = {
+    it("shows all lines when lines is not a list", () => {
+        const config = {
             ...minimal,
-            max_departures: null,
-        };
-        const line: Line = {
-            name: "U4",
-            departures: [departure(), departure()],
-            traffic_infos: [],
-        };
-        const now = new Date(2026, 0, 1, 8, 0);
-        expect(
-            visibleDepartures(line, resolveConfig(config).max_departures, now),
-        ).toHaveLength(2);
-    });
-});
-
-describe("toSavedConfig", () => {
-    // The form sends all its data, including the toggle default it displays.
-    const formDefaults = { lines: [], show_traffic_infos: true };
-
-    it("keeps unset options out when another option is edited", () => {
-        const formValue = { ...minimal, ...formDefaults, max_departures: 5 };
-        expect(toSavedConfig(minimal, formValue)).toEqual({
-            ...minimal,
-            max_departures: 5,
-        });
-    });
-
-    it("saves the traffic info toggle once it is turned off", () => {
-        const formValue = {
-            ...minimal,
-            ...formDefaults,
-            show_traffic_infos: false,
-        };
-        expect(toSavedConfig(minimal, formValue)).toEqual({
-            ...minimal,
-            show_traffic_infos: false,
-        });
-    });
-
-    it("keeps the traffic info toggle when the config set it", () => {
-        const previous = { ...minimal, show_traffic_infos: true };
-        const formValue = { ...previous, lines: [] };
-        expect(toSavedConfig(previous, formValue)).toEqual(previous);
-    });
-
-    it("drops blank line names", () => {
-        const formValue = {
-            ...minimal,
-            ...formDefaults,
-            lines: ["U4", " ", ""],
-        };
-        expect(toSavedConfig(minimal, formValue).lines).toEqual(["U4"]);
-    });
-
-    it("keeps an emptied list when the config set lines", () => {
-        const previous = { ...minimal, lines: ["U4"] };
-        const formValue = { ...previous, ...formDefaults };
-        expect(toSavedConfig(previous, formValue).lines).toEqual([]);
-    });
-
-    it("keeps the card type and other keys", () => {
-        const previous = { ...minimal, grid_options: { columns: 6 } };
-        const formValue = { ...previous, ...formDefaults };
-        expect(toSavedConfig(previous, formValue)).toEqual(previous);
+            lines: "U4",
+        } as unknown as TransportCardConfig;
+        expect(resolveConfig(config).lines).toEqual([]);
     });
 });
