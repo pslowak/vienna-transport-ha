@@ -21,6 +21,7 @@ A custom integration and Lovelace card for [Home Assistant](https://www.home-ass
 - **Delay indicator** - know exactly which departure is running late and by how much
 - **Cooling indicator** - know exactly which vehicles are air-conditioned
 - **Elevator disruptions** - know which elevators at your stop are out of service
+- **Guided setup** - find your stop by line and direction (no lookup of IDs needed)
 - **Auto-registered Lovelace card** - no manual resource setup
 - **One sensor per stop** - multiple stops per config entry
 
@@ -42,9 +43,13 @@ A custom integration and Lovelace card for [Home Assistant](https://www.home-ass
 
 1. Go to **Settings → Devices & Services → Add Integration**.
 2. Search for *Vienna Public Transport* and select it.
-3. Enter the **RBL stop IDs** you want to monitor. You can find stop IDs via the [RBL search](https://till.mabe.at/rbl/).
+3. Choose how to find the stop you want to monitor:
+   - **Find stop by line**: pick a line, its direction and the stop. Adds one stop.
+   - **Enter stop ID**: enter one or more **RBL stop IDs**. You can find stop IDs via the [RBL search](https://till.mabe.at/rbl/).
 4. A sensor entity (e.g. `sensor.vienna_transport_departures_for_stop_2683`) is created for each stop ID.
 5. If the card does not appear in the Lovelace card picker, **clear your browser cache**.
+
+A stop ID stands for a platform, so its sensor shows all lines departing there. Use the card's `lines` option to show only some of them.
 
 ## Lovelace Card
 
