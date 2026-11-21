@@ -32,6 +32,21 @@ export function normalizeConfig(
     };
 }
 
+/** Merges the resolved options into the config, keeping its type and other keys. */
+export function toEditorConfig(
+    config: TransportCardConfig,
+): TransportCardConfig {
+    const editorConfig: TransportCardConfig = {
+        ...config,
+        ...normalizeConfig(config),
+    };
+    // Showing all departures is the meaning of a missing max_departures.
+    if (editorConfig.max_departures === undefined) {
+        delete editorConfig.max_departures;
+    }
+    return editorConfig;
+}
+
 // A YAML config can hold any value. Departures are cut with slice, which reads
 // null as 0 and would hide every departure, so only a count is kept.
 function isPositiveInteger(value: unknown): value is number {

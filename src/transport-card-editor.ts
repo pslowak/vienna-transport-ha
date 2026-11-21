@@ -3,7 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import { TRANSPORT_CARD_EDITOR_NAME } from "./constants.ts";
 import type { HomeAssistant, LovelaceCardEditor } from "./ha.ts";
 import {
-    normalizeConfig,
+    toEditorConfig,
     type TransportCardConfig,
 } from "./transport-card-config.ts";
 import { getHassLanguage, t } from "./i18n.ts";
@@ -32,10 +32,7 @@ export class TransportCardEditor
     static styles = unsafeCSS(editorStyles);
 
     setConfig(config: TransportCardConfig): void {
-        this._config = {
-            ...config,
-            show_traffic_infos: normalizeConfig(config).show_traffic_infos,
-        };
+        this._config = toEditorConfig(config);
     }
 
     render() {

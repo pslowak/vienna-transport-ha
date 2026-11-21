@@ -3,6 +3,7 @@ import type { Departure, Line } from "./api.ts";
 import { visibleDepartures } from "./departures.ts";
 import {
     normalizeConfig,
+    toEditorConfig,
     type TransportCardConfig,
 } from "./transport-card-config.ts";
 
@@ -99,5 +100,41 @@ describe("normalizeConfig", () => {
             show_traffic_infos: null,
         } as unknown as TransportCardConfig;
         expect(normalizeConfig(config).show_traffic_infos).toBe(true);
+    });
+});
+
+describe("toEditorConfig", () => {
+    it("shows the editor the values the card resolved from malformed input", () => {
+        const config = {
+            ...minimal,
+            lines: "U4",
+            max_departures: 0,
+            show_traffic_infos: null,
+        } as unknown as TransportCardConfig;
+        expect(toEditorConfig(config)).toEqual({
+            type: "custom:transport-card",
+            entity: "sensor.mock_station",
+            lines: [],
+            show_traffic_infos: true,
+        });
+    });
+
+    it("leaves out max_departures when all departures are shown", () => {
+        const config = {
+            ...minimal,
+            max_departures: null,
+        } as unknown as TransportCardConfig;
+        expect(toEditorConfig(config)).not.toHaveProperty("max_departures");
+    });
+
+    it("keeps valid options, the card type and other keys", () => {
+        const config = {
+            ...minimal,
+            lines: ["U4"],
+            max_departures: 5,
+            show_traffic_infos: false,
+            grid_options: { columns: 6 },
+        } as TransportCardConfig;
+        expect(toEditorConfig(config)).toEqual(config);
     });
 });
