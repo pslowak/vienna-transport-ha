@@ -25,7 +25,15 @@ export function normalizeConfig(
     return {
         entity: config.entity,
         lines: Array.isArray(config.lines) ? config.lines : [],
-        max_departures: config.max_departures,
+        max_departures: isPositiveInteger(config.max_departures)
+            ? config.max_departures
+            : undefined,
         show_traffic_infos: config.show_traffic_infos !== false,
     };
+}
+
+// A YAML config can hold any value. Departures are cut with slice, which reads
+// null as 0 and would hide every departure, so only a count is kept.
+function isPositiveInteger(value: unknown): value is number {
+    return Number.isInteger(value) && (value as number) > 0;
 }
