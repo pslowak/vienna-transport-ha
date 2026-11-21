@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import type { Departure, Line, Stop, Vehicle } from "./api.ts";
-import type { TransportCardConfig } from "./transport-card-config.ts";
 import {
     departureTiming,
     formatDelay,
@@ -37,42 +36,22 @@ function stop(lines: Line[]): Stop {
     return { props: { id: 1, name: "Volkertplatz" }, lines, traffic_infos: [] };
 }
 
-function config(lines?: string[], maxDepartures?: number): TransportCardConfig {
-    return {
-        type: "custom:transport-card",
-        entity: "sensor.mock_station",
-        lines,
-        max_departures: maxDepartures,
-    };
-}
-
 describe("selectLines", () => {
     const all = stop([line("U4"), line("U6"), line("71")]);
 
     it("returns all lines when no lines are configured", () => {
-        expect(selectLines(all, config())).toEqual(all.lines);
-    });
-
-    it("returns all lines when the configured list is empty", () => {
-        expect(selectLines(all, config([]))).toEqual(all.lines);
+        expect(selectLines(all, [])).toEqual(all.lines);
     });
 
     it("keeps only configured lines in stop order", () => {
-        expect(
-            selectLines(all, config(["71", "U4"])).map((l) => l.name),
-        ).toEqual(["U4", "71"]);
+        expect(selectLines(all, ["71", "U4"]).map((l) => l.name)).toEqual([
+            "U4",
+            "71",
+        ]);
     });
 
     it("returns nothing when no line matches", () => {
-        expect(selectLines(all, config(["U9"]))).toEqual([]);
-    });
-
-    it("ignores a non-array value instead of crashing", () => {
-        const malformed = {
-            ...config(),
-            lines: "U4",
-        } as unknown as TransportCardConfig;
-        expect(selectLines(all, malformed)).toEqual(all.lines);
+        expect(selectLines(all, ["U9"])).toEqual([]);
     });
 });
 

@@ -1,5 +1,4 @@
 import type { Departure, Line, Stop } from "./api.ts";
-import type { TransportCardConfig } from "./transport-card-config.ts";
 import { t } from "./i18n.ts";
 
 /** Wait in minutes from which the actual clock time is shown instead. */
@@ -17,9 +16,8 @@ export interface DepartureTiming {
     actual: Date;
 }
 
-export function selectLines(stop: Stop, config: TransportCardConfig): Line[] {
-    const names = config.lines;
-    if (!Array.isArray(names) || names.length === 0) {
+export function selectLines(stop: Stop, names: string[]): Line[] {
+    if (names.length === 0) {
         return stop.lines;
     }
     return stop.lines.filter((line) => names.includes(line.name));

@@ -6,7 +6,11 @@ import {
     TRANSPORT_CARD_NAME,
 } from "./constants.ts";
 import type { HomeAssistant, LovelaceCard } from "./ha.ts";
-import type { TransportCardConfig } from "./transport-card-config.ts";
+import {
+    normalizeConfig,
+    type ResolvedTransportCardConfig,
+    type TransportCardConfig,
+} from "./transport-card-config.ts";
 import "./registration.ts";
 import "./transport-card-editor.ts";
 import { getHassLanguage, t } from "./i18n.ts";
@@ -21,7 +25,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
     @state() private _lang: string = "en";
 
-    @state() private config?: TransportCardConfig;
+    @state() private config?: ResolvedTransportCardConfig;
 
     @state() private _now: Date = new Date();
 
@@ -31,6 +35,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
         return document.createElement(TRANSPORT_CARD_EDITOR_NAME);
     }
 
+    /** Starting values for a card added in the UI, not the defaults of missing options. */
     static getStubConfig(): TransportCardConfig {
         return {
             type: "custom:transport-card",
@@ -70,7 +75,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
         if (!config.entity) {
             throw new Error(t("card.config.entity_required", this._lang));
         }
-        this.config = config;
+        this.config = normalizeConfig(config);
     }
 
     getCardSize(): number {
@@ -95,13 +100,12 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
         const stop = entity.attributes as unknown as Stop;
         const config = this.config;
-        const showTrafficInfos = config.show_traffic_infos !== false;
-        const lines: Line[] = selectLines(stop, config);
+        const lines: Line[] = selectLines(stop, config.lines);
 
         if (lines.length === 0) {
             return html`
                 <ha-card>
-                    ${renderTrafficInfos(stop.traffic_infos, this._lang, showTrafficInfos)}
+                    ${renderTrafficInfos(stop.traffic_infos, this._lang, config.show_traffic_infos)}
                     ${t("card.state.no_departures", this._lang)}
                 </ha-card>
             `;
@@ -109,7 +113,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
 
         return html`
             <ha-card>
-                ${renderTrafficInfos(stop.traffic_infos, this._lang, showTrafficInfos)}
+                ${renderTrafficInfos(stop.traffic_infos, this._lang, config.show_traffic_infos)}
                 <div class="stop">
                     <span>${stop.props.name}</span>
                     ${lines.map((line: Line) =>
@@ -120,7 +124,11 @@ export class TransportCard extends LitElement implements LovelaceCard {
         `;
     }
 
-    private renderLine(line: Line, config: TransportCardConfig, now: Date) {
+    private renderLine(
+        line: Line,
+        config: ResolvedTransportCardConfig,
+        now: Date,
+    ) {
         const departures = visibleDepartures(line, config.max_departures, now);
 
         return html`
@@ -128,7 +136,7 @@ export class TransportCard extends LitElement implements LovelaceCard {
                 ${renderTrafficInfos(
                     line.traffic_infos,
                     this._lang,
-                    config.show_traffic_infos !== false,
+                    config.show_traffic_infos,
                 )}
                 ${departures.map((dep) =>
                     renderDepartureRow(dep, line, this._lang, now),
