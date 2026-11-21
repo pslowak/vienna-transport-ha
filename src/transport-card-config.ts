@@ -1,11 +1,14 @@
 import type { LovelaceCardConfig } from "./ha.ts";
+import { t } from "./i18n.ts";
 
+// YAML writes an option without a value as null, so null means the option is not set.
 export interface TransportCardConfig extends LovelaceCardConfig {
     type: "custom:transport-card";
     entity: string;
-    lines?: Array<string>;
-    max_departures?: number;
-    show_traffic_infos?: boolean;
+    /** Line names; YAML reads names like 71 as numbers. */
+    lines?: Array<string | number> | null;
+    max_departures?: number | null;
+    show_traffic_infos?: boolean | null;
 }
 
 /** Card config with each option resolved to the value the card uses. */
@@ -18,37 +21,49 @@ export interface ResolvedTransportCardConfig {
     show_traffic_infos: boolean;
 }
 
-/** Resolves the options a user left out, or set to an unusable value, to their defaults. */
-export function normalizeConfig(
+/**
+ * Checks the options of a config, throwing an error that names the invalid option.
+ *
+ * The entity is not checked: the editor starts from a config without one.
+ */
+export function assertConfig(
+    config: LovelaceCardConfig,
+    lang?: string,
+): asserts config is TransportCardConfig {
+    const { lines, max_departures, show_traffic_infos } = config;
+
+    if (lines != null && !isLineList(lines)) {
+        throw new Error(t("card.config.invalid_lines", lang));
+    }
+    if (max_departures != null && !isPositiveInteger(max_departures)) {
+        throw new Error(t("card.config.invalid_max_departures", lang));
+    }
+    if (show_traffic_infos != null && typeof show_traffic_infos !== "boolean") {
+        throw new Error(t("card.config.invalid_show_traffic_infos", lang));
+    }
+}
+
+/** Resolves the options a config leaves out to their defaults. */
+export function resolveConfig(
     config: TransportCardConfig,
 ): ResolvedTransportCardConfig {
     return {
         entity: config.entity,
-        lines: Array.isArray(config.lines) ? config.lines : [],
-        max_departures: isPositiveInteger(config.max_departures)
-            ? config.max_departures
-            : undefined,
-        show_traffic_infos: config.show_traffic_infos !== false,
+        lines: (config.lines ?? []).map(String),
+        max_departures: config.max_departures ?? undefined,
+        show_traffic_infos: config.show_traffic_infos ?? true,
     };
 }
 
-/** Merges the resolved options into the config, keeping its type and other keys. */
-export function toEditorConfig(
-    config: TransportCardConfig,
-): TransportCardConfig {
-    const editorConfig: TransportCardConfig = {
-        ...config,
-        ...normalizeConfig(config),
-    };
-    // Showing all departures is the meaning of a missing max_departures.
-    if (editorConfig.max_departures === undefined) {
-        delete editorConfig.max_departures;
-    }
-    return editorConfig;
+function isLineList(value: unknown): value is Array<string | number> {
+    return (
+        Array.isArray(value) &&
+        value.every(
+            (line) => typeof line === "string" || typeof line === "number",
+        )
+    );
 }
 
-// A YAML config can hold any value. Departures are cut with slice, which reads
-// null as 0 and would hide every departure, so only a count is kept.
 function isPositiveInteger(value: unknown): value is number {
     return Number.isInteger(value) && (value as number) > 0;
 }

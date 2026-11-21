@@ -7,7 +7,8 @@ import {
 } from "./constants.ts";
 import type { HomeAssistant, LovelaceCard } from "./ha.ts";
 import {
-    normalizeConfig,
+    assertConfig,
+    resolveConfig,
     type ResolvedTransportCardConfig,
     type TransportCardConfig,
 } from "./transport-card-config.ts";
@@ -75,7 +76,9 @@ export class TransportCard extends LitElement implements LovelaceCard {
         if (!config.entity) {
             throw new Error(t("card.config.entity_required", this._lang));
         }
-        this.config = normalizeConfig(config);
+        // Home Assistant shows the error of an invalid config as an error card.
+        assertConfig(config, this._lang);
+        this.config = resolveConfig(config);
     }
 
     getCardSize(): number {

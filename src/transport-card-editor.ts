@@ -3,7 +3,8 @@ import { customElement, property, state } from "lit/decorators.js";
 import { TRANSPORT_CARD_EDITOR_NAME } from "./constants.ts";
 import type { HomeAssistant, LovelaceCardEditor } from "./ha.ts";
 import {
-    toEditorConfig,
+    assertConfig,
+    resolveConfig,
     type TransportCardConfig,
 } from "./transport-card-config.ts";
 import { getHassLanguage, t } from "./i18n.ts";
@@ -32,24 +33,34 @@ export class TransportCardEditor
     static styles = unsafeCSS(editorStyles);
 
     setConfig(config: TransportCardConfig): void {
-        this._config = toEditorConfig(config);
+        // Home Assistant switches to the YAML editor for an invalid config.
+        assertConfig(config, this._lang);
+        this._config = config;
     }
 
     render() {
-        if (!this.hass) {
+        if (!this.hass || !this._config) {
             return nothing;
         }
 
         return html`
             <ha-form
                 .hass=${this.hass}
-                .data=${this._config}
+                .data=${this.formData(this._config)}
                 .schema=${this.schema}
                 .computeLabel=${this.computeLabel}
                 .computeHelper=${this.computeHelper}
                 @value-changed=${this.onValueChanged}
             ></ha-form>
         `;
+    }
+
+    // Shows the toggle with its default, without writing it into the config.
+    private formData(config: TransportCardConfig): TransportCardConfig {
+        return {
+            ...config,
+            show_traffic_infos: resolveConfig(config).show_traffic_infos,
+        };
     }
 
     private get schema() {
@@ -120,7 +131,7 @@ export class TransportCardEditor
             ...this._config,
             ...value,
             lines: (value.lines ?? this._config?.lines ?? []).filter(
-                (line) => line?.trim().length > 0,
+                (line) => String(line).trim().length > 0,
             ),
         };
 
