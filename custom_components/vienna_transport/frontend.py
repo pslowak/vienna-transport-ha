@@ -7,6 +7,7 @@ from homeassistant.components.http.server import StaticPathConfig
 from homeassistant.components.lovelace import LovelaceData
 from homeassistant.components.lovelace.resources import ResourceStorageCollection
 from homeassistant.core import HomeAssistant
+from homeassistant.loader import async_get_integration
 
 from .const import DOMAIN
 
@@ -63,10 +64,40 @@ async def async_register_card(hass: HomeAssistant) -> None:
         resources.loaded = True
         _LOGGER.debug("Lovelace resource collection loaded from storage")
 
-    existing = [r for r in resources.async_items() if r.get("url") == CARD_URL]
-    if existing:
+    await _async_register_resource(resources, await _async_card_url(hass))
+
+
+async def _async_card_url(hass: HomeAssistant) -> str:
+    # The card is served with long-lived cache headers. A version in the
+    # resource URL makes browsers fetch the new card after an update instead
+    # of keeping the cached one.
+    integration = await async_get_integration(hass, DOMAIN)
+    if integration.version is None:
+        return CARD_URL
+    return f"{CARD_URL}?v={integration.version}"
+
+
+async def _async_register_resource(
+    resources: ResourceStorageCollection, url: str
+) -> None:
+    existing = [r for r in resources.async_items() if _is_card_url(r.get("url"))]
+
+    if any(r.get("url") == url for r in existing):
         _LOGGER.debug("Card resource already registered, skipping")
         return
 
-    await resources.async_create_item({"res_type": "module", "url": CARD_URL})
-    _LOGGER.info("Registered Transport Card as Lovelace resource: %s", CARD_URL)
+    if existing:
+        # Update the resource of an older version in place: a second resource
+        # would load the card twice and fail to define its element again.
+        await resources.async_update_item(
+            existing[0]["id"], {"res_type": "module", "url": url}
+        )
+        _LOGGER.info("Updated Transport Card Lovelace resource: %s", url)
+        return
+
+    await resources.async_create_item({"res_type": "module", "url": url})
+    _LOGGER.info("Registered Transport Card as Lovelace resource: %s", url)
+
+
+def _is_card_url(url: object) -> bool:
+    return isinstance(url, str) and (url == CARD_URL or url.startswith(f"{CARD_URL}?"))
