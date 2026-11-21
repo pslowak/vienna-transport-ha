@@ -6,6 +6,7 @@ import { t } from "./i18n.ts";
 import {
     assertConfig,
     resolveConfig,
+    toSavedConfig,
     type TransportCardConfig,
 } from "./transport-card-config.ts";
 
@@ -131,5 +132,57 @@ describe("resolveConfig", () => {
         expect(
             visibleDepartures(line, resolveConfig(config).max_departures, now),
         ).toHaveLength(2);
+    });
+});
+
+describe("toSavedConfig", () => {
+    // The form sends all its data, including the toggle default it displays.
+    const formDefaults = { lines: [], show_traffic_infos: true };
+
+    it("keeps unset options out when another option is edited", () => {
+        const formValue = { ...minimal, ...formDefaults, max_departures: 5 };
+        expect(toSavedConfig(minimal, formValue)).toEqual({
+            ...minimal,
+            max_departures: 5,
+        });
+    });
+
+    it("saves the traffic info toggle once it is turned off", () => {
+        const formValue = {
+            ...minimal,
+            ...formDefaults,
+            show_traffic_infos: false,
+        };
+        expect(toSavedConfig(minimal, formValue)).toEqual({
+            ...minimal,
+            show_traffic_infos: false,
+        });
+    });
+
+    it("keeps the traffic info toggle when the config set it", () => {
+        const previous = { ...minimal, show_traffic_infos: true };
+        const formValue = { ...previous, lines: [] };
+        expect(toSavedConfig(previous, formValue)).toEqual(previous);
+    });
+
+    it("drops blank line names", () => {
+        const formValue = {
+            ...minimal,
+            ...formDefaults,
+            lines: ["U4", " ", ""],
+        };
+        expect(toSavedConfig(minimal, formValue).lines).toEqual(["U4"]);
+    });
+
+    it("keeps an emptied list when the config set lines", () => {
+        const previous = { ...minimal, lines: ["U4"] };
+        const formValue = { ...previous, ...formDefaults };
+        expect(toSavedConfig(previous, formValue).lines).toEqual([]);
+    });
+
+    it("keeps the card type and other keys", () => {
+        const previous = { ...minimal, grid_options: { columns: 6 } };
+        const formValue = { ...previous, ...formDefaults };
+        expect(toSavedConfig(previous, formValue)).toEqual(previous);
     });
 });

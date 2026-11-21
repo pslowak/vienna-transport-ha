@@ -5,6 +5,7 @@ import type { HomeAssistant, LovelaceCardEditor } from "./ha.ts";
 import {
     assertConfig,
     resolveConfig,
+    toSavedConfig,
     type TransportCardConfig,
 } from "./transport-card-config.ts";
 import { getHassLanguage, t } from "./i18n.ts";
@@ -55,7 +56,7 @@ export class TransportCardEditor
         `;
     }
 
-    // Shows the toggle with its default, without writing it into the config.
+    // Shows the toggle with its default; toSavedConfig keeps it out of the config.
     private formData(config: TransportCardConfig): TransportCardConfig {
         return {
             ...config,
@@ -123,17 +124,13 @@ export class TransportCardEditor
     };
 
     private onValueChanged(ev: CustomEvent) {
-        const value = ev.detail.value as Partial<TransportCardConfig>;
-
-        const newConfig: TransportCardConfig = {
-            type: "custom:transport-card",
-            entity: "",
-            ...this._config,
-            ...value,
-            lines: (value.lines ?? this._config?.lines ?? []).filter(
-                (line) => String(line).trim().length > 0,
-            ),
-        };
+        if (!this._config) {
+            return;
+        }
+        const newConfig = toSavedConfig(
+            this._config,
+            ev.detail.value as TransportCardConfig,
+        );
 
         this.dispatchEvent(
             new CustomEvent("config-changed", {

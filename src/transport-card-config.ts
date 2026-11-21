@@ -55,6 +55,38 @@ export function resolveConfig(
     };
 }
 
+/**
+ * Builds the config to save from the editor form.
+ *
+ * The form sends all its data on every change, including defaults it only
+ * displays. Options the previous config left unset stay unset while they
+ * keep their default.
+ */
+export function toSavedConfig(
+    previous: TransportCardConfig,
+    formValue: TransportCardConfig,
+): TransportCardConfig {
+    const config: TransportCardConfig = { ...previous, ...formValue };
+
+    const lines = (config.lines ?? []).filter(
+        (line) => String(line).trim().length > 0,
+    );
+    if (lines.length > 0 || previous.lines != null) {
+        config.lines = lines;
+    } else {
+        delete config.lines;
+    }
+
+    if (
+        config.show_traffic_infos === true &&
+        previous.show_traffic_infos == null
+    ) {
+        delete config.show_traffic_infos;
+    }
+
+    return config;
+}
+
 function isLineList(value: unknown): value is Array<string | number> {
     return (
         Array.isArray(value) &&
