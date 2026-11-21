@@ -57,6 +57,8 @@ describe("assertConfig", () => {
         ["lines", "U4", "card.config.invalid_lines"],
         ["lines", [true], "card.config.invalid_lines"],
         ["lines", [{ name: "U4" }], "card.config.invalid_lines"],
+        ["lines", [NaN], "card.config.invalid_lines"],
+        ["lines", [Infinity], "card.config.invalid_lines"],
         ["max_departures", 0, "card.config.invalid_max_departures"],
         ["max_departures", -1, "card.config.invalid_max_departures"],
         ["max_departures", 2.5, "card.config.invalid_max_departures"],
@@ -64,7 +66,7 @@ describe("assertConfig", () => {
         ["max_departures", "3", "card.config.invalid_max_departures"],
         ["show_traffic_infos", "no", "card.config.invalid_show_traffic_infos"],
         ["show_traffic_infos", 1, "card.config.invalid_show_traffic_infos"],
-    ])("rejects %s set to %j", (option, value, key) => {
+    ])("rejects %s set to %o", (option, value, key) => {
         expect(() => assertConfig(withOption(option, value))).toThrow(t(key));
     });
 

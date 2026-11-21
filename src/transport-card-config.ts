@@ -58,9 +58,7 @@ export function resolveConfig(
 function isLineList(value: unknown): value is Array<string | number> {
     return (
         Array.isArray(value) &&
-        value.every(
-            (line) => typeof line === "string" || typeof line === "number",
-        )
+        value.every((line) => typeof line === "string" || Number.isFinite(line))
     );
 }
 
