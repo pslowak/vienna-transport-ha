@@ -4,11 +4,11 @@ import csv
 import logging
 from pathlib import Path
 
-from custom_components.vienna_transport.stop_list import StopListEntry
+from custom_components.vienna_transport.setup.model import StopListEntry
 
 _LOGGER = logging.getLogger(__name__)
 
-_DEFAULT_PATH = Path(__file__).parent / "data" / "stops.csv"
+_DEFAULT_PATH = Path(__file__).parent.parent / "data" / "stops.csv"
 _ENCODING = "utf-8"
 _DELIMITER = ";"
 

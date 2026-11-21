@@ -24,8 +24,8 @@ from custom_components.vienna_transport.exceptions import (
 )
 from custom_components.vienna_transport.model import TransportData
 from custom_components.vienna_transport.parser import ViennaTransportParser
-from custom_components.vienna_transport.stop_list_loader import StopListLoader
-from custom_components.vienna_transport.stop_list_query import StopListQuery
+from custom_components.vienna_transport.setup.loader import StopListLoader
+from custom_components.vienna_transport.setup.query import StopListQuery
 from custom_components.vienna_transport.validator import ViennaTransportValidator
 
 _LOGGER = logging.getLogger(__name__)

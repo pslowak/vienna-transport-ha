@@ -1,5 +1,5 @@
-from custom_components.vienna_transport.stop_list import StopListEntry
-from custom_components.vienna_transport.stop_list_query import StopListQuery
+from custom_components.vienna_transport.setup.model import StopListEntry
+from custom_components.vienna_transport.setup.query import StopListQuery
 
 
 def _entry(stop_id: int, name: str, line: str, towards: str) -> StopListEntry:

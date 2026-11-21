@@ -3,10 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from custom_components.vienna_transport.stop_list import StopListEntry
-from custom_components.vienna_transport.stop_list_loader import StopListLoader
+from custom_components.vienna_transport.setup.loader import StopListLoader
+from custom_components.vienna_transport.setup.model import StopListEntry
 
-FIXTURES_DIR = Path(__file__).parent / "fixtures"
+FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 
 
 def test_load_returns_entries_in_file_order() -> None:
