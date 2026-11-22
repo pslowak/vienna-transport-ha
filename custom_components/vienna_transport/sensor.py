@@ -40,6 +40,9 @@ class ViennaTransportSensor(
     """Sensor entity representing departures for one stop."""
 
     _attr_has_entity_name = True
+    # Departures change on every poll, so recording them would add a large
+    # history row per stop and minute. The card reads the live state only.
+    _unrecorded_attributes = frozenset({"lines", "traffic_infos"})
 
     def __init__(self, coordinator: ViennaTransportCoordinator, stop_id: int) -> None:
         """Initialize sensor.
