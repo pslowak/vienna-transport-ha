@@ -3,7 +3,7 @@
 <p align="center"><em>Real-time departures for Vienna's public transport, right on your Home Assistant dashboard.</em></p>
 
 [![GitHub Release](https://img.shields.io/github/v/release/pslowak/vienna-transport-ha)](https://github.com/pslowak/vienna-transport-ha/releases/latest)
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![Marketplace](https://img.shields.io/badge/Marketplace-Custom-orange.svg)](https://www.home-assistant.io/integrations/marketplace/)
 [![codecov](https://codecov.io/gh/pslowak/vienna-transport-ha/branch/main/graph/badge.svg)](https://codecov.io/gh/pslowak/vienna-transport-ha)
 [![backend tests](https://github.com/pslowak/vienna-transport-ha/actions/workflows/be-test.yml/badge.svg)](https://github.com/pslowak/vienna-transport-ha/actions/workflows/be-test.yml)
 
@@ -29,11 +29,17 @@ A custom integration and Lovelace card for [Home Assistant](https://www.home-ass
 
 ## Installation
 
-### HACS (recommended)
+### Marketplace (recommended)
 
-1. In HACS go to **Settings → Custom repositories** and add `https://github.com/pslowak/vienna-transport-ha` (category: **Integration**).
-2. Search for *Vienna Public Transport*, and download it.
-3. Restart Home Assistant.
+[![Open your Home Assistant instance and open this repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=pslowak&repository=vienna-transport-ha&category=integration)
+
+Or add it manually:
+
+1. Go to **Settings → Marketplace** and select **Add from link**.
+2. Enter `https://github.com/pslowak/vienna-transport-ha` and select **Add**. If you haven't connected GitHub yet, Home Assistant asks you to sign in first.
+3. Open *Vienna Public Transport* and select **Install**.
+
+On Home Assistant 2026.10, use HACS instead: go to **HACS → Custom repositories**, add the repository URL (category: **Integration**), download it and restart Home Assistant.
 
 ### Manual
 
