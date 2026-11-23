@@ -87,7 +87,7 @@ max_departures: 3
 uv sync --extra dev                   # Install dependencies
 uv run pytest                         # Run tests
 uv run ruff check                     # Linting
-uv run mypy custom_components tests   # Type checking
+uv run mypy                           # Type checking
 uv run scripts/build_stop_list.py     # Build the stop list
 ```
 
