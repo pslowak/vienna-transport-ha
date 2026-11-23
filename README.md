@@ -43,7 +43,7 @@ On Home Assistant 2026.10, use HACS instead: go to **HACS → Custom repositorie
 
 ### Manual
 
-1. Download the latest release from the [GitHub releases page](https://github.com/pslowak/vienna-transport-ha/releases). 
+1. Download `vienna-transport.zip` from the [latest release](https://github.com/pslowak/vienna-transport-ha/releases/latest) and unpack it.
 2. Copy `custom_components/vienna_transport/` into your `custom_components/` directory.
 3. Restart Home Assistant.
 
