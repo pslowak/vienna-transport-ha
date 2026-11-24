@@ -39,7 +39,7 @@ Or add it manually:
 2. Enter `https://github.com/pslowak/vienna-transport-ha` and select **Add**. If you haven't connected GitHub yet, Home Assistant asks you to sign in first.
 3. Open *Vienna Public Transport* and select **Install**.
 
-On Home Assistant 2026.10, use HACS instead: go to **HACS → Custom repositories**, add the repository URL (category: **Integration**), download it and restart Home Assistant.
+On Home Assistant versions before 2026.11, use HACS instead: go to **HACS → Custom repositories**, add the repository URL (category: **Integration**), download it and restart Home Assistant.
 
 ### Manual
 
