@@ -54,7 +54,7 @@ On Home Assistant versions before 2026.11, use HACS instead: go to **HACS → Cu
 3. Choose how to find the stop you want to monitor:
    - **Find stop by line**: pick a line, its direction and the stop. Adds one stop.
    - **Enter stop ID**: enter one or more **RBL stop IDs**. You can find stop IDs via the [RBL search](https://till.mabe.at/rbl/).
-4. A sensor entity (e.g. `sensor.vienna_transport_departures_for_stop_2683`) is created for each stop ID.
+4. A sensor entity named after the stop (e.g. `sensor.vienna_transport_volkertplatz_id_2683`) is created for each stop ID.
 5. If the card does not appear in the Lovelace card picker, **clear your browser cache**.
 
 A stop ID stands for a platform, so its sensor shows all lines departing there. Use the card's `lines` option to show only some of them.
@@ -65,7 +65,7 @@ Add the card to your dashboard:
 
 ```yaml
 type: 'custom:transport-card'
-entity: sensor.vienna_transport_departures_for_stop_2683
+entity: sensor.vienna_transport_volkertplatz_id_2683
 max_departures: 3
 ```
 
