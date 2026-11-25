@@ -7,10 +7,11 @@ import {
     type TransportCardConfig,
 } from "./transport-card-config.ts";
 import { getHassLanguage, t } from "./i18n.ts";
+import type en from "./translations/en.json";
 import editorStyles from "./transport-card-editor.css?inline";
 
 interface EditorSchema {
-    name: string;
+    name: keyof typeof en.editor.fields;
 }
 
 @customElement(TRANSPORT_CARD_EDITOR_NAME)
