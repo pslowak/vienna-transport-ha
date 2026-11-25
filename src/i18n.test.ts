@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { t } from "./i18n.ts";
 
 describe("t", () => {
@@ -62,6 +62,17 @@ describe("t", () => {
         it("returns key if intermediate segment does not exist", () => {
             const key = "card.missing.entity_not_found";
             expect(t(key, "en")).toBe(key);
+        });
+
+        it("falls back to English if key is missing in the language", async () => {
+            vi.resetModules();
+            vi.doMock("./translations/de.json", () => ({ default: {} }));
+            const { t: tWithoutGerman } = await import("./i18n.ts");
+            vi.doUnmock("./translations/de.json");
+
+            expect(tWithoutGerman("editor.fields.entity.label", "de")).toBe(
+                "Entity",
+            );
         });
     });
 
