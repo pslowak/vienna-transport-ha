@@ -77,6 +77,7 @@ flowchart LR
 | Orchestration  | `ViennaTransportCoordinator` | `coordinator.py`  | Polls the registered stops every 60s and dispatches `TransportData` to sensors. Falls back to Cache on client, validation or parser errors. |
 | Orchestration  | `ExpiringCache`              | `cache.py`        | TTL cache of last good `Stop` per stop ID for resilience during API outages.                                                                |
 | Infrastructure | `ViennaTransportClient`      | `client.py`       | Fetches raw departure data from the Wiener Linien API for all registered stops.                                                             |
+| Infrastructure | `Response`                   | `schema.py`       | Pydantic models of the API response format.                                                                                                 |
 | Infrastructure | `ViennaTransportValidator`   | `validator.py`    | Checks the structure of raw API responses with pydantic, before they are parsed.                                                            |
 | Infrastructure | `ViennaTransportParser`      | `parser.py`       | Converts raw API response into typed `Model` data.                                                                                          |
 | Infrastructure | `StopListLoader`             | `setup/loader.py` | Loads the stop list for the Config Flow.                                                                                                    |
