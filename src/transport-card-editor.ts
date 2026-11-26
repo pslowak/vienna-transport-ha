@@ -7,10 +7,11 @@ import {
     type TransportCardConfig,
 } from "./transport-card-config.ts";
 import { getHassLanguage, t } from "./i18n.ts";
+import type en from "./translations/en.json";
 import editorStyles from "./transport-card-editor.css?inline";
 
 interface EditorSchema {
-    name: string;
+    name: keyof typeof en.editor.fields;
 }
 
 @customElement(TRANSPORT_CARD_EDITOR_NAME)
@@ -84,35 +85,11 @@ export class TransportCardEditor
         ];
     }
 
-    private computeLabel = (schema: EditorSchema) => {
-        switch (schema.name) {
-            case "entity":
-                return t("editor.fields.entity.label", this._lang);
-            case "max_departures":
-                return t("editor.fields.max_departures.label", this._lang);
-            case "show_traffic_infos":
-                return t("editor.fields.show_traffic_infos.label", this._lang);
-            case "lines":
-                return t("editor.fields.lines.label", this._lang);
-        }
+    private computeLabel = (schema: EditorSchema) =>
+        t(`editor.fields.${schema.name}.label`, this._lang);
 
-        return schema.name || undefined;
-    };
-
-    private computeHelper = (schema: EditorSchema) => {
-        switch (schema.name) {
-            case "entity":
-                return t("editor.fields.entity.helper", this._lang);
-            case "max_departures":
-                return t("editor.fields.max_departures.helper", this._lang);
-            case "show_traffic_infos":
-                return t("editor.fields.show_traffic_infos.helper", this._lang);
-            case "lines":
-                return t("editor.fields.lines.helper", this._lang);
-        }
-
-        return undefined;
-    };
+    private computeHelper = (schema: EditorSchema) =>
+        t(`editor.fields.${schema.name}.helper`, this._lang);
 
     private onValueChanged(ev: CustomEvent) {
         const value = ev.detail.value as Partial<TransportCardConfig>;
