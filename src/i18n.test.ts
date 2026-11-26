@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { t } from "./i18n.ts";
+import { t, type TranslationKey } from "./i18n.ts";
 
 describe("t", () => {
     describe("language resolution", () => {
@@ -50,17 +50,17 @@ describe("t", () => {
 
     describe("missing keys", () => {
         it("returns key if key does not exist", () => {
-            const key = "key.does.not.exist";
+            const key = "key.does.not.exist" as TranslationKey;
             expect(t(key, "en")).toBe(key);
         });
 
         it("returns key if key points to subtree", () => {
-            const key = "meta";
+            const key = "meta" as TranslationKey;
             expect(t(key, "en")).toBe(key);
         });
 
         it("returns key if intermediate segment does not exist", () => {
-            const key = "card.missing.entity_not_found";
+            const key = "card.missing.entity_not_found" as TranslationKey;
             expect(t(key, "en")).toBe(key);
         });
     });

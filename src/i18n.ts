@@ -4,6 +4,14 @@ import de from "./translations/de.json";
 
 type TranslationVal = string | { [key: string]: TranslationVal };
 
+/** Dotted paths to the texts of a translation bundle. */
+type Paths<T> = {
+    [K in keyof T & string]: T[K] extends string ? K : `${K}.${Paths<T[K]>}`;
+}[keyof T & string];
+
+/** A key of a text in the English bundle, e.g. "card.time.now". */
+export type TranslationKey = Paths<typeof en>;
+
 const LOCALE_REGISTRY: Record<string, TranslationVal> = {
     en,
     de,
@@ -33,7 +41,7 @@ function resolveRegistryKey(lang: string): string {
 }
 
 export function t(
-    key: string,
+    key: TranslationKey,
     lang: string = DEFAULT_LANG,
     replacements?: Record<string, string | number>,
 ): string {
