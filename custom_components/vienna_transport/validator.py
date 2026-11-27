@@ -18,7 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 class ViennaTransportValidator:
     """Validator for checking raw API data before it is parsed."""
 
-    def validate(self, raw_batches: list[dict[str, Any]]) -> None:
+    def validate(self, raw_batches: list[dict[str, Any]]) -> list[Response]:
         """Validate batched raw API responses.
 
         Only successful responses are checked in full: Responses with any other
@@ -28,20 +28,24 @@ class ViennaTransportValidator:
             raw_batches: Raw JSON responses from Wiener Linien monitor API,
                 one per batch.
 
+        Returns:
+            One validated response per batch, in the same order: an OkResponse
+            for a successful batch, a Response with only its message otherwise.
+
         Raises:
             ValidationError: If any batch does not match the expected structure.
 
         """
         _LOGGER.debug("Validating %d batch(es)", len(raw_batches))
-        for raw in raw_batches:
-            self._validate_one(raw)
+        return [self._validate_one(raw) for raw in raw_batches]
 
     @staticmethod
-    def _validate_one(raw: dict[str, Any]) -> None:
+    def _validate_one(raw: dict[str, Any]) -> Response:
         try:
             response = Response.model_validate(raw)
             if response.message.message_code == MessageCode.OK:
-                OkResponse.model_validate(raw)
+                return OkResponse.model_validate(raw)
+            return response
         except pydantic.ValidationError as e:
             error = ViennaTransportValidator._to_validation_error(e)
             _LOGGER.warning("%s", error)
