@@ -40,23 +40,27 @@ function resolveRegistryKey(lang: string): string {
     return DEFAULT_LANG;
 }
 
+function lookup(lang: string, key: string): string | undefined {
+    const value = key
+        .split(".")
+        .reduce<TranslationVal | undefined>(
+            (node, segment) =>
+                (node as Record<string, TranslationVal>)?.[segment],
+            LOCALE_REGISTRY[lang],
+        );
+    return typeof value === "string" ? value : undefined;
+}
+
 export function t(
     key: TranslationKey,
     lang: string = DEFAULT_LANG,
     replacements?: Record<string, string | number>,
 ): string {
     const registryKey = resolveRegistryKey(lang);
-    const bundle = LOCALE_REGISTRY[registryKey];
+    // A key missing in the user's language falls back to English.
+    const value = lookup(registryKey, key) ?? lookup(DEFAULT_LANG, key);
 
-    const value = key
-        .split(".")
-        .reduce<TranslationVal | undefined>(
-            (node, segment) =>
-                (node as Record<string, TranslationVal>)?.[segment],
-            bundle,
-        );
-
-    if (typeof value !== "string") {
+    if (value === undefined) {
         console.warn(`[i18n] Missing key "${key}" in locale "${registryKey}"`);
         return key;
     }
