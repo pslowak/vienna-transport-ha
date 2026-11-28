@@ -8,6 +8,7 @@ import pytest
 
 import custom_components.vienna_transport as integration
 from custom_components.vienna_transport.exceptions import ValidationError
+from custom_components.vienna_transport.schema import OkResponse, Response
 from custom_components.vienna_transport.validator import ViennaTransportValidator
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -61,8 +62,37 @@ def test_validate_accepts_fixture(
     validator.validate([raw])
 
 
+def test_validate_returns_ok_response_with_data(
+    validator: ViennaTransportValidator, raw: dict[str, Any]
+) -> None:
+    [response] = validator.validate([raw])
+
+    assert isinstance(response, OkResponse)
+    stop = response.data.monitors[0].location_stop.properties
+    assert (stop.title, stop.attributes.rbl) == ("Volkertplatz", 2683)
+
+
+def test_validate_returns_message_only_for_non_ok_response(
+    validator: ViennaTransportValidator,
+) -> None:
+    [response] = validator.validate([{"message": {"messageCode": 316}}])
+
+    assert type(response) is Response
+    assert response.message.message_code == 316
+
+
+def test_validate_returns_one_response_per_batch_in_order(
+    validator: ViennaTransportValidator, raw: dict[str, Any]
+) -> None:
+    error = {"message": {"messageCode": 316}}
+
+    responses = validator.validate([error, raw])
+
+    assert [type(response) for response in responses] == [Response, OkResponse]
+
+
 def test_validate_accepts_empty_list(validator: ViennaTransportValidator) -> None:
-    validator.validate([])
+    assert validator.validate([]) == []
 
 
 def test_validate_does_not_modify_response(
