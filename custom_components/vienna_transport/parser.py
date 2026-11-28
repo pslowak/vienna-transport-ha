@@ -15,17 +15,18 @@ from custom_components.vienna_transport.model import (
     TransportData,
     Vehicle,
 )
+from custom_components.vienna_transport.schema import MessageCode
 
 _LOGGER = logging.getLogger(__name__)
 
-_MSG_CODE_OK = 1
-_MSG_CODE_RATE_LIMIT = 316
-_MSG_CODE_DB_UNAVAILABLE = 311
-_MSG_CODE_STOP_NOT_FOUND = 312
-_MSG_CODE_INVALID_PARAM = 320
-_MSG_CODE_MISSING_PARAM = 321
-_MSG_CODE_NO_DATA = 322
-_MSG_CODE_UNKNOWN = -1
+_ERRORS: dict[int, str] = {
+    MessageCode.DB_UNAVAILABLE: "API unavailable",
+    MessageCode.STOP_NOT_FOUND: "Stop not found",
+    MessageCode.RATE_LIMIT: "API rate limit reached",
+    MessageCode.INVALID_PARAM: "Invalid query parameter",
+    MessageCode.MISSING_PARAM: "Missing query parameter",
+    MessageCode.NO_DATA: "No data in API",
+}
 
 
 class ViennaTransportParser:
@@ -62,9 +63,9 @@ class ViennaTransportParser:
     @staticmethod
     def _parse_one(raw: dict[str, Any]) -> TransportData:
         try:
-            msg_code = raw["message"].get("messageCode", _MSG_CODE_UNKNOWN)
+            msg_code = raw["message"].get("messageCode", MessageCode.UNKNOWN)
 
-            if msg_code == _MSG_CODE_OK:
+            if msg_code == MessageCode.OK:
                 data = raw.get("data", {})
                 raw_monitors = data.get("monitors", [])
 
@@ -83,32 +84,14 @@ class ViennaTransportParser:
 
                 return TransportData(stops={stop.props.id: stop for stop in stops})
 
-            if msg_code == _MSG_CODE_RATE_LIMIT:
-                _LOGGER.warning("API rate limit reached (message code %s)", msg_code)
-                raise ParserError(f"API rate limit reached (message code {msg_code})")
-
-            if msg_code == _MSG_CODE_DB_UNAVAILABLE:
-                _LOGGER.warning("API unavailable (message code %s)", msg_code)
-                raise ParserError(f"API unavailable (message code {msg_code})")
-
-            if msg_code == _MSG_CODE_STOP_NOT_FOUND:
-                _LOGGER.warning("Stop not found (message code %s)", msg_code)
-                raise ParserError(f"Stop not found (message code {msg_code})")
-
-            if msg_code == _MSG_CODE_INVALID_PARAM:
-                _LOGGER.warning("Invalid query parameter (message code %s)", msg_code)
-                raise ParserError(f"Invalid query parameter (message code {msg_code})")
-
-            if msg_code == _MSG_CODE_MISSING_PARAM:
-                _LOGGER.warning("Missing query parameter (message code %s)", msg_code)
-                raise ParserError(f"Missing query parameter (message code {msg_code})")
-
-            if msg_code == _MSG_CODE_NO_DATA:
-                _LOGGER.warning("No data in API (message code %s)", msg_code)
-                raise ParserError(f"No data in API (message code {msg_code})")
-
-            _LOGGER.warning("Unexpected message code %s", msg_code)
-            raise ParserError(f"Unexpected message code {msg_code}")
+            reason = _ERRORS.get(msg_code)
+            error = (
+                f"{reason} (message code {msg_code})"
+                if reason
+                else f"Unexpected message code {msg_code}"
+            )
+            _LOGGER.warning("%s", error)
+            raise ParserError(error)
         except (KeyError, TypeError, ValueError, AttributeError) as e:
             _LOGGER.warning("Unexpected API response %s", e)
             _LOGGER.debug("API response raw: %s", raw)
