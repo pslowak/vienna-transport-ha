@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.1](https://github.com/pslowak/vienna-transport-ha/compare/v1.3.0...v1.3.1) (2026-11-28)
+
+
+### Bug Fixes
+
+* **card:** fall back to English for missing translations ([#269](https://github.com/pslowak/vienna-transport-ha/issues/269)) ([abb7ed6](https://github.com/pslowak/vienna-transport-ha/commit/abb7ed6c065a2c487660d655bc8c73d16a7cb19c))
+* **frontend:** version card resource URL ([#256](https://github.com/pslowak/vienna-transport-ha/issues/256)) ([45a357c](https://github.com/pslowak/vienna-transport-ha/commit/45a357c82bb6dad8b51b6a2c9c86e7fdece3519b))
+* **sensor:** exclude departures from recorder ([#255](https://github.com/pslowak/vienna-transport-ha/issues/255)) ([1e395cc](https://github.com/pslowak/vienna-transport-ha/commit/1e395cc7e4bb65ffe8b8a8b9c59c3cf4777616f8))
+
 ## [1.3.0](https://github.com/pslowak/vienna-transport-ha/compare/v1.2.0...v1.3.0) (2026-11-21)
 
 
