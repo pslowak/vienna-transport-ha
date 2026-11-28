@@ -21,6 +21,12 @@ class MessageCode(IntEnum):
     """Message codes of the API response."""
 
     OK = 1
+    DB_UNAVAILABLE = 311
+    STOP_NOT_FOUND = 312
+    RATE_LIMIT = 316
+    INVALID_PARAM = 320
+    MISSING_PARAM = 321
+    NO_DATA = 322
     UNKNOWN = -1
 
 
